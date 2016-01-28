@@ -115,17 +115,20 @@ loop args prover thy = go False conjs [] thy{ thy_asserts = assums }
   where
   (conjs,assums) = theoryGoals thy
 
+  --       todo   failed
   go _     []     [] _  = do putStrLn "Finished!"
                              return (return ())
   go False []     _ _   = return (return ())
   go True  []     q thy = do putStrLn "Reconsidering conjectures..."
                              go False (reverse q) [] thy
   go b     (c:cs) q thy =
-    do (str,m_lemmas) <- tryProve args prover c thy
-       case m_lemmas of
-         Just lemmas ->
+    do (str,m_result) <- tryProve args prover c thy
+       case m_result of
+         Just (lemmas,coords) ->
            do let lms = thy_asserts thy
               let n = (length lms)
+              --putStrLn "coords on which we inducted:"
+              --print coords
               m <- go True cs q thy{ thy_asserts = makeProved n c:lms }
               return $ do putStrLn $ pad (show n) 2 ++ ": " ++ rpad str 40 ++
                                      if null lemmas then ""
@@ -139,7 +142,7 @@ makeProved i (Formula _ _ tvs b) = Formula Assert (Lemma i) tvs b
 formulaVars :: Formula a -> [Local a]
 formulaVars = fst . forallView . fm_body
 
-tryProve :: Name a => Args -> Prover -> Formula a -> Theory a -> IO (String,Maybe [Int])
+tryProve :: Name a => Args -> Prover -> Formula a -> Theory a -> IO (String, Maybe ProofSketch)
 tryProve args prover fm thy =
   do let (prenex,term) =
            forallView $ fm_body $ head $ thy_asserts $ fmap (\ (Ren x) -> x)
@@ -160,22 +163,30 @@ tryProve args prover fm thy =
 
      (errs,res) <- evalTree (any (not . isSuccess) . map ob_content) ptree
 
-     mlemmas <- case res of
+     mresult <- case res of
        Obligation (ObInduction coords _ n) _:_
          | sort (map (ind_num . ob_info) res) == [0..n-1]
          , all (isSuccess . ob_content) res
            -> do if null coords
                     then putStrLn $ "Proved without using induction"
                     else putStrLn $ "Proved by induction on " ++ intercalate ", " (map (lcl_name . (prenex !!)) coords)
+                 
+                 -- try parsing prover output
                  let steps =
                        [ do (pf,lemmas) <- parsePCL ax_list s
                             putStrLn pf
                             return lemmas
                        | Obligation _ (Success (Just (s,ax_list))) <- res
                        ]
-                 if null steps then return (Just [])
-                   else do putStrLn "Proof:"
-                           (Just . concat) <$> sequence steps
+                 
+                 lemmas <- if null steps
+                             then let numLemmas = (length . thy_asserts) thy
+                                  in  return [0..numLemmas-1] -- afaik, all lemmas were used
+                             else do putStrLn "Proof:"
+                                     lemmas <- concat <$> sequence steps
+                                     return lemmas
+                 let lemmas' = usort lemmas
+                 return $ Just (lemmas', coords)
 
          | otherwise
            -> do putStrLn $ "Confusion :("
@@ -197,7 +208,7 @@ tryProve args prover fm thy =
        | e <-  errs
        ]
 
-     return (ppTerm (toTerm term), if null res then Nothing else fmap usort mlemmas)
+     return (ppTerm (toTerm term), if null res then Nothing else mresult)
 
 obligations :: Name a => Args -> Formula a -> [StandardPass] -> Theory a -> Fresh (Tree (Obligation (Theory a)))
 obligations args fm pre_passes thy0 =
