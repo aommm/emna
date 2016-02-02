@@ -116,28 +116,29 @@ loop args prover thy = go False conjs [] thy{ thy_asserts = assums }
   (conjs,assums) = theoryGoals thy
 
   --       todo   failed
-  go _     []     [] _  = do putStrLn "Finished!"
-                             return (return ())
-  go False []     _ _   = return (return ())
-  go True  []     q thy = do putStrLn "Reconsidering conjectures..."
-                             go False (reverse q) [] thy
-  go b     (c:cs) q thy =
+  go _     []     [] thy = do putStrLn "Finished!"
+                              saveTheory thy
+                              return (return ())
+  go False []     _ _    = return (return ())
+  go True  []     q thy  = do putStrLn "Reconsidering conjectures..."
+                              go False (reverse q) [] thy
+  go b     (c:cs) q thy  =
     do (str,m_result) <- tryProve args prover c thy
        case m_result of
-         Just (lemmas,coords) ->
+         Just proof@(lemmas,coords) ->
            do let lms = thy_asserts thy
               let n = (length lms)
               --putStrLn "coords on which we inducted:"
               --print coords
-              m <- go True cs q thy{ thy_asserts = makeProved n c:lms }
+              m <- go True cs q thy{ thy_asserts = makeProved n c proof:lms }
               return $ do putStrLn $ pad (show n) 2 ++ ": " ++ rpad str 40 ++
                                      if null lemmas then ""
                                         else " using " ++ intercalate ", " (map show lemmas)
                           m
          Nothing -> go b    cs (c:q) thy
 
-makeProved :: Int -> Formula a -> Formula a
-makeProved i (Formula _ _ tvs b) = Formula Assert (Lemma i) tvs b
+makeProved :: Int -> Formula a -> ProofSketch -> Formula a
+makeProved i (Formula _ _ tvs b) p = Formula Assert (Lemma i (Just p)) tvs b
 
 formulaVars :: Formula a -> [Local a]
 formulaVars = fst . forallView . fm_body
@@ -260,6 +261,14 @@ isSuccess :: Result -> Bool
 isSuccess Success{} = True
 isSuccess _         = False
 
+saveTheory :: Theory a -> IO ()
+saveTheory thy = do
+  --let thyString = show thy
+  putStrLn "saving theory..."
+  --putStrLn thyString
+  putStrLn "... done!"
+  return ()
+
 data Prover = Prover
   { prover_cmd    :: String -> (String,[String])
   , prover_ext    :: String
@@ -360,7 +369,7 @@ parsePCL axiom_list s =
      let collected :: ([String],[Info String],[String])
          collected@(_,used,_) = collect matches . drop 2 . dropWhile (/= "Proof:") . lines $ out
 
-     return (unlines (fmt collected),[ i | Lemma i <- used ])
+     return (unlines (fmt collected),[ i | Lemma i mp <- used ])
              {-
              ++ "\n" ++ out
              ++ "\n" ++ unlines [ ppTerm e1 ++ " = " ++ ppTerm e2 ++ " " ++ show n | (n,(e1,e2)) <- axs ]
@@ -429,7 +438,7 @@ prettyInfo i =
   case i of
     Definition f      -> ren f ++ " def"
     IH i              -> "IH" ++ show (i+1)
-    Lemma i           -> "lemma " ++ show i
+    Lemma i p         -> "lemma " ++ show i
     DataDomain d      -> ""
     DataProjection d  -> d ++ " projection"
     DataDistinct d    -> ""
