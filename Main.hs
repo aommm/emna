@@ -58,6 +58,7 @@ data Args =
     , timeout :: Double
     , filenames :: Bool
     , prover    :: String
+    , output    :: Maybe String
     }
   deriving (Show,Data,Typeable)
 
@@ -70,6 +71,7 @@ defArgs =
     , timeout = 1     &= name "t" &= help "Timeout in seconds (default 1)"
     , filenames = False           &= help "Print out filenames of theories"
     , prover = "w"                &= help "Prover (waldmeister/z3)"
+    , output = Nothing &= name "o" &= help "Proof output file"
     }
   &= program "emna" &= summary "simple inductive prover with proof output"
 
@@ -110,14 +112,14 @@ instance Name I where
   freshNamed s      = refresh (I undefined s)
   getUnique (I u _) = u
 
-loop :: Name a => Args -> Prover -> Theory a -> IO (IO ())
+loop :: (Show a, Name a) => Args -> Prover -> Theory a -> IO (IO ())
 loop args prover thy = go False conjs [] thy{ thy_asserts = assums }
   where
   (conjs,assums) = theoryGoals thy
 
   --       todo   failed
   go _     []     [] thy = do putStrLn "Finished!"
-                              saveTheory thy
+                              saveTheory args thy
                               return (return ())
   go False []     _ _    = return (return ())
   go True  []     q thy  = do putStrLn "Reconsidering conjectures..."
@@ -261,13 +263,20 @@ isSuccess :: Result -> Bool
 isSuccess Success{} = True
 isSuccess _         = False
 
-saveTheory :: Theory a -> IO ()
-saveTheory thy = do
-  --let thyString = show thy
-  putStrLn "saving theory..."
-  --putStrLn thyString
-  putStrLn "... done!"
-  return ()
+-- Save theory to file
+saveTheory :: (Show a) => Args -> Theory a -> IO ()
+saveTheory args thy = do
+  when (hasOutput args) $ do
+    -- TODO: only absolute path works here, why!?
+    -- http://stackoverflow.com/questions/21765570/haskell-compilation-with-an-input-file-error-openfile-does-not-exist-no-such
+    let (Just file) = output args
+    -- format theory as string
+    let thyString   = show thy
+    putStrLn $ "saving theory to "++ file ++ "..."
+    writeFile file (thyString)
+    putStrLn "... done!"
+    return ()
+  where hasOutput = isJust . output
 
 data Prover = Prover
   { prover_cmd    :: String -> (String,[String])
