@@ -46,6 +46,7 @@ import Waldmeister
 import qualified System.IO as IO
 import System.Console.CmdArgs
 import System.Process (readProcessWithExitCode)
+import System.Directory (makeAbsolute)
 
 import qualified Data.Map as M
 import Data.Map (Map)
@@ -75,9 +76,23 @@ defArgs =
     }
   &= program "emna" &= summary "simple inductive prover with proof output"
 
+-- Parse command line arguments
+parseArgs :: IO Args
+parseArgs = do
+  args <- cmdArgs defArgs
+  if isJust (output args)
+    then do
+      -- dereference hej to path/to/cwd/hej
+      -- TODO: doesn't defererence ~, . or ..
+      let (Just path) = output args
+      path' <- makeAbsolute path
+      return args {output = Just path'}
+    else do
+      return args
+
 main :: IO ()
 main = do
-  args@Args{..} <- cmdArgs defArgs
+  args@Args{..} <- parseArgs
   x <- readHaskellOrTipFile file defaultParams
   case x of
     Left err  -> putStrLn err
