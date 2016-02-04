@@ -13,6 +13,7 @@ import Tip.Passes
 import Tip.Pretty
 import Tip.Scope
 import Tip.Pretty.SMT as SMT
+import Tip.Parser.PrintTIP (render)
 
 import Debug.Trace
 
@@ -301,14 +302,16 @@ isSuccess Success{} = True
 isSuccess _         = False
 
 -- Save theory to file
-saveTheory :: (Show a) => Args -> Theory a -> IO ()
+saveTheory :: (Show a, Name a) => Args -> Theory a -> IO ()
 saveTheory args thy = do
   when (hasOutput args) $ do
     -- TODO: only absolute path works here, why!?
     -- http://stackoverflow.com/questions/21765570/haskell-compilation-with-an-input-file-error-openfile-does-not-exist-no-such
     let (Just file) = output args
     -- format theory as string
-    let thyString   = show thy
+    --let thyString   = show thy
+    let (doc,_)   = prover_pretty z3 undefined thy
+    let thyString = show doc
     putStrLn $ "saving theory to "++ file ++ "..."
     writeFile file (thyString)
     putStrLn "... done!"
