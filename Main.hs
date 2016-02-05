@@ -310,8 +310,9 @@ saveTheory args thy = do
     let (Just file) = output args
     -- format theory as string
     --let thyString   = show thy
-    let (doc,_)   = prover_pretty z3 undefined thy
-    let thyString = show doc
+    --let (doc,_)   = prover_pretty z3 undefined thy
+    --let thyString = show doc
+    let thyString = ppRender thy
     putStrLn $ "saving theory to "++ file ++ "..."
     writeFile file (thyString)
     putStrLn "... done!"
