@@ -308,14 +308,17 @@ saveTheory args thy = do
   when (hasOutput args) $ do
     -- TODO: only absolute path works here, why!?
     -- http://stackoverflow.com/questions/21765570/haskell-compilation-with-an-input-file-error-openfile-does-not-exist-no-such
-    let (Just file) = output args
+    let (Just filePath) = output args
     -- format theory as string
-    --let thyString   = show thy
-    --let (doc,_)   = prover_pretty z3 undefined thy
-    --let thyString = show doc
-    let thyString = ppRender thy
-    putStrLn $ "saving theory to "++ file ++ "..."
-    writeFile file (thyString)
+    --let thyString = ppRender thy
+    
+    -- make library, and format as string
+    -- TODO: load library and concatenate somehow
+    let lib = thyToLib thy
+    let libString = ppRender lib
+
+    putStrLn $ "saving theory to "++ filePath ++ "..."
+    writeFile filePath (libString)
     putStrLn "... done!"
     return ()
   where hasOutput = isJust . output
