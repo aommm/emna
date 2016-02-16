@@ -134,8 +134,8 @@ instance Name I where
 
 isUserAsserted :: Formula a -> Bool
 isUserAsserted f = case (fm_info f) of
-                     UserAsserted -> True
-                     _            -> False
+                     UserAsserted _ -> True
+                     _              -> False
 
 showFormula :: Name a => Formula a -> Theory a -> String
 showFormula fm thy = ppTerm $ toTerm $ snd $ extractQuantifiedLocals fm thy
@@ -171,7 +171,8 @@ loop args prover thy = go False conjs [] thy{ thy_asserts = assums }
          Nothing -> go b    cs (c:q) thy
 
 makeProved :: Int -> Formula a -> ProofSketch -> Formula a
-makeProved i (Formula _ _ tvs b) p = Formula Assert (Lemma i (Just p)) tvs b
+-- todo not Nothing
+makeProved i (Formula _ _ tvs b) p = Formula Assert (Lemma i Nothing (Just p)) tvs b
 
 formulaVars :: Formula a -> [Local a]
 formulaVars = fst . forallView . fm_body
@@ -419,7 +420,7 @@ parsePCL axiom_list s =
      let collected :: ([String],[Info String],[String])
          collected@(_,used,_) = collect matches . drop 2 . dropWhile (/= "Proof:") . lines $ out
 
-     return (unlines (fmt collected),[ i | Lemma i mp <- used ])
+     return (unlines (fmt collected),[ i | Lemma i n mp <- used ])
              {-
              ++ "\n" ++ out
              ++ "\n" ++ unlines [ ppTerm e1 ++ " = " ++ ppTerm e2 ++ " " ++ show n | (n,(e1,e2)) <- axs ]
@@ -488,12 +489,13 @@ prettyInfo i =
   case i of
     Definition f      -> ren f ++ " def"
     IH i              -> "IH" ++ show (i+1)
-    Lemma i p         -> "lemma " ++ show i
+    Lemma i (Just n) p -> "lemma " ++ show i ++ "(" ++ show n ++ ")"
+    Lemma i n p       -> "lemma " ++ show i
     DataDomain d      -> ""
     DataProjection d  -> d ++ " projection"
     DataDistinct d    -> ""
     Defunction f      -> "by defunctionalisation of " ++ f
-    UserAsserted      -> ""
+    UserAsserted (Just i) -> show i
     _                 -> ""
 
 newtype Ren = Ren String
