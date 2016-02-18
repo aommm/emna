@@ -3,49 +3,59 @@
 (define-fun-rec
   (par (a)
     (append
-       ((x (list a)) (y (list a))) (list a)
+       ((x (list a)) (x (list a))) (list a)
        (match x
-         (case nil y)
-         (case (cons z xs) (cons z (append xs y)))))))
+         (case nil x)
+         (case (cons x xs) (cons x (append xs x)))))))
 (define-fun-rec
   (par (a)
     (rev
        ((x (list a))) (list a)
        (match x
          (case nil (as nil (list a)))
-         (case (cons y xs) (append (rev xs) (cons y (as nil (list a)))))))))
-(assert-prove
-  (par (x) ((forall ((y (list x))) (= (rev (rev y)) y))) (pro0f)))
-(assert-prove
-  (par (a) ((forall ((xs (list a))) (= (rev (rev xs)) xs))) (pro0f)))
-(assert-prove
+         (case (cons x xs) (append (rev xs) (cons x (as nil (list a)))))))))
+(assert-proof
   (par (x)
-    ((forall ((y (list x)) (z (list x)))
-       (= (append (rev z) (rev y)) (rev (append y z)))))
-    (pro0f)))
-(assert-prove
+     (forall ((x (list x))) (= (rev (rev x)) x))
+    ([0, 1, 2, 3, 4, 5, 6, 7] [])))
+(assert-proof
+  (par (a)
+     (forall ((xs (list a))) (= (rev (rev xs)) xs))
+    ([0, 1, 2, 3, 4, 5, 6] [0])))
+(assert-proof
   (par (x)
-    ((forall ((y x))
-       (= (rev (cons y (as nil (list x)))) (cons y (as nil (list x))))))
-    (pro0f)))
-(assert-prove
-  (par (x) ((= (rev (as nil (list x))) (as nil (list x)))) (pro0f)))
-(assert-prove
+    
+    (forall ((x (list x)) (x (list x)))
+      (= (append (rev x) (rev x)) (rev (append x x))))
+    ([0, 1, 2, 3, 4, 5] [0])))
+(assert-proof
   (par (x)
-    ((forall ((y (list x)) (z (list x)) (x2 (list x)))
-       (= (append (append y z) x2) (append y (append z x2)))))
-    (pro0f)))
-(assert-prove
+    
+    (forall ((x x))
+      (= (rev (cons x (as nil (list x)))) (cons x (as nil (list x)))))
+    ([0, 1, 2, 3, 4] [])))
+(assert-proof
   (par (x)
-    ((forall ((y x) (z (list x)) (x2 (list x)))
-       (= (append (cons y z) x2) (cons y (append z x2)))))
-    (pro0f)))
-(assert-prove
+     (= (rev (as nil (list x))) (as nil (list x)))
+    ([0, 1, 2, 3] [])))
+(assert-proof
   (par (x)
-    ((forall ((y (list x))) (= (append (as nil (list x)) y) y)))
-    (pro0f)))
-(assert-prove
+    
+    (forall ((x (list x)) (x (list x)) (x (list x)))
+      (= (append (append x x) x) (append x (append x x))))
+    ([0, 1, 2] [0])))
+(assert-proof
   (par (x)
-    ((forall ((y (list x))) (= (append y (as nil (list x))) y)))
-    (pro0f)))
+    
+    (forall ((x x) (x (list x)) (x (list x)))
+      (= (append (cons x x) x) (cons x (append x x))))
+    ([0, 1] [])))
+(assert-proof
+  (par (x)
+     (forall ((x (list x))) (= (append (as nil (list x)) x) x))
+    ([0] [])))
+(assert-proof
+  (par (x)
+     (forall ((x (list x))) (= (append x (as nil (list x))) x))
+    ([] [0])))
 (check-sat)

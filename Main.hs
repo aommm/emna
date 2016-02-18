@@ -41,6 +41,7 @@ import Control.Concurrent.STM.Promise.Workers
 import Text.PrettyPrint (Doc)
 
 import System.Environment
+import System.Directory
 
 import Waldmeister
 
@@ -310,10 +311,20 @@ saveTheory args thy = do
     -- http://stackoverflow.com/questions/21765570/haskell-compilation-with-an-input-file-error-openfile-does-not-exist-no-such
     let (Just filePath) = output args
     -- format theory as string
+
+    exists <- doesFileExist filePath
+    library <- if exists
+                 then do
+                   libraryString <- readFile filePath
+                   -- TODO parse library when parseLibrary works
+                   undefined
+                 else
+                   emptyLibrary
+    
     --let thyString = ppRender thy
     
     -- make library, and format as string
-    -- TODO: load library and concatenate somehow
+    -- TODO extend library with theory
     let lib = thyToLib thy
     let libString = ppRender lib
 
