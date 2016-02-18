@@ -14,6 +14,7 @@ import Tip.Pretty
 import Tip.Scope
 import Tip.Pretty.SMT as SMT
 import Tip.Parser.PrintTIP (render)
+import Tip.Parser (parseLibrary)
 
 import Debug.Trace
 
@@ -304,27 +305,30 @@ isSuccess Success{} = True
 isSuccess _         = False
 
 -- Save theory to file
+-- TODO maybe Ord a, Eq a,PrettyVar a
 saveTheory :: (Show a, Name a) => Args -> Theory a -> IO ()
 saveTheory args thy = do
   when (hasOutput args) $ do
     -- TODO: only absolute path works here, why!?
     -- http://stackoverflow.com/questions/21765570/haskell-compilation-with-an-input-file-error-openfile-does-not-exist-no-such
     let (Just filePath) = output args
-    -- format theory as string
-
+    -- maybe read existing library
     exists <- doesFileExist filePath
     library <- if exists
                  then do
                    libraryString <- readFile filePath
-                   -- TODO parse library when parseLibrary works
-                   undefined
+                   case parseLibrary libraryString of
+                    Right library -> return library
+                    Left msg      -> error $ "parsing library failed:"++show msg
                  else
-                   emptyLibrary
-    
-    --let thyString = ppRender thy
-    
+                   return emptyLibrary
     -- make library, and format as string
-    -- TODO extend library with theory
+    -- TODO our library is not general enough >____<
+    -- they can make their theory general by passing it through some dumb filters,
+    -- can we copy something? 
+    -- This function should still be general, since the theory is 'a' in calling context
+    -- Need to convert from Id to Show a, Name a. ??
+    --let lib = extendLibrary thy library
     let lib = thyToLib thy
     let libString = ppRender lib
 

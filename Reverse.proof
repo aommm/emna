@@ -1,61 +1,127 @@
 (declare-datatypes (a)
   ((list (nil) (cons (head a) (tail (list a))))))
+(declare-datatypes (a)
+  ((Tree (Empty)
+     (Node (Node_0 a) (Node_1 (Tree a)) (Node_2 (Tree a))))))
+(define-fun-rec
+  (par (a)
+    (swap
+       ((x (Tree a))) (Tree a)
+       (match x
+         (case Empty (as Empty (Tree a)))
+         (case (Node y p q) (Node y (swap q) (swap p)))))))
 (define-fun-rec
   (par (a)
     (append
-       ((x (list a)) (x (list a))) (list a)
+       ((x (list a)) (y (list a))) (list a)
        (match x
-         (case nil x)
-         (case (cons x xs) (cons x (append xs x)))))))
+         (case nil y)
+         (case (cons z xs) (cons z (append xs y)))))))
 (define-fun-rec
   (par (a)
-    (rev
+    (flatten
+       ((x (Tree a))) (list a)
+       (match x
+         (case Empty (as nil (list a)))
+         (case (Node y p q)
+           (append (flatten p)
+             (append (cons y (as nil (list a))) (flatten q))))))))
+(define-fun-rec
+  (par (a)
+    (reverse
        ((x (list a))) (list a)
        (match x
          (case nil (as nil (list a)))
-         (case (cons x xs) (append (rev xs) (cons x (as nil (list a)))))))))
+         (case (cons y xs)
+           (append (reverse xs) (cons y (as nil (list a)))))))))
 (assert-proof
   (par (x)
-     (forall ((x (list x))) (= (rev (rev x)) x))
-    ([0, 1, 2, 3, 4, 5, 6, 7] [])))
+    lemma-0 (forall ((y (list x))) (= (reverse (reverse y)) y))
+    ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] [0])))
 (assert-proof
   (par (a)
-     (forall ((xs (list a))) (= (rev (rev xs)) xs))
-    ([0, 1, 2, 3, 4, 5, 6] [0])))
+    lemma-1
+    (forall ((p (Tree a)))
+      (= (flatten (swap p)) (reverse (flatten p))))
+    ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] [])))
 (assert-proof
   (par (x)
-    
-    (forall ((x (list x)) (x (list x)))
-      (= (append (rev x) (rev x)) (rev (append x x))))
-    ([0, 1, 2, 3, 4, 5] [0])))
+    lemma-10
+    (forall ((y x) (z (list x)) (x2 (list x)))
+      (= (append (cons y z) x2) (cons y (append z x2))))
+    ([0, 1, 2, 3, 4, 5] [])))
 (assert-proof
   (par (x)
-    
-    (forall ((x x))
-      (= (rev (cons x (as nil (list x)))) (cons x (as nil (list x)))))
+    lemma-11 (forall ((y (list x))) (= (append (as nil (list x)) y) y))
     ([0, 1, 2, 3, 4] [])))
 (assert-proof
   (par (x)
-     (= (rev (as nil (list x))) (as nil (list x)))
-    ([0, 1, 2, 3] [])))
+    lemma-12 (forall ((y (list x))) (= (append y (as nil (list x))) y))
+    ([0, 1, 2, 3] [0])))
 (assert-proof
   (par (x)
-    
-    (forall ((x (list x)) (x (list x)) (x (list x)))
-      (= (append (append x x) x) (append x (append x x))))
-    ([0, 1, 2] [0])))
+    lemma-13
+    (forall ((y x) (z (Tree x)) (x2 (Tree x)))
+      (= (Node y (swap x2) (swap z)) (swap (Node y z x2))))
+    ([0, 1, 2] [])))
 (assert-proof
   (par (x)
-    
-    (forall ((x x) (x (list x)) (x (list x)))
-      (= (append (cons x x) x) (cons x (append x x))))
+    lemma-14
+    (forall ((y x) (z (Tree x)))
+      (= (Node y (as Empty (Tree x)) (swap z))
+        (swap (Node y z (as Empty (Tree x))))))
     ([0, 1] [])))
 (assert-proof
   (par (x)
-     (forall ((x (list x))) (= (append (as nil (list x)) x) x))
-    ([0] [])))
+    lemma-15 (forall ((y (Tree x))) (= (swap (swap y)) y)) ([0] [0])))
 (assert-proof
   (par (x)
-     (forall ((x (list x))) (= (append x (as nil (list x))) x))
-    ([] [0])))
+    lemma-16 (= (swap (as Empty (Tree x))) (as Empty (Tree x)))
+    ([] [])))
+(assert-proof
+  (par (x)
+    lemma-2
+    (forall ((y (Tree x)))
+      (= (reverse (flatten y)) (flatten (swap y))))
+    ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] [0])))
+(assert-proof
+  (par (x)
+    lemma-3
+    (forall ((y (list x)) (z (list x)))
+      (= (append (reverse z) (reverse y)) (reverse (append y z))))
+    ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] [0])))
+(assert-proof
+  (par (x)
+    lemma-4
+    (forall ((y x))
+      (= (reverse (cons y (as nil (list x))))
+        (cons y (as nil (list x)))))
+    ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [])))
+(assert-proof
+  (par (x)
+    lemma-5 (= (reverse (as nil (list x))) (as nil (list x)))
+    ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] [])))
+(assert-proof
+  (par (x)
+    lemma-6
+    (forall ((y x) (z (Tree x)))
+      (= (append (flatten z) (cons y (as nil (list x))))
+        (flatten (Node y z (as Empty (Tree x))))))
+    ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9] [])))
+(assert-proof
+  (par (x)
+    lemma-7
+    (forall ((y x) (z (Tree x)))
+      (= (flatten (Node y (as Empty (Tree x)) z)) (cons y (flatten z))))
+    ([0, 1, 2, 3, 4, 5, 6, 7, 8] [])))
+(assert-proof
+  (par (x)
+    lemma-8 (= (flatten (as Empty (Tree x))) (as nil (list x)))
+    ([0, 1, 2, 3, 4, 5, 6, 7] [])))
+(assert-proof
+  (par (x)
+    lemma-9
+    (forall ((y (list x)) (z (list x)) (x2 (list x)))
+      (= (append (append y z) x2) (append y (append z x2))))
+    ([0, 1, 2, 3, 4, 5, 6] [0])))
 (check-sat)
