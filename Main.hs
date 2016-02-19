@@ -172,9 +172,10 @@ loop args prover thy = go False conjs [] thy{ thy_asserts = assums }
                 l -> return l
          Nothing -> go b    cs (c:q) thy
 
+
 makeProved :: Int -> Formula a -> ProofSketch -> Formula a
--- todo not Nothing
-makeProved i (Formula _ _ tvs b) p = Formula Assert (Lemma i Nothing (Just p)) tvs b
+makeProved i (Formula _ _ tvs b) p = Formula Assert (Lemma i (Just lemmaName) (Just p)) tvs b
+  where lemmaName = "lemma-"++show i -- Name it locally first; will probably be translated later
 
 formulaVars :: Formula a -> [Local a]
 formulaVars = fst . forallView . fm_body
@@ -225,8 +226,11 @@ tryProve args prover fm thy =
                              else do putStrLn "Proof:"
                                      lemmas <- concat <$> sequence steps
                                      return lemmas
+
                  let lemmas' = usort lemmas
-                 return $ Just (lemmas', coords)
+                     -- Name lemmas locally first; will probably be translated later
+                     lemmaNames = map (\l -> "lemma-"++show l) lemmas'
+                 return $ Just (lemmaNames, coords)
 
          | otherwise
            -> do putStrLn $ "Confusion :("
