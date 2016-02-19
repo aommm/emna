@@ -318,25 +318,27 @@ saveTheory args thy = do
                  then do
                    libraryString <- readFile filePath
                    case parseLibrary libraryString of
-                    Right library -> return library
+                    Right library -> putStrLn "loaded library" >> return library
                     Left msg      -> error $ "parsing library failed:"++show msg
                  else
-                   return emptyLibrary
-    -- make library, and format as string
-    -- TODO our library is not general enough >____<
-    -- they can make their theory general by passing it through some dumb filters,
-    -- can we copy something? 
-    -- This function should still be general, since the theory is 'a' in calling context
-    -- Need to convert from Id to Show a, Name a. ??
-    --let lib = extendLibrary thy library
-    let lib = thyToLib thy
-    let libString = ppRender lib
+                   putStrLn "new library" >> return emptyLibrary
+
+    -- @fulhack: use 'ren' to convert thy to Theory I, lib to Library I. Only then can we extendLibrary
+    -- @superfulhack: had to use 'ren2' to fix types
+    let libraryThy = libToThy library -- :: Theory Id
+        libraryThy' = ren libraryThy  :: Theory I
+        library' = thyToLib libraryThy' :: Library I
+        thy' = ren2 thy :: Theory I
+        library'' = extendLibrary thy' library'
+        libString = ppRender library''
 
     putStrLn $ "saving theory to "++ filePath ++ "..."
     writeFile filePath (libString)
     putStrLn "... done!"
     return ()
   where hasOutput = isJust . output
+        ren = renameWith (\ x -> [ I i (varStr x) | i <- [0..] ])
+        ren2 = renameWith (\ x -> [ I i (varStr x) | i <- [0..] ])
 
 data Prover = Prover
   { prover_cmd    :: String -> (String,[String])
