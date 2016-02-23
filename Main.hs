@@ -15,6 +15,7 @@ import Tip.Scope
 import Tip.Pretty.SMT as SMT
 import Tip.Parser.PrintTIP (render)
 import Tip.Parser (parseLibrary)
+import Tip.Rename
 
 import Debug.Trace
 
@@ -310,9 +311,13 @@ isSuccess _         = False
 
 -- Save theory to file
 -- TODO maybe Ord a, Eq a,PrettyVar a
-saveTheory :: (Show a, Name a) => Args -> Theory a -> IO ()
+saveTheory :: (Show a, Name a,Ord a) => Args -> Theory a -> IO ()
 saveTheory args thy = do
   when (hasOutput args) $ do
+
+    --putStrLn "lemmas:"
+    --mapM_ (putStrLn.ppRender) (thy_asserts thy)
+
     -- TODO: only absolute path works here, why!?
     -- http://stackoverflow.com/questions/21765570/haskell-compilation-with-an-input-file-error-openfile-does-not-exist-no-such
     let (Just filePath) = output args
@@ -327,22 +332,33 @@ saveTheory args thy = do
                  else
                    putStrLn "new library" >> return emptyLibrary
 
-    -- @fulhack: use 'ren' to convert thy to Theory I, lib to Library I. Only then can we extendLibrary
-    -- @superfulhack: had to use 'ren2' to fix types
     let libraryThy = libToThy library -- :: Theory Id
-        libraryThy' = ren libraryThy  :: Theory I
-        library' = thyToLib libraryThy' :: Library I
-        thy' = ren2 thy :: Theory I
+
+        -- ren way
+        --libraryThy' = ren libraryThy  :: Theory I
+        --library' = thyToLib libraryThy' :: Library I
+        --thy' = ren2 thy :: Theory I
+
+        -- renameAvoiding way (does actual renaming, necessary for function bodies)
+        libraryThy' = renameAvoiding SMT.smtKeywords SMT.validSMTChar libraryThy :: Theory RenamedId
+        library' = thyToLib libraryThy' :: Library RenamedId
+        thy' = renameAvoiding SMT.smtKeywords SMT.validSMTChar thy :: Theory RenamedId
+
         library'' = extendLibrary thy' library'
         libString = ppRender library''
+
+        --thy'' = SMT.validSMTChar
+
+    --putStrLn "lemmas, reloaded:"
+    --mapM_ (putStrLn.ppRender) (thy_asserts thy')
 
     putStrLn $ "saving theory to "++ filePath ++ "..."
     writeFile filePath (libString)
     putStrLn "... done!"
     return ()
   where hasOutput = isJust . output
-        ren = renameWith (\ x -> [ I i (varStr x) | i <- [0..] ])
-        ren2 = renameWith (\ x -> [ I i (varStr x) | i <- [0..] ])
+        --ren = renameWith (\ x -> [ I i (varStr x) | i <- [0..] ])
+        --ren2 = renameWith (\ x -> [ I i (varStr x) | i <- [0..] ])
 
 data Prover = Prover
   { prover_cmd    :: String -> (String,[String])
