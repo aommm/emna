@@ -7,15 +7,15 @@ import qualified Prelude
 []     ++ ys = ys
 (x:xs) ++ ys = x:(xs ++ ys)
 
-rev :: [a] -> [a]
-rev []     = []
-rev (x:xs) = rev xs ++ [x]
+reverse :: [a] -> [a]
+reverse []     = []
+reverse (x:xs) = reverse xs ++ [x]
 
 -- lemma_assoc xs ys zs = xs ++ (ys ++ zs) === (xs ++ ys) ++ zs
 --
 -- lemma_rid xs = xs ++ [] === xs
 --
--- lemma xs ys = rev xs ++ rev ys === rev (ys ++ xs)
+-- lemma xs ys = reverse xs ++ reverse ys === reverse (ys ++ xs)
 
-conj xs = rev (rev xs) === xs
+conj xs = reverse (reverse xs) === xs
 

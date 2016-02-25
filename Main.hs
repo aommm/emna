@@ -341,7 +341,7 @@ saveTheory args thy = do
 
         -- renameAvoiding way (does actual renaming, necessary for function bodies)
         libraryThy' = renameAvoiding SMT.smtKeywords SMT.validSMTChar libraryThy :: Theory RenamedId
-        library' = thyToLib libraryThy' :: Library RenamedId
+        library' = trace "initial library" $ thyToLib libraryThy' :: Library RenamedId
         thy' = renameAvoiding SMT.smtKeywords SMT.validSMTChar thy :: Theory RenamedId
 
         library'' = extendLibrary thy' library'

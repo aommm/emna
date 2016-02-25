@@ -1,0 +1,70 @@
+(declare-datatypes (a)
+  ((list (nil) (cons (head a) (tail (list a))))))
+(define-fun-rec
+  (par (a)
+    (append
+       ((x (list a)) (y (list a))) (list a)
+       (match x
+         (case nil y)
+         (case (cons z xs) (cons z (append xs y)))))))
+(define-fun-rec
+  (par (a)
+    (rev
+       ((x (list a))) (list a)
+       (match x
+         (case nil (as nil (list a)))
+         (case (cons y xs) (append (rev xs) (cons y (as nil (list a)))))))))
+(assert-proof
+  (par (x)
+    lemma-0 (forall ((y (list x))) (= (append y (as nil (list x))) y))
+    ([] [0])))
+(assert-proof
+  (par (x)
+    lemma-1 (forall ((y (list x))) (= (append (as nil (list x)) y) y))
+    ([lemma-0] [])))
+(assert-proof
+  (par (x)
+    lemma-2
+    (forall ((y x) (z (list x)) (x2 (list x)))
+      (= (append (cons y z) x2) (cons y (append z x2))))
+    ([lemma-0, lemma-1] [])))
+(assert-proof
+  (par (x)
+    lemma-3
+    (forall ((y (list x)) (z (list x)) (x2 (list x)))
+      (= (append (append y z) x2) (append y (append z x2))))
+    ([lemma-0, lemma-1, lemma-2] [0])))
+(assert-proof
+  (par (x)
+    lemma-4 (= (rev (as nil (list x))) (as nil (list x)))
+    ([lemma-0, lemma-1, lemma-2, lemma-3] [])))
+(assert-proof
+  (par (x)
+    lemma-5
+    (forall ((y x))
+      (= (rev (cons y (as nil (list x)))) (cons y (as nil (list x)))))
+    ([lemma-0, lemma-1, lemma-2, lemma-3, lemma-4] [])))
+(assert-proof
+  (par (x)
+    lemma-6
+    (forall ((y (list x)) (z (list x)))
+      (= (append (rev z) (rev y)) (rev (append y z))))
+    ([lemma-0, lemma-1, lemma-2, lemma-3, lemma-4, lemma-5] [0])))
+(assert-proof
+  (par (a)
+    lemma-7 (forall ((xs (list a))) (= (rev (rev xs)) xs))
+    ([lemma-0, lemma-1, lemma-2, lemma-3, lemma-4, lemma-5, lemma-6]
+      [0])))
+(assert-proof
+  (par (x)
+    lemma-8 (forall ((y (list x))) (= (rev (rev y)) y))
+    ([lemma-0,
+      lemma-1,
+      lemma-2,
+      lemma-3,
+      lemma-4,
+      lemma-5,
+      lemma-6,
+      lemma-7]
+      [])))
+(check-sat)
