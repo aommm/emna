@@ -1,0 +1,78 @@
+(declare-datatypes (a)
+  ((list (nil) (cons (head a) (tail (list a))))))
+(define-fun-rec
+  (par (a)
+    (append
+       ((x (list a)) (y (list a))) (list a)
+       (match x
+         (case nil y)
+         (case (cons z xs) (cons z (append xs y)))))))
+(define-fun-rec
+  (par (a)
+    (reverse
+       ((x (list a))) (list a)
+       (match x
+         (case nil (as nil (list a)))
+         (case (cons y xs)
+           (append (reverse xs) (cons y (as nil (list a)))))))))
+(assert-proof
+  (par (x)
+    lemma-10 (forall ((y (list x))) (= (append (as nil (list x)) y) y))
+    ([lemma-9] [])))
+(assert-proof
+  (par (x)
+    lemma-11
+    (forall ((y x) (z (list x)) (x2 (list x)))
+      (= (append (cons y z) x2) (cons y (append z x2))))
+    ([lemma-9, lemma-10] [])))
+(assert-proof
+  (par (x)
+    lemma-12
+    (forall ((y (list x)) (z (list x)) (x2 (list x)))
+      (= (append (append y z) x2) (append y (append z x2))))
+    ([lemma-9, lemma-10, lemma-11] [0])))
+(assert-proof
+  (par (x)
+    lemma-13 (= (reverse (as nil (list x))) (as nil (list x)))
+    ([lemma-9, lemma-10, lemma-11, lemma-12] [])))
+(assert-proof
+  (par (x)
+    lemma-14
+    (forall ((y x))
+      (= (reverse (cons y (as nil (list x))))
+        (cons y (as nil (list x)))))
+    ([lemma-9, lemma-10, lemma-11, lemma-12, lemma-13] [])))
+(assert-proof
+  (par (x)
+    lemma-15
+    (forall ((y (list x)) (z (list x)))
+      (= (append (reverse z) (reverse y)) (reverse (append y z))))
+    ([lemma-9, lemma-10, lemma-11, lemma-12, lemma-13, lemma-14] [0])))
+(assert-proof
+  (par (a)
+    lemma-16 (forall ((xs (list a))) (= (reverse (reverse xs)) xs))
+    ([lemma-9,
+      lemma-10,
+      lemma-11,
+      lemma-12,
+      lemma-13,
+      lemma-14,
+      lemma-15]
+      [0])))
+(assert-proof
+  (par (x)
+    lemma-17 (forall ((y (list x))) (= (reverse (reverse y)) y))
+    ([lemma-9,
+      lemma-10,
+      lemma-11,
+      lemma-12,
+      lemma-13,
+      lemma-14,
+      lemma-15,
+      lemma-16]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-9 (forall ((y (list x))) (= (append y (as nil (list x))) y))
+    ([] [0])))
+(check-sat)

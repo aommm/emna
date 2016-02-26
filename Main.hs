@@ -309,14 +309,10 @@ isSuccess :: Result -> Bool
 isSuccess Success{} = True
 isSuccess _         = False
 
--- Save theory to file
--- TODO maybe Ord a, Eq a,PrettyVar a
+-- Save library to file
 saveTheory :: (Show a, Name a,Ord a) => Args -> Theory a -> IO ()
 saveTheory args thy = do
   when (hasOutput args) $ do
-
-    --putStrLn "lemmas:"
-    --mapM_ (putStrLn.ppRender) (thy_asserts thy)
 
     -- TODO: only absolute path works here, why!?
     -- http://stackoverflow.com/questions/21765570/haskell-compilation-with-an-input-file-error-openfile-does-not-exist-no-such
@@ -332,33 +328,21 @@ saveTheory args thy = do
                  else
                    putStrLn "new library" >> return emptyLibrary
 
+    -- library -> theory, so that we can renameAvoiding
     let libraryThy = libToThy library -- :: Theory Id
-
-        -- ren way
-        --libraryThy' = ren libraryThy  :: Theory I
-        --library' = thyToLib libraryThy' :: Library I
-        --thy' = ren2 thy :: Theory I
-
-        -- renameAvoiding way (does actual renaming, necessary for function bodies)
         libraryThy' = renameAvoiding SMT.smtKeywords SMT.validSMTChar libraryThy :: Theory RenamedId
-        library' = trace "initial library" $ thyToLib libraryThy' :: Library RenamedId
+        library' = thyToLib libraryThy' :: Library RenamedId
         thy' = renameAvoiding SMT.smtKeywords SMT.validSMTChar thy :: Theory RenamedId
 
         library'' = extendLibrary thy' library'
         libString = ppRender library''
-
-        --thy'' = SMT.validSMTChar
-
-    --putStrLn "lemmas, reloaded:"
-    --mapM_ (putStrLn.ppRender) (thy_asserts thy')
 
     putStrLn $ "saving theory to "++ filePath ++ "..."
     writeFile filePath (libString)
     putStrLn "... done!"
     return ()
   where hasOutput = isJust . output
-        --ren = renameWith (\ x -> [ I i (varStr x) | i <- [0..] ])
-        --ren2 = renameWith (\ x -> [ I i (varStr x) | i <- [0..] ])
+
 
 data Prover = Prover
   { prover_cmd    :: String -> (String,[String])
