@@ -337,6 +337,11 @@ saveTheory args thy = do
         library'' = extendLibrary thy' library'
         libString = ppRender library''
 
+    --putStrLn "library reverse" -- type variable here is named 'a2' instead of 'a', causing inequality
+    --print $ id $ (thy_funcs libraryThy') !! 1
+    --putStrLn "theory reverse"
+    --print $ id $ (thy_funcs thy') !! 1
+
     putStrLn $ "saving theory to "++ filePath ++ "..."
     writeFile filePath (libString)
     putStrLn "... done!"
