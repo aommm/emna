@@ -8,6 +8,7 @@ module Main where
 import Tip.HaskellFrontend
 import Tip.QuickSpec
 import Tip.Core hiding (Unknown)
+import Tip.Library
 import Tip.Fresh
 import Tip.Passes
 import Tip.Pretty
