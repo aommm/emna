@@ -14,19 +14,19 @@ data Features a = Features
     { features :: [a] 
     } deriving (Eq,Ord,Show)
 
-emptyFeatures :: Features a
+emptyFeatures :: Features Id
 emptyFeatures = Features []
 
-mergeFeatures :: Features a -> Features a -> Features a
+mergeFeatures :: Features Id -> Features Id -> Features Id
 mergeFeatures (Features fs1) (Features fs2) = Features $ fs1 ++ fs2
 
-addFeature :: Features a -> a -> Features a
+addFeature :: Features Id -> Id -> Features Id
 addFeature (Features fs) f = Features $ f:fs
 
-printFeatures :: Show a => Features a -> IO ()
+printFeatures :: Features Id -> IO ()
 printFeatures (Features []) = return ()
 printFeatures (Features (f:fs)) = do
-    putStrLn $ show f
+    putStrLn $ idString f
     printFeatures (Features fs)
 
 -- Reads a library file to begin with
@@ -45,11 +45,11 @@ main = do
                     putStrLn "loaded library"
                     saveLibrary library
 
-saveLibrary :: (PrettyVar a, Show a, Ord a) => Library a -> IO ()
+saveLibrary :: Library Id -> IO ()
 saveLibrary (Library _ _ ls) = do 
     readFeature $ M.elems ls
 
-readFeature :: (PrettyVar a, Show a, Ord a) => [Formula a] -> IO ()
+readFeature :: [Formula Id] -> IO ()
 readFeature [] = return ()
 readFeature (f:xs) = do
     let fs = emptyFeatures
@@ -63,13 +63,13 @@ readFeature (f:xs) = do
     printFeatures fs
     readFeature xs
 
-extractFromExpressions :: (Show a, Ord a) => [Expr a] -> Features a -> IO (Features a)
+extractFromExpressions :: [Expr Id] -> Features Id -> IO (Features Id)
 extractFromExpressions [] fs = do return fs
 extractFromExpressions (x:xs) fs = do
     fs1 <- extractFromExpr x fs
     return fs1
 
-extractFromExpr :: (Show a, Ord a) => Expr a -> Features a -> IO (Features a)
+extractFromExpr :: Expr Id -> Features Id -> IO (Features Id)
 extractFromExpr expr fs = do
     case expr of
 
