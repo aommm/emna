@@ -14,24 +14,26 @@ data Features a = Features
     { features :: [a] 
     } deriving (Eq,Ord,Show)
 
-emptyFeatures :: Features Id
+data Feature a = SingleFeature a
+
+emptyFeatures :: Features (Feature Id)
 emptyFeatures = Features []
 
-mergeFeatures :: Features Id -> Features Id -> Features Id
+mergeFeatures :: Features (Feature Id) -> Features (Feature Id) -> Features (Feature Id)
 mergeFeatures (Features fs1) (Features []) = Features fs1
 mergeFeatures f1@(Features fs1) (Features (f:fs2)) = mergeFeatures (addFeature f1 f) (Features fs2)
 
-addFeature :: Features Id -> Id -> Features Id
+addFeature :: Features (Feature Id) -> Feature Id -> Features (Feature Id)
 addFeature (Features fs) f
     | any (hasFeature f) fs = Features fs
     | otherwise = Features $ f:fs
 
-hasFeature :: Id -> Id -> Bool
-hasFeature a b = (idUnique a) == (idUnique b)
+hasFeature :: Feature Id -> Feature Id -> Bool
+hasFeature (SingleFeature a) (SingleFeature b) = (idUnique a) == (idUnique b)
 
-printFeatures :: Features Id -> IO ()
+printFeatures :: Features (Feature Id) -> IO ()
 printFeatures (Features []) = return ()
-printFeatures (Features (f:fs)) = do
+printFeatures (Features ((SingleFeature f):fs)) = do
     putStrLn $ idString f
     printFeatures (Features fs)
 
@@ -69,13 +71,13 @@ readFeature (f:xs) = do
     printFeatures fs
     readFeature xs
 
-extractFromExpressions :: [Expr Id] -> Features Id -> IO (Features Id)
+extractFromExpressions :: [Expr Id] -> Features (Feature Id) -> IO ( Features (Feature Id))
 extractFromExpressions [] fs = do return fs
 extractFromExpressions (x:xs) fs = do
     fs1 <- extractFromExpr x fs
     return fs1
 
-extractFromExpr :: Expr Id -> Features Id -> IO (Features Id)
+extractFromExpr :: Expr Id -> Features (Feature Id) -> IO ( Features (Feature Id))
 extractFromExpr expr fs = do
     case expr of
 
@@ -93,11 +95,11 @@ extractFromExpr expr fs = do
         -- Use of global function?
         Gbl (Global name typ args) :@: exps -> do
             fs1 <- extractFromExpressions exps fs
-            return $ addFeature fs1 name
+            return $ addFeature fs1 (SingleFeature name)
 
         -- Local variable, we are looking for the type
         Lcl (Local name (TyCon feature _)) -> do
-            return $ addFeature fs feature
+            return $ addFeature fs (SingleFeature feature)
 
         _ -> do
             -- putStrLn $ show expr
