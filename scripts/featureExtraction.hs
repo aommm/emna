@@ -18,10 +18,16 @@ emptyFeatures :: Features Id
 emptyFeatures = Features []
 
 mergeFeatures :: Features Id -> Features Id -> Features Id
-mergeFeatures (Features fs1) (Features fs2) = Features $ fs1 ++ fs2
+mergeFeatures (Features fs1) (Features []) = Features fs1
+mergeFeatures f1@(Features fs1) (Features (f:fs2)) = mergeFeatures (addFeature f1 f) (Features fs2)
 
 addFeature :: Features Id -> Id -> Features Id
-addFeature (Features fs) f = Features $ f:fs
+addFeature (Features fs) f
+    | any (hasFeature f) fs = Features fs
+    | otherwise = Features $ f:fs
+
+hasFeature :: Id -> Id -> Bool
+hasFeature a b = (idUnique a) == (idUnique b)
 
 printFeatures :: Features Id -> IO ()
 printFeatures (Features []) = return ()
