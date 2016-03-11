@@ -62,12 +62,12 @@ printFeatures (Features (m@(MultiFeature f fs2):fs)) = do
 featureToString :: Feature Id -> String
 featureToString EmptyFeature = "_"
 featureToString (SingleFeature f) = idString f
-featureToString (MultiFeature f fs) = idString f ++ (featuresToString fs " ")
+featureToString (MultiFeature f fs) = idString f ++ "(" ++ (featuresToString fs " ") ++ ")"
 
 featuresToString :: [Feature Id] -> String -> String
 featuresToString [] _ = ""
-featuresToString [f] sep = sep ++(featureToString f)
-featuresToString (f:fs) sep = sep ++ (featureToString f) ++ (featuresToString fs sep)
+featuresToString [f] sep = (featureToString f)
+featuresToString (f:fs) sep = (featureToString f) ++ sep ++ (featuresToString fs sep)
 
 -- Reads a library file to begin with
 main :: IO ()
@@ -101,7 +101,7 @@ readFeature (f:xs) = do
 
     fs <- extractFromExpr (fm_body f) fs
     printFeatures fs
-    readFeature xs
+    readFeature [head xs]
 
 extractFromExpressions :: [Expr Id] -> Features (Feature Id) -> IO (Features (Feature Id))
 extractFromExpressions [] fs = do return fs
