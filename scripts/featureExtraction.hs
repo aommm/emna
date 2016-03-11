@@ -8,6 +8,8 @@ import qualified Data.Map as M
 import Tip.Types
 import Tip.Pretty
 import Data.Maybe
+import Data.List
+import Debug.Trace
 
 -- Datatype for listing the features of a formula
 data Features a = Features
@@ -16,6 +18,7 @@ data Features a = Features
 
 data Feature a = SingleFeature a -- One lonely symbol
     | MultiFeature a [Feature a] -- Symbol with inner symbols
+    | EmptyFeature -- Not defined symbol
     deriving (Eq,Ord,Show)
 
 emptyFeatures :: Features (Feature Id)
@@ -32,7 +35,11 @@ getFeature (Features (x:xs)) = Just x
 addFeature :: Features (Feature Id) -> Feature Id -> Features (Feature Id)
 addFeature (Features fs) f
     | any (hasFeature f) fs = Features fs
-    | otherwise = Features $ f:fs
+    | otherwise = Features $ (fs++[f])
+
+addFeatures :: Features (Feature Id) -> [Feature Id] -> Features (Feature Id)
+addFeatures f' [] = f'
+addFeatures f' (f:fs) = addFeature (addFeatures f' fs) f
 
 hasFeature :: Feature Id -> Feature Id -> Bool
 hasFeature (SingleFeature a) (SingleFeature b) = (idUnique a) == (idUnique b)
@@ -44,13 +51,23 @@ extractId (MultiFeature i _) = i
 
 printFeatures :: Features (Feature Id) -> IO ()
 printFeatures (Features []) = return ()
-printFeatures (Features ((SingleFeature f):fs)) = do
-    putStrLn $ idString f
+printFeatures (Features (s@(SingleFeature f):fs)) = do
+    putStrLn $ featureToString s
     printFeatures (Features fs)
 
-printFeatures (Features ((MultiFeature f fs2):fs)) = do
-    putStrLn $ (idString f) ++ " " ++ (idString $ extractId $ head fs2)
+printFeatures (Features (m@(MultiFeature f fs2):fs)) = do
+    putStrLn $ featureToString m
     printFeatures (Features fs)
+
+featureToString :: Feature Id -> String
+featureToString EmptyFeature = "_"
+featureToString (SingleFeature f) = idString f
+featureToString (MultiFeature f fs) = idString f ++ (featuresToString fs " ")
+
+featuresToString :: [Feature Id] -> String -> String
+featuresToString [] _ = ""
+featuresToString [f] sep = sep ++(featureToString f)
+featuresToString (f:fs) sep = sep ++ (featureToString f) ++ (featuresToString fs sep)
 
 -- Reads a library file to begin with
 main :: IO ()
@@ -84,13 +101,14 @@ readFeature (f:xs) = do
 
     fs <- extractFromExpr (fm_body f) fs
     printFeatures fs
-    -- readFeature xs
+    readFeature xs
 
 extractFromExpressions :: [Expr Id] -> Features (Feature Id) -> IO (Features (Feature Id))
 extractFromExpressions [] fs = do return fs
 extractFromExpressions (x:xs) fs = do
     fs1 <- extractFromExpr x fs
-    return fs1
+    fs2 <- extractFromExpressions xs fs1 
+    return fs2
 
 extractFromExpr :: Expr Id -> Features (Feature Id) -> IO (Features (Feature Id))
 extractFromExpr expr fs = do
@@ -114,16 +132,28 @@ extractFromExpr expr fs = do
         -- Currently 
         Gbl (Global name typ args) :@: exps -> do
             f1@(Features fs1) <- extractFromExpressions exps fs
-            let fs2 = addFeature f1 (SingleFeature name)
-            case (length exps) of
-                0 -> return fs2
-                1 -> return $ addFeature fs2 (MultiFeature name [head fs1])
-                2 -> return $ addFeature (addFeature fs2 (MultiFeature name [head fs1])) (MultiFeature name [last fs1])
+            return $ createMultiFeatures fs fs1 name (length fs1)
 
         -- Local variable, we are looking for the type
         Lcl (Local name (TyCon feature _)) -> do
             return $ addFeature fs (SingleFeature feature)
 
         _ -> do
-            -- putStrLn $ show expr
+            putStrLn $ show expr
             return fs
+
+-- First step in generating the feature combos
+createMultiFeatures :: Features (Feature Id) -> [Feature Id] -> Id -> Int -> Features (Feature Id)
+createMultiFeatures f' [] name d = addFeature f' (MultiFeature name (take d (repeat EmptyFeature))) -- The empty case
+createMultiFeatures f' (f:fs) name d = addFeatures f' (generateCombos f fs name)
+
+generateCombos :: Feature Id -> [Feature Id] -> Id -> [Feature Id]
+generateCombos base [] name = [MultiFeature name [base], MultiFeature name [EmptyFeature]]
+generateCombos base (a:as) name = (extendCombos emptyCase (generateCombos a as name)) ++ (extendCombos baseCase (generateCombos a as name))
+    where 
+        baseCase = MultiFeature name [base]
+        emptyCase = MultiFeature name [EmptyFeature]
+
+extendCombos :: Feature Id -> [Feature Id] -> [Feature Id]
+extendCombos b [] = []
+extendCombos b@(MultiFeature name [base]) ((MultiFeature _ f'):fs) = (MultiFeature name (base:f')):(extendCombos b fs)
