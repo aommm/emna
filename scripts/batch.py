@@ -10,7 +10,7 @@ def fail():
 if len(sys.argv) != 3: fail()
 dir_path = sys.argv[1]
 proof_path = sys.argv[2]
-if not (isdir(dir_path) and isfile(proof_path)): fail()
+if not (isdir(dir_path) and (not isdir(proof_path))): fail()
 
 def isproblem(f):
 	return isfile(join(dir_path, f)) and splitext(f)[1] == '.smt2'
