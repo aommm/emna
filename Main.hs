@@ -60,6 +60,7 @@ data Args =
   Args
     { file    :: String
     , explore :: Bool
+    , extra   :: [String]
     , indvars :: Int
     , timeout :: Double
     , filenames :: Bool
@@ -73,6 +74,7 @@ defArgs =
   Args
     { file    = ""    &= argPos 0 &= typFile
     , explore = True  &= name "e" &= help "Explore theory"
+    , extra   = []                &= help "Additional functions for exploration"
     , indvars = 1     &= name "v" &= help "Number of variables to do induction on"
     , timeout = 1     &= name "t" &= help "Timeout in seconds (default 1)"
     , filenames = False           &= help "Print out filenames of theories"
@@ -98,7 +100,7 @@ parseArgs = do
 main :: IO ()
 main = do
   args@Args{..} <- parseArgs
-  x <- readHaskellOrTipFile file defaultParams
+  x <- readHaskellOrTipFile file defaultParams{ extra_names = extra }
   case x of
     Left err  -> putStrLn err
     Right thy ->
@@ -351,7 +353,7 @@ saveTheory args thy = do
 
 
 data Prover = Prover
-  { prover_cmd    :: String -> (String,[String])
+  { prover_cmd    :: String -> Double -> (String,[String])
   , prover_ext    :: String
   , prover_pre    :: [StandardPass]
   , prover_post   :: [StandardPass]
@@ -360,13 +362,13 @@ data Prover = Prover
   }
 
 promise :: Name a => Args -> Prover -> Obligation (Theory a) -> IO (Promise [Obligation Result])
-promise args Prover{..} (Obligation info thy) =
+promise params Prover{..} (Obligation info thy) =
   do u <- newUnique
      let filename = "/tmp/" ++ show (hashUnique u) ++ prover_ext
-     when (filenames args) (putStrLn filename)
+     when (filenames params) (putStrLn filename)
      let (thy_pretty,axiom_list) = prover_pretty thy (head (freshPass (runPasses prover_post) thy))
      writeFile filename (show thy_pretty)
-     let (prog,args) = prover_cmd filename
+     let (prog,args) = prover_cmd filename (timeout params)
      promise <- processPromise prog args ""
 
      let update :: PromiseResult ProcessResult -> PromiseResult [Obligation Result]
@@ -376,9 +378,12 @@ promise args Prover{..} (Obligation info thy) =
 
      return promise{ result = fmap update (result promise) }
 
+showCeil :: Double -> String
+showCeil = show . (ceiling :: Double -> Integer)
+
 z3 :: Prover
 z3 = Prover
-  { prover_cmd = \ filename -> ("z3",["-smt2",filename])
+  { prover_cmd = \ filename t -> ("z3",["-smt2",filename,"-t:" ++ showCeil (t*1000)])
   , prover_ext = ".smt2"
   , prover_pre =
       [ TypeSkolemConjecture, Monomorphise False
@@ -388,6 +393,7 @@ z3 = Prover
       ]
   , prover_post =
       [ AxiomatizeFuncdefs2
+      , RemoveMatch -- in case they appear in conjectures
       , SkolemiseConjecture
       , NegateConjecture
       ]
@@ -401,7 +407,7 @@ z3 = Prover
 
 waldmeister :: Prover
 waldmeister = Prover
-  { prover_cmd = \ filename -> ("waldmeister",filename:["--auto","--output=/dev/stderr","--pcl"])
+  { prover_cmd = \ filename t -> ("waldmeister",filename:["--auto","--output=/dev/stderr","--pcl","--expert","-tl",showCeil t])
   , prover_ext = ".w"
   , prover_pre =
       [ TypeSkolemConjecture, Monomorphise False
@@ -412,6 +418,7 @@ waldmeister = Prover
   , prover_post =
       [ AxiomatizeFuncdefs2, AxiomatizeDatadeclsUEQ
       , SkolemiseConjecture
+      , UniqLocals
       ]
   , prover_pretty = \ orig -> Waldmeister.ppTheory . niceRename orig
   , prover_pipe =
