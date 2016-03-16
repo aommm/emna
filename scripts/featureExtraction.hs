@@ -21,16 +21,28 @@ data Feature a = SingleFeature a -- One lonely symbol
     | EmptyFeature -- Not defined symbol
     deriving (Eq,Ord,Show)
 
+-- Reads a library file to begin with
+main :: IO ()
+main = do
+    args <- getArgs
+    let filePath = head args
+    exists <- doesFileExist filePath
+    case exists of
+        False -> putStrLn "File not found"
+        True -> do
+            libraryString <- readFile filePath
+            case parseLibrary libraryString of
+                Left msg      -> error $ "parsing library failed:"++show msg
+                Right library -> do
+                    putStrLn "loaded library"
+                    saveLibrary library
+
 emptyFeatures :: Features (Feature Id)
 emptyFeatures = Features []
 
 mergeFeatures :: Features (Feature Id) -> Features (Feature Id) -> Features (Feature Id)
 mergeFeatures (Features fs1) (Features []) = Features fs1
 mergeFeatures f1@(Features fs1) (Features (f:fs2)) = mergeFeatures (addFeature f1 f) (Features fs2)
-
-getFeature :: Features (Feature Id) -> Maybe (Feature Id)
-getFeature (Features []) = Nothing
-getFeature (Features (x:xs)) = Just x
 
 addFeature :: Features (Feature Id) -> Feature Id -> Features (Feature Id)
 addFeature (Features fs) f
@@ -62,22 +74,6 @@ featuresToString [] _ = ""
 featuresToString [f] sep = (featureToString f)
 featuresToString (f:fs) sep = (featureToString f) ++ sep ++ (featuresToString fs sep)
 
--- Reads a library file to begin with
-main :: IO ()
-main = do
-    args <- getArgs
-    let filePath = head args
-    exists <- doesFileExist filePath
-    case exists of
-        False -> putStrLn "File not found"
-        True -> do
-            libraryString <- readFile filePath
-            case parseLibrary libraryString of
-                Left msg      -> error $ "parsing library failed:"++show msg
-                Right library -> do
-                    putStrLn "loaded library"
-                    saveLibrary library
-
 saveLibrary :: Library Id -> IO ()
 saveLibrary (Library _ _ ls) = do 
     readFeature $ M.elems ls
@@ -93,8 +89,9 @@ readFeature (f:xs) = do
     putStrLn $ "--------------------------------------"
 
     fs <- extractFromExpr (fm_body f) fs
-    printFeatures fs
-    -- readFeature xs
+    putStrLn "Blaha"
+    --printFeatures fs
+    readFeature xs
 
 extractFromExpressions :: [Expr Id] -> Features (Feature Id) -> IO (Features (Feature Id))
 extractFromExpressions [] fs = do return fs
@@ -125,6 +122,12 @@ extractFromExpr expr fs = do
         -- Currently 
         Gbl (Global name typ args) :@: exps -> do
             f1 <- extractFromExpressions exps fs
+            let fargs = extractArgumentFeatures (features f1)
+            let f2 = createMultiFeatures emptyFeatures fargs name (length exps)
+            putStrLn "----- f1:"
+            printFeatures f1
+            putStrLn "----- f2:"
+            printFeatures f2
             return $ addFeature f1 (MultiFeature name (take (length exps) (repeat EmptyFeature)))
 
         -- Local variable, we are looking for the type
@@ -134,6 +137,10 @@ extractFromExpr expr fs = do
         _ -> do
             -- putStrLn $ show expr
             return fs
+
+extractArgumentFeatures :: [Feature Id] -> [Feature Id]
+extractArgumentFeatures [] = []
+extractArgumentFeatures (f:fs) = [f] ++ (extractArgumentFeatures fs)
 
 -- First step in generating the feature combos
 createMultiFeatures :: Features (Feature Id) -> [Feature Id] -> Id -> Int -> Features (Feature Id)
@@ -146,7 +153,5 @@ generateCombos base (a:as) name = (extendCombos emptyCase (generateCombos a as n
     where 
         baseCase = MultiFeature name [base]
         emptyCase = MultiFeature name [EmptyFeature]
-
-extendCombos :: Feature Id -> [Feature Id] -> [Feature Id]
-extendCombos b [] = []
-extendCombos b@(MultiFeature name [base]) ((MultiFeature _ f'):fs) = (MultiFeature name (base:f')):(extendCombos b fs)
+        extendCombos b [] = []
+        extendCombos b@(MultiFeature name' [base']) ((MultiFeature _ f'):fs) = (MultiFeature name' (base':f')):(extendCombos b fs)
