@@ -34,34 +34,27 @@ getFeature (Features (x:xs)) = Just x
 
 addFeature :: Features (Feature Id) -> Feature Id -> Features (Feature Id)
 addFeature (Features fs) f
-    | any (hasFeature f) fs = Features fs
+    | any (equalsFeature f) fs = Features fs
     | otherwise = Features $ (fs++[f])
 
 addFeatures :: Features (Feature Id) -> [Feature Id] -> Features (Feature Id)
 addFeatures f' [] = f'
 addFeatures f' (f:fs) = addFeature (addFeatures f' fs) f
 
-hasFeature :: Feature Id -> Feature Id -> Bool
-hasFeature (SingleFeature a) (SingleFeature b) = (idUnique a) == (idUnique b)
-hasFeature _ _ = False
-
-extractId :: Feature Id -> Id
-extractId (SingleFeature i) = i
-extractId (MultiFeature i _) = i
+equalsFeature :: Feature Id -> Feature Id -> Bool
+equalsFeature (SingleFeature a) (SingleFeature b) = (idUnique a) == (idUnique b)
+equalsFeature _ _ = False
 
 printFeatures :: Features (Feature Id) -> IO ()
 printFeatures (Features []) = return ()
-printFeatures (Features (s@(SingleFeature f):fs)) = do
-    putStrLn $ featureToString s
-    printFeatures (Features fs)
-
-printFeatures (Features (m@(MultiFeature f fs2):fs)) = do
-    putStrLn $ featureToString m
+printFeatures (Features (f:fs)) = do
+    putStrLn $ featureToString f
     printFeatures (Features fs)
 
 featureToString :: Feature Id -> String
 featureToString EmptyFeature = "_"
 featureToString (SingleFeature f) = idString f
+featureToString (MultiFeature f []) = idString f
 featureToString (MultiFeature f fs) = idString f ++ "(" ++ (featuresToString fs " ") ++ ")"
 
 featuresToString :: [Feature Id] -> String -> String
@@ -101,7 +94,7 @@ readFeature (f:xs) = do
 
     fs <- extractFromExpr (fm_body f) fs
     printFeatures fs
-    readFeature [head xs]
+    -- readFeature xs
 
 extractFromExpressions :: [Expr Id] -> Features (Feature Id) -> IO (Features (Feature Id))
 extractFromExpressions [] fs = do return fs
@@ -131,15 +124,15 @@ extractFromExpr expr fs = do
         -- `++`, `list ++`, `++ list` and `list ++ list`.
         -- Currently 
         Gbl (Global name typ args) :@: exps -> do
-            f1@(Features fs1) <- extractFromExpressions exps fs
-            return $ createMultiFeatures fs fs1 name (length fs1)
+            f1 <- extractFromExpressions exps fs
+            return $ addFeature f1 (MultiFeature name (take (length exps) (repeat EmptyFeature)))
 
         -- Local variable, we are looking for the type
         Lcl (Local name (TyCon feature _)) -> do
             return $ addFeature fs (SingleFeature feature)
 
         _ -> do
-            putStrLn $ show expr
+            -- putStrLn $ show expr
             return fs
 
 -- First step in generating the feature combos
