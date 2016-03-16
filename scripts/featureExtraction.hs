@@ -16,6 +16,10 @@ import Control.Monad
 data FNode a = FNode a [FNode a]
     deriving (Eq,Ord,Show)
 
+-- Feature that has been extracted
+data Feature a = SingleF a | MultiF a [Feature a]
+    deriving (Eq,Ord,Show)
+
 -- Reads a library file to begin with
 main :: IO ()
 main = do
@@ -42,13 +46,24 @@ readLibrary (f:xs) = do
     pprint f
     putStrLn $ "--------------------------------------"
     let trees = extractSubTrees 2 (buildTree (fm_body f))
-    
+    let features = extractFeatures trees
+    mapM_ printFeature features
+    putStrLn $ show features
     -- readLibrary xs
 
 -- Printing a tree using indentation
 printTree :: String -> FNode Id -> IO ()
 printTree sep (FNode id fs) = do putStrLn $ sep ++ idString id; mapM_ (printTree (sep ++ "  ")) fs
-    
+
+-- Printing feature
+printFeature :: Feature Id -> IO ()
+printFeature f = do putStrLn $ featureToString f
+
+featureToString :: Feature Id -> String
+featureToString (SingleF id) = idString id
+featureToString (MultiF id []) = idString id
+featureToString (MultiF id fs) = (idString id) ++ "(" ++ (intercalate " " (map featureToString fs)) ++ ")"
+
 -- Builds a tree for an expression, recursively :)
 buildTree :: Expr Id -> FNode Id
 buildTree (Quant _ _ _ e') = buildTree e'
@@ -61,3 +76,14 @@ buildTree _ = FNode (Id "unknown" 0 (Just (0,0))) []
 extractSubTrees :: Int -> FNode Id -> [FNode Id]
 extractSubTrees 1 (FNode id fs) = [(FNode id [])]
 extractSubTrees depth (FNode id fs) = [(FNode id (concat $ map (extractSubTrees (depth-1)) fs))] ++ (concat $ map (extractSubTrees depth) fs)
+
+-- Extracts the features from a list of trees
+extractFeatures :: [FNode Id] -> [Feature Id]
+extractFeatures [] = []
+extractFeatures ((FNode id []):ts) = (SingleF id):(extractFeatures ts)
+extractFeatures ((FNode id fs):ts) = (map (addToMulti (MultiF id [])) (extractFeatures fs)) ++ (extractFeatures ts)
+
+-- Adds a feature to a multi feature
+addToMulti :: Feature Id -> Feature Id -> Feature Id
+addToMulti (MultiF id fs) s@(SingleF _) = (MultiF id [s])
+addToMulti (MultiF id fs) m@(MultiF id' fs') = (MultiF id ((SingleF id'):fs'))
