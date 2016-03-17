@@ -9,18 +9,23 @@ from sklearn.externals import joblib
 
 # Handle arguments
 def fail():
-  print('Usage: python learn.py [/path/to/classifier.pkl]')
+  print('Usage: python learn.py [/path/to/data]')
   sys.exit(0)
 
-classifier_path = None
-if len(sys.argv) == 1: # default path: emna/data/classifier.pkl
-  scriptPath = os.path.dirname(os.path.realpath(__file__))
-  classifier_path = os.path.join(scriptPath, os.pardir, 'data', 'classifier.pkl')
-  classifier_path = os.path.abspath(classifier_path) # prettify
+data_path = None
+if len(sys.argv) == 1: # default path: emna/data
+  script_path = os.path.dirname(os.path.realpath(__file__))
+  data_path = os.path.join(script_path, os.pardir, 'data') 
 elif len(sys.argv) == 2:
-  classifier_path = sys.argv[1]
+  data_path = sys.argv[1]
 else:
   fail()
+classifier_path = os.path.join(data_path, 'classifier.pkl') 
+vectorizer_path = os.path.join(data_path, 'vectorizer.pkl') 
+classifier_path = os.path.abspath(classifier_path) # prettify
+vectorizer_path = os.path.abspath(vectorizer_path)
+
+
 
 # Connect to db
 try:
@@ -46,7 +51,7 @@ def get_features():
   features_list = [features[lemma] for lemma in features]
   v = DictVectorizer()
   features_arr = v.fit_transform(features_list)
-  return features_arr
+  return features_arr, v
 
 
 # Create array of classes (i.e. ["[0,1]", "[0]"])
@@ -73,14 +78,16 @@ def train(features, classes):
 
 def __main__():
   print 'getting features from database'
-  features = get_features()
+  features, v = get_features()
   classes = get_classes()
   print 'training'
   clf = train(features, classes)
   print 'saving to file'
   joblib.dump(clf, classifier_path) 
+  joblib.dump(v, vectorizer_path) 
   print 'done!'
 
+  print features[0]
   # testPrediction = clf.predict(features[0])
   # print 'predicting first datapoint as belonging to', testPrediction
 

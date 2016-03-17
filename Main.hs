@@ -42,15 +42,17 @@ import Control.Concurrent.STM.Promise.Tree hiding (Node)
 import Control.Concurrent.STM.Promise.Workers
 
 import Text.PrettyPrint (Doc)
+import Text.Read (readMaybe)
 
 import System.Environment
+import System.Environment.FindBin
 import System.Directory
 
 import Waldmeister
 
 import qualified System.IO as IO
 import System.Console.CmdArgs
-import System.Process (readProcessWithExitCode)
+import System.Process (readProcessWithExitCode, readCreateProcess, CmdSpec(RawCommand), CreateProcess(cwd,CreateProcess), proc )
 import System.Directory (makeAbsolute)
 
 import qualified Data.Map as M
@@ -197,8 +199,9 @@ tryProve args prover fm thy =
      putStrLn $ "  " ++ (ppTerm (toTerm term))
      IO.hFlush IO.stdout
 
-     let ind_order =  [] --[[2],[1],[0],[]]
-         tree = freshPass (obligations args fm ind_order (prover_pre prover)) thy
+     -- TODO: get ind_order from classify.py
+     ind_order <- getIndOrder fm --[[2],[1],[0],[]]
+     let tree = freshPass (obligations args fm ind_order (prover_pre prover)) thy
 
      ptree :: Tree (Promise [Obligation Result]) <- T.traverse (promise args prover) tree
 
@@ -258,6 +261,22 @@ tryProve args prover fm thy =
        ]
 
      return (ppTerm (toTerm term), if null res then Nothing else mresult)
+
+getIndOrder :: Formula a -> IO ([[Int]])
+getIndOrder f = do
+  -- TODO use featureExtraction.hs
+  let features :: [String] = ["a", "b", "++"]
+  -- call classify.py
+  -- Getting CWD in Haskell is f'ing impossible
+  --cwd <- getProgPath
+  --cwd <- getCurrentDirectory
+  let process = (proc "python" ["./scripts/classify.py", show features]) { cwd = Just "/Users/aom/emna" }
+  result <- readCreateProcess process ""
+  print result
+  return $ case readMaybe result of
+    Nothing -> []
+    Just xs -> xs
+
 
 obligations :: Name a => Args -> Formula a -> [[Int]] -> [StandardPass] -> Theory a -> Fresh (Tree (Obligation (Theory a)))
 obligations args fm ind_order pre_passes thy0 =
