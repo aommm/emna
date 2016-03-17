@@ -26,7 +26,7 @@ import Tip.Utils (usort)
 import Data.Generics.Geniplate
 
 import Data.Maybe
-import Data.List (sort, sortBy, isInfixOf, nub, (\\), intercalate)
+import Data.List (sort, sortBy, isInfixOf, nub, (\\), intercalate, delete)
 import Data.Ord
 import Data.Char
 
@@ -197,7 +197,8 @@ tryProve args prover fm thy =
      putStrLn $ "  " ++ (ppTerm (toTerm term))
      IO.hFlush IO.stdout
 
-     let tree = freshPass (obligations args fm (prover_pre prover)) thy
+     let ind_order =  [] --[[2],[1],[0],[]]
+         tree = freshPass (obligations args fm ind_order (prover_pre prover)) thy
 
      ptree :: Tree (Promise [Obligation Result]) <- T.traverse (promise args prover) tree
 
@@ -258,16 +259,16 @@ tryProve args prover fm thy =
 
      return (ppTerm (toTerm term), if null res then Nothing else mresult)
 
-obligations :: Name a => Args -> Formula a -> [StandardPass] -> Theory a -> Fresh (Tree (Obligation (Theory a)))
-obligations args fm pre_passes thy0 =
+obligations :: Name a => Args -> Formula a -> [[Int]] -> [StandardPass] -> Theory a -> Fresh (Tree (Obligation (Theory a)))
+obligations args fm ind_order pre_passes thy0 =
   requireAny <$>
     sequence
       [ do body' <- freshen (fm_body fm)
-           pack coords <$>
+           trace (show coords) $ pack coords <$>
              runPasses
                (pre_passes ++ [Induction coords])
                (thy0 { thy_asserts = fm{ fm_body = body' } : thy_asserts thy0})
-      | coords <- combine [ i | (Local _ (TyCon t _),i) <- formulaVars fm `zip` [0..]
+      | coords <- (sort ind_order . combine) [ i | (Local _ (TyCon t _),i) <- formulaVars fm `zip` [0..]
                               , Just DatatypeInfo{} <- [lookupType t scp]
                               ]
       ]
@@ -284,6 +285,11 @@ obligations args fm pre_passes thy0 =
       [ Leaf (Obligation (ObInduction coords i (length thys)) thy)
       | (thy,i) <- thys `zip` [0..]
       ]
+  -- sort the second list based on the order defined by the first list
+  sort (x:xs) ys | x `elem` ys = x : sort xs (delete x ys)
+                 | otherwise   = sort xs ys
+  sort []     ys               = ys
+
 
 data Obligation a = Obligation
     { ob_info     :: ObInfo
