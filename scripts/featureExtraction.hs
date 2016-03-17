@@ -36,6 +36,7 @@ main = do
 readLibrary :: [Formula Id] -> IO ()
 readLibrary [] = return ()
 readLibrary (f:xs) = do
+    putStrLn $ (fromJust $ getFmName f)
     let tree = buildTree (fm_body f)
     let trees = extractSubTrees 3 tree
     let features = nub $ concat $ map extractFeatures trees
@@ -51,6 +52,7 @@ buildTree :: Expr Id -> FNode Id
 buildTree (Quant _ _ _ e') = buildTree e'
 buildTree (Builtin Equal :@: exps) = FNode (Id "==" 0 (Just (0,0))) $ map buildTree exps
 buildTree (Lcl (Local name (TyCon feature _))) = FNode feature []
+buildTree (Lcl (Local name (TyVar feature))) = FNode (Id "anyType" 0 (Just (0,0))) []
 buildTree (Gbl (Global name typ args) :@: exps) = FNode name $ map buildTree exps
 buildTree _ = FNode (Id "unknown" 0 (Just (0,0))) []
 
