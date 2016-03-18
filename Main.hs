@@ -266,14 +266,14 @@ getIndOrder :: Formula a -> IO ([[Int]])
 getIndOrder f = do
   -- TODO use featureExtraction.hs
   let features :: [String] = ["a", "b", "++"]
-  -- call classify.py
-  -- Getting CWD in Haskell is f'ing impossible
+  -- TODO Getting CWD in Haskell is f'ing impossible, hardcoded for now
   --cwd <- getProgPath
   --cwd <- getCurrentDirectory
-  let process = (proc "python" ["./scripts/classify.py", show features]) { cwd = Just "/Users/aom/emna" }
-  result <- readCreateProcess process ""
-  print result
-  return $ case readMaybe result of
+  let cwd = "/Users/aom/emna"
+  let process = (proc "python" ["./scripts/classify.py", show features]) { cwd = Just cwd }
+  out <- readCreateProcess process ""
+  print out
+  return $ case readMaybe out of
     Nothing -> []
     Just xs -> xs
 
