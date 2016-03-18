@@ -26,7 +26,7 @@ import Tip.Utils (usort)
 import Data.Generics.Geniplate
 
 import Data.Maybe
-import Data.List (sort, sortBy, isInfixOf, nub, (\\), intercalate)
+import Data.List (sort, sortBy, isInfixOf, nub, (\\), intercalate, delete)
 import Data.Ord
 import Data.Char
 
@@ -42,15 +42,17 @@ import Control.Concurrent.STM.Promise.Tree hiding (Node)
 import Control.Concurrent.STM.Promise.Workers
 
 import Text.PrettyPrint (Doc)
+import Text.Read (readMaybe)
 
 import System.Environment
+import System.Environment.FindBin
 import System.Directory
 
 import Waldmeister
 
 import qualified System.IO as IO
 import System.Console.CmdArgs
-import System.Process (readProcessWithExitCode)
+import System.Process (readProcessWithExitCode, readCreateProcess, CmdSpec(RawCommand), CreateProcess(cwd,CreateProcess), proc )
 import System.Directory (makeAbsolute)
 
 import qualified Data.Map as M
@@ -197,7 +199,9 @@ tryProve args prover fm thy =
      putStrLn $ "  " ++ (ppTerm (toTerm term))
      IO.hFlush IO.stdout
 
-     let tree = freshPass (obligations args fm (prover_pre prover)) thy
+     -- TODO: get ind_order from classify.py
+     ind_order <- getIndOrder fm --[[2],[1],[0],[]]
+     let tree = freshPass (obligations args fm ind_order (prover_pre prover)) thy
 
      ptree :: Tree (Promise [Obligation Result]) <- T.traverse (promise args prover) tree
 
@@ -258,16 +262,32 @@ tryProve args prover fm thy =
 
      return (ppTerm (toTerm term), if null res then Nothing else mresult)
 
-obligations :: Name a => Args -> Formula a -> [StandardPass] -> Theory a -> Fresh (Tree (Obligation (Theory a)))
-obligations args fm pre_passes thy0 =
+getIndOrder :: Formula a -> IO ([[Int]])
+getIndOrder f = do
+  -- TODO use featureExtraction.hs
+  let features :: [String] = ["a", "b", "++"]
+  -- call classify.py
+  -- Getting CWD in Haskell is f'ing impossible
+  --cwd <- getProgPath
+  --cwd <- getCurrentDirectory
+  let process = (proc "python" ["./scripts/classify.py", show features]) { cwd = Just "/Users/aom/emna" }
+  result <- readCreateProcess process ""
+  print result
+  return $ case readMaybe result of
+    Nothing -> []
+    Just xs -> xs
+
+
+obligations :: Name a => Args -> Formula a -> [[Int]] -> [StandardPass] -> Theory a -> Fresh (Tree (Obligation (Theory a)))
+obligations args fm ind_order pre_passes thy0 =
   requireAny <$>
     sequence
       [ do body' <- freshen (fm_body fm)
-           pack coords <$>
+           trace (show coords) $ pack coords <$>
              runPasses
                (pre_passes ++ [Induction coords])
                (thy0 { thy_asserts = fm{ fm_body = body' } : thy_asserts thy0})
-      | coords <- combine [ i | (Local _ (TyCon t _),i) <- formulaVars fm `zip` [0..]
+      | coords <- (sort ind_order . combine) [ i | (Local _ (TyCon t _),i) <- formulaVars fm `zip` [0..]
                               , Just DatatypeInfo{} <- [lookupType t scp]
                               ]
       ]
@@ -284,6 +304,11 @@ obligations args fm pre_passes thy0 =
       [ Leaf (Obligation (ObInduction coords i (length thys)) thy)
       | (thy,i) <- thys `zip` [0..]
       ]
+  -- sort the second list based on the order defined by the first list
+  sort (x:xs) ys | x `elem` ys = x : sort xs (delete x ys)
+                 | otherwise   = sort xs ys
+  sort []     ys               = ys
+
 
 data Obligation a = Obligation
     { ob_info     :: ObInfo
