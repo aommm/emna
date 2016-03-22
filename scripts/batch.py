@@ -46,7 +46,7 @@ for problem in problems:
 	total += 1
 	problem_name = os.path.splitext(problem)[0]
 	problem_file = join(dir_path, problem)
-	print("proving "+problem_name+str(timeit.default_timer()))
+	print("proving "+problem_name)
 	# Run emna
 	start_time = timeit.default_timer()
 	output = sh.emna('--prover=z', '--output='+proof_path, problem_file, _ok_code=[0,1], _err=print_err, _out=print_out, _tty_out=False)
