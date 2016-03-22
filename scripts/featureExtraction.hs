@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 import System.Environment
 import System.Directory
 import Tip.Parser (parseLibrary)
@@ -12,6 +14,8 @@ import Data.List
 import Debug.Trace
 import Control.Monad
 import Database.PostgreSQL.Simple
+import Data.ByteString.Internal
+import Data.ByteString.Char8 (pack)
 
 -- Tree structure
 data FNode a = FNode a [FNode a]
@@ -31,7 +35,33 @@ main = do
                 Left msg      -> error $ "Parsing library failed:"++show msg
                 Right (Library _ _ ls) -> do
                     features <- readLibrary (M.elems ls)
-                    putStrLn $ show features
+                    conn <- connectPostgreSQL (pack "dbname='' user='' password=''")
+                    clearDB conn
+                    insertLemmas conn features
+                    insertFeatures conn features
+                    putStrLn "finished"
+
+clearDB :: Connection -> IO ()
+clearDB conn = do
+    execute_ conn "delete from hs_lemma_feature"
+    execute_ conn "delete from hs_lemma_using"
+    execute_ conn "delete from hs_lemma" 
+    return ()
+
+-- Inserts a all the lemmas
+insertLemmas :: Connection -> [(String, [String])] -> IO ()
+insertLemmas conn [] = return ()
+insertLemmas conn ((lemma, _):xs) = do
+    execute conn "insert into hs_lemma (name) values (?) " [lemma]
+    insertLemmas conn xs
+
+-- Inserts all the features
+insertFeatures :: Connection -> [(String, [String])] -> IO ()
+insertFeatures conn [] = return ()
+insertFeatures conn ((lemma, features):xs) = do
+    let values = zip (take (length features) (repeat lemma)) features
+    executeMany conn "insert into hs_lemma_feature (lemma, feature) values (?,?)" values
+    insertFeatures conn xs
 
 -- Going through each lemma of the library
 readLibrary :: [Formula Id] -> IO ([(String, [String])])
