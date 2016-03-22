@@ -11,6 +11,7 @@ import Data.Maybe
 import Data.List
 import Debug.Trace
 import Control.Monad
+import Database.PostgreSQL.Simple
 
 -- Tree structure
 data FNode a = FNode a [FNode a]
@@ -29,19 +30,18 @@ main = do
             case parseLibrary libraryString of
                 Left msg      -> error $ "Parsing library failed:"++show msg
                 Right (Library _ _ ls) -> do
-                    putStrLn "Loaded library"
-                    readLibrary (M.elems ls)
+                    features <- readLibrary (M.elems ls)
+                    putStrLn $ show features
 
 -- Going through each lemma of the library
-readLibrary :: [Formula Id] -> IO ()
-readLibrary [] = return ()
+readLibrary :: [Formula Id] -> IO ([(String, [String])])
+readLibrary [] = return []
 readLibrary (f:xs) = do
-    putStrLn $ (fromJust $ getFmName f)
     let tree = buildTree (fm_body f)
     let trees = extractSubTrees 3 tree
     let features = nub $ concat $ map extractFeatures trees
-    putStrLn $ show features
-    readLibrary xs
+    rest <- readLibrary xs
+    return $ ((fromJust $ getFmName f), features):rest
 
 -- Printing a tree using indentation
 printTree :: String -> FNode Id -> IO ()
