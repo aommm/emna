@@ -264,6 +264,8 @@ tryProve args prover fm thy =
 
 getIndOrder :: Formula a -> IO ([[Int]])
 getIndOrder f = do
+  return []
+  {-
   -- TODO use featureExtraction.hs
   let features :: [String] = ["a", "b", "++"]
   -- TODO Getting CWD in Haskell is f'ing impossible, hardcoded for now
@@ -276,7 +278,7 @@ getIndOrder f = do
   return $ case readMaybe out of
     Nothing -> []
     Just xs -> xs
-
+-}
 
 obligations :: Name a => Args -> Formula a -> [[Int]] -> [StandardPass] -> Theory a -> Fresh (Tree (Obligation (Theory a)))
 obligations args fm ind_order pre_passes thy0 =
