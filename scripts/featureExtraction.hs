@@ -35,7 +35,7 @@ main = do
                 Left msg      -> error $ "Parsing library failed:"++show msg
                 Right (Library _ _ ls) -> do
                     features <- readLibrary (M.elems ls)
-                    conn <- connectPostgreSQL (pack "dbname='' user='' password=''")
+                    conn <- connectPostgreSQL (pack "dbname='hipspec' user='hipspecuser' password='hipspecpassword'")
                     clearDB conn
                     insertLemmas conn features
                     insertFeatures conn features
@@ -49,29 +49,32 @@ clearDB conn = do
     return ()
 
 -- Inserts a all the lemmas
-insertLemmas :: Connection -> [(String, [String])] -> IO ()
+insertLemmas :: Connection -> [(String, [Int], [String])] -> IO ()
 insertLemmas conn [] = return ()
-insertLemmas conn ((lemma, _):xs) = do
-    execute conn "insert into hs_lemma (name) values (?) " [lemma]
+insertLemmas conn ((lemma, vars, _):xs) = do
+    execute conn "insert into hs_lemma (name, indvars) values (?, ?) " [lemma, ("{" ++ (intercalate "," (map show vars)) ++ "}")]
     insertLemmas conn xs
 
 -- Inserts all the features
-insertFeatures :: Connection -> [(String, [String])] -> IO ()
+insertFeatures :: Connection -> [(String, [Int], [String])] -> IO ()
 insertFeatures conn [] = return ()
-insertFeatures conn ((lemma, features):xs) = do
+insertFeatures conn ((lemma, _, features):xs) = do
     let values = zip (take (length features) (repeat lemma)) features
     executeMany conn "insert into hs_lemma_feature (lemma, feature) values (?,?)" values
     insertFeatures conn xs
 
 -- Going through each lemma of the library
-readLibrary :: [Formula Id] -> IO ([(String, [String])])
+readLibrary :: [Formula Id] -> IO ([(String, [Int], [String])])
 readLibrary [] = return []
 readLibrary (f:xs) = do
     let tree = buildTree (fm_body f)
     let trees = extractSubTrees 3 tree
     let features = nub $ concat $ map extractFeatures trees
     rest <- readLibrary xs
-    return $ ((fromJust $ getFmName f), features):rest
+    return $ ((fromJust $ getFmName f), (getInductionVariables $ fm_info f), features):rest
+
+getInductionVariables :: Info Id -> [Int]
+getInductionVariables (Lemma _ _ (Just (_, vars))) = vars
 
 -- Printing a tree using indentation
 printTree :: String -> FNode Id -> IO ()
