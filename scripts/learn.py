@@ -39,7 +39,7 @@ except:
 def get_features():
   # Get from db
   cur = conn.cursor()
-  cur.execute("""SELECT * from hs_lemma_feature""")
+  cur.execute("""SELECT * from hs_lemma_feature ORDER BY lemma""")
   rows = cur.fetchall()
   # Create dict
   features = dict()
@@ -58,15 +58,12 @@ def get_features():
 def get_classes():
   # Get from db
   cur = conn.cursor()
-  cur.execute("""SELECT * from hs_lemma""")
+  cur.execute("""SELECT * from hs_lemma ORDER BY name""")
   rows = cur.fetchall()
-  # Create set
-  classes = set()
-  for [lemma, indvars] in rows:
-    clas = str(indvars)
-    classes.add(clas)
+  # Extract classes
+  classes_list = [str(indvars) for [lemma, indvars] in rows]
   # Convert to numerical thingy
-  classes_arr = numpy.array(list(classes))
+  classes_arr = numpy.array(list(classes_list))
   return classes_arr    
 
 
@@ -87,7 +84,6 @@ def __main__():
   joblib.dump(v, vectorizer_path) 
   print 'done!'
 
-  print features[0]
   # testPrediction = clf.predict(features[0])
   # print 'predicting first datapoint as belonging to', testPrediction
 
