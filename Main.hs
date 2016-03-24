@@ -55,6 +55,8 @@ import System.Console.CmdArgs
 import System.Process (readProcessWithExitCode, readCreateProcess, CmdSpec(RawCommand), CreateProcess(cwd,CreateProcess), proc )
 import System.Directory (makeAbsolute)
 
+import FeatureExtraction
+
 import qualified Data.Map as M
 import Data.Map (Map)
 
