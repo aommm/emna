@@ -11,6 +11,7 @@ import Data.Map (Map)
 import qualified Data.Map as M
 import Tip.Types
 import Tip.Pretty
+import Tip.Fresh
 import Data.Maybe
 import Data.List
 import Debug.Trace
@@ -48,47 +49,47 @@ insertFeatures conn ((lemma, _, features):xs) = do
     insertFeatures conn xs
 
 -- Going through each lemma of the library
-readLibrary :: [Formula Id] -> IO ([(String, [Int], [String])])
-readLibrary [] = return []
-readLibrary (f:xs) = do
+formulasToFeatures :: Name a => [Formula a] -> IO ([(String, [Int], [String])])
+formulasToFeatures [] = return []
+formulasToFeatures (f:xs) = do
     let tree = buildTree (fm_body f)
     let trees = extractSubTrees 3 tree
     let features = nub $ concat $ map extractFeatures trees
-    rest <- readLibrary xs
+    rest <- formulasToFeatures xs
     return $ ((fromJust $ getFmName f), (getInductionVariables $ fm_info f), features):rest
 
-getInductionVariables :: Info Id -> [Int]
+getInductionVariables :: Name a => Info a -> [Int]
 getInductionVariables (Lemma _ _ (Just (_, vars))) = vars
 
 -- Printing a tree using indentation
-printTree :: String -> FNode Id -> IO ()
-printTree sep (FNode id fs) = do putStrLn $ sep ++ idString id; mapM_ (printTree (sep ++ "  ")) fs
+printTree :: String -> FNode String -> IO ()
+printTree sep (FNode id fs) = do putStrLn $ sep ++ id; mapM_ (printTree (sep ++ "  ")) fs
 
 -- Builds a tree for an expression, recursively :)
-buildTree :: Expr Id -> FNode Id
+buildTree :: Name a => Expr a -> FNode String
 buildTree (Quant _ _ _ e') = buildTree e'
-buildTree (Builtin Equal :@: exps) = FNode (Id "==" 0 (Just (0,0))) $ map buildTree exps
-buildTree (Lcl (Local name (TyCon feature _))) = FNode feature []
-buildTree (Lcl (Local name (TyVar feature))) = FNode (Id "anyType" 0 (Just (0,0))) []
-buildTree (Gbl (Global name typ args) :@: exps) = FNode name $ map buildTree exps
-buildTree _ = FNode (Id "unknown" 0 (Just (0,0))) []
+buildTree (Builtin Equal :@: exps) = FNode "==" $ map buildTree exps
+buildTree (Lcl (Local name (TyCon feature _))) = FNode (varStr feature) []
+buildTree (Lcl (Local name (TyVar feature))) = FNode "anyType" []
+buildTree (Gbl (Global name typ args) :@: exps) = FNode (varStr name) $ map buildTree exps
+buildTree _ = FNode "unknown" []
 
 -- Extract subtrees with certain depth. Returns all possible trees as a list
-extractSubTrees :: Int -> FNode Id -> [FNode Id]
+extractSubTrees :: Int -> FNode String -> [FNode String]
 extractSubTrees depth f@(FNode id fs) = [thisSubTree] ++ otherSubTrees
     where
         thisSubTree =  extractSubTree depth f --(FNode id (concat $ map (extractSubTrees (depth-1)) fs))
         otherSubTrees = (concat $ map (extractSubTrees depth) fs)
 
 -- Extract one subtree
-extractSubTree :: Int -> FNode Id -> FNode Id
+extractSubTree :: Int -> FNode String -> FNode String
 extractSubTree 1 (FNode id _) = (FNode id [])
 extractSubTree depth (FNode id fs) = (FNode id (map (extractSubTree (depth-1)) fs))
 
 -- Extracts features from a tree
-extractFeatures :: FNode Id -> [String]
-extractFeatures (FNode id []) = [(idString id)]
-extractFeatures (FNode id f') = [(idString id)] ++ (map (\x -> (idString id) ++ "(" ++ x ++ ")") combos)
+extractFeatures :: FNode String -> [String]
+extractFeatures (FNode id []) = [id]
+extractFeatures (FNode id f') = [id] ++ (map (\x -> (id) ++ "(" ++ x ++ ")") combos)
     where
         arguments = map extractFeatures f'
         combos = combineArguments arguments

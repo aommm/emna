@@ -33,7 +33,7 @@ main = do
             case parseLibrary libraryString of
                 Left msg      -> error $ "Parsing library failed:"++show msg
                 Right (Library _ _ ls) -> do
-                    features <- readLibrary (M.elems ls)
+                    features <- formulasToFeatures (M.elems ls)
                     conn <- connectPostgreSQL (pack "dbname='hipspec' user='' password=''")
                     clearDB conn
                     insertLemmas conn features

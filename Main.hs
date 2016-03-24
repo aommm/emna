@@ -55,7 +55,7 @@ import System.Console.CmdArgs
 import System.Process (readProcessWithExitCode, readCreateProcess, CmdSpec(RawCommand), CreateProcess(cwd,CreateProcess), proc )
 import System.Directory (makeAbsolute)
 
-import FeatureExtraction
+import FeatureExtraction (formulasToFeatures)
 
 import qualified Data.Map as M
 import Data.Map (Map)
@@ -264,23 +264,20 @@ tryProve args prover fm thy =
 
      return (ppTerm (toTerm term), if null res then Nothing else mresult)
 
-getIndOrder :: Formula a -> IO ([[Int]])
+getIndOrder :: Name a => Formula a -> IO ([[Int]])
 getIndOrder f = do
-  return []
-  {-
-  -- TODO use featureExtraction.hs
-  let features :: [String] = ["a", "b", "++"]
+  [(_name,_indvars,features)] <- formulasToFeatures [f]
   -- TODO Getting CWD in Haskell is f'ing impossible, hardcoded for now
   --cwd <- getProgPath
   --cwd <- getCurrentDirectory
   let cwd = "/Users/aom/emna"
-  let process = (proc "python" ["./scripts/classify.py", show features]) { cwd = Just cwd }
+  -- TODO remove data here
+  let process = (proc "python" ["./scripts/classify.py", show features, "./step2/data"]) { cwd = Just cwd }
   out <- readCreateProcess process ""
-  print out
+  putStrLn $ "induction order from script:"++out
   return $ case readMaybe out of
     Nothing -> []
     Just xs -> xs
--}
 
 obligations :: Name a => Args -> Formula a -> [[Int]] -> [StandardPass] -> Theory a -> Fresh (Tree (Obligation (Theory a)))
 obligations args fm ind_order pre_passes thy0 =
