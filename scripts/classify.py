@@ -53,11 +53,13 @@ def classify_features(formula, clf):
   return classes
   
 def __main__():
-  clf = joblib.load(classifier_path)
-  v = joblib.load(vectorizer_path)
-  features = parse_features(features_string, v)
-  classes = classify_features(features, clf)
-  sys.stdout.write(str(classes)) # print without newline
-  # sys.stdout.write("[]")
+  try:
+    clf = joblib.load(classifier_path)
+    v = joblib.load(vectorizer_path)
+    features = parse_features(features_string, v)
+    classes = classify_features(features, clf)
+    sys.stdout.write(str(classes)) # print without newline
+  except Exception:
+    sys.stdout.write("[]")
 
 __main__()
