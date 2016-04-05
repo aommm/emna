@@ -59,7 +59,7 @@ formulasToFeatures (f:xs) = do
     return $ ((fromJust $ getFmName f), (getInductionVariables $ fm_info f), features):rest
 
 getInductionVariables :: Name a => Info a -> [Int]
-getInductionVariables (Lemma _ _ (Just (_, vars))) = vars
+getInductionVariables (Lemma _ _ (Just p)) = indVars p
 
 -- Printing a tree using indentation
 printTree :: String -> FNode String -> IO ()
