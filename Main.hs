@@ -180,15 +180,15 @@ loop args prover thy = go False conjs [] thy{ thy_asserts = assums }
   go b     (c:cs) q thy =
     do (str,m_result) <- tryProve args prover c thy
        case m_result of
-         Just proof@(lemmas,coords) ->
+         Just proof ->
            do let lms = thy_asserts thy
               let n = (length lms)
               g <- go True cs q thy{ thy_asserts = makeProved n c proof:lms }
               case g of
                 Right m -> return $
                   Right $ do putStrLn $ pad (show n) 2 ++ ": " ++ rpad str 40 ++
-                                     if null lemmas then ""
-                                        else " using " ++ intercalate ", " (map show lemmas)
+                                     if null (lemmasUsed proof) then ""
+                                        else " using " ++ intercalate ", " (map show (lemmasUsed proof))
                              m
                 l -> return l
          Nothing -> go b    cs (c:q) thy
@@ -252,7 +252,8 @@ tryProve args prover fm thy =
                  let lemmas' = usort lemmas
                      -- Name lemmas locally first; will probably be translated later
                      lemmaNames = map (\l -> "lemma-"++show l) lemmas'
-                 return $ Just (lemmaNames, coords)
+                 -- TODO: not hardcoded provers
+                 return $ Just $ ProofSketch lemmaNames coords Structural "z3-4.4.0" "emna-0.1"
 
          | otherwise
            -> do putStrLn $ "Confusion :("
