@@ -69,7 +69,9 @@ data Args =
     , timeout :: Double
     , filenames :: Bool
     , prover    :: String
-    , output    :: Maybe String
+    , output    :: String
+    , workingDir :: String
+    , dataDir   :: String
     }
   deriving (Show,Data,Typeable)
 
@@ -83,26 +85,37 @@ defArgs =
     , timeout = 1     &= name "t" &= help "Timeout in seconds (default 1)"
     , filenames = False           &= help "Print out filenames of theories"
     , prover = "w"                &= help "Prover (waldmeister/z3)"
-    , output = Nothing &= name "o" &= help "Proof output file"
+    , output = "" &= name "o" &= help "Proof output file (default: dataDir/lib.tiplib)"
+    -- v Workaround: store cwd here since getCurrentDirectory crashes in some fns
+    , workingDir = ""         &= help "Working directory for scripts (default: cwd)" 
+    , dataDir = "" &= name "d" &= help "Path to data directory (default: cwd/data)"
     }
   &= program "emna" &= summary "simple inductive prover with proof output"
 
 -- Parse command line arguments
 parseArgs :: IO Args
 parseArgs = do
+  cwd <- getCurrentDirectory 
   args <- cmdArgs defArgs
-  if isJust (output args)
-    then do
-      -- dereference hej to path/to/cwd/hej
-      -- TODO: doesn't defererence ~, . or ..
-      let (Just path) = output args
-      path' <- makeAbsolute path
-      return args {output = Just path'}
-    else do
-      return args
+  -- Process 'dataDir'
+  let dataDir' = if dataDir args == ""
+                  then cwd ++ "/data"
+                  else dataDir args
+  -- Process 'output'
+  let output' = if output args == ""
+                 then dataDir' ++ "/lib.tiplib"
+                 else output args
+
+  -- make paths absolute
+  -- dereference hej to path/to/cwd/hej
+  -- TODO: doesn't defererence ~, . or ..
+  dataDir'' <- makeAbsolute dataDir'
+  output'' <- makeAbsolute output'
+  return args {output = output'', dataDir = dataDir'', workingDir = cwd}
+
 
 main :: IO ()
-main = do
+main = do  
   args@Args{..} <- parseArgs
   x <- readHaskellOrTipFile file defaultParams{ extra_names = extra }
   case x of
@@ -201,8 +214,7 @@ tryProve args prover fm thy =
      putStrLn $ "  " ++ (ppTerm (toTerm term))
      IO.hFlush IO.stdout
 
-     -- TODO: get ind_order from classify.py
-     ind_order <- getIndOrder fm --[[2],[1],[0],[]]
+     ind_order <- getIndOrder args fm --[[2],[1],[0],[]]
      let tree = freshPass (obligations args fm ind_order (prover_pre prover)) thy
 
      ptree :: Tree (Promise [Obligation Result]) <- T.traverse (promise args prover) tree
@@ -264,15 +276,10 @@ tryProve args prover fm thy =
 
      return (ppTerm (toTerm term), if null res then Nothing else mresult)
 
-getIndOrder :: Name a => Formula a -> IO ([[Int]])
-getIndOrder f = do
+getIndOrder :: Name a => Args -> Formula a -> IO ([[Int]])
+getIndOrder args f = do
   [(_name,_indvars,features)] <- formulasToFeatures [f]
-  -- TODO Getting CWD in Haskell is f'ing impossible, hardcoded for now
-  --cwd <- getProgPath
-  --cwd <- getCurrentDirectory
-  let cwd = "/Users/aom/emna"
-  -- TODO remove data here
-  let process = (proc "python" ["./scripts/classify.py", show features, "./step2/data"]) { cwd = Just cwd }
+  let process = (proc "python" ["./scripts/classify.py", show features, dataDir args]) { cwd = Just (workingDir args) }
   out <- readCreateProcess process ""
   putStrLn $ "induction order from script:"++out
   return $ case readMaybe out of
@@ -345,7 +352,7 @@ saveTheory args thy = do
 
     -- TODO: only absolute path works here, why!?
     -- http://stackoverflow.com/questions/21765570/haskell-compilation-with-an-input-file-error-openfile-does-not-exist-no-such
-    let (Just filePath) = output args
+    let filePath = output args
     -- maybe read existing library
     exists <- doesFileExist filePath
     library <- if exists
@@ -375,7 +382,7 @@ saveTheory args thy = do
     writeFile filePath (libString)
     putStrLn "... done!"
     return ()
-  where hasOutput = isJust . output
+  where hasOutput _ = True
 
 
 data Prover = Prover
