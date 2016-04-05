@@ -25,6 +25,7 @@ main :: IO ()
 main = do
     args <- getArgs
     let filePath = head args
+    connString <- getConnString
     exists <- doesFileExist filePath
     case exists of
         False -> putStrLn "File not found"
@@ -39,4 +40,17 @@ main = do
                     insertLemmas conn features
                     insertFeatures conn features
                     putStrLn "finished"
+
+getConnString :: IO String
+getConnString = do
+    dbName <- lookupEnv "HS_DB_NAME"
+    dbHost <- lookupEnv "HS_DB_HOST"
+    dbUsername <- lookupEnv "HS_DB_USERNAME"
+    dbPassword <- lookupEnv "HS_DB_PASSWORD"
+    let dbName' = fromMaybe "hipspec" dbName
+    let dbHost' = fromMaybe "localhost" dbHost
+    let connString = "dbname='"++ dbName'++ "' host='"++ dbHost' ++"'"
+    let connStringUser = maybe "" (\s -> " username='"++ s ++"'") dbUsername
+    let connStringPass = maybe "" (\s -> " password='"++ s ++"'") dbPassword
+    return $ connString ++ connStringUser ++ connStringPass
 
