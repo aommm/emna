@@ -209,12 +209,20 @@ extractQuantifiedLocals fm thy =
 tryProve :: Name a => Args -> Prover -> Formula a -> Theory a -> IO (String, Maybe ProofSketch)
 tryProve args prover fm thy =
   do let (prenex,term) = extractQuantifiedLocals fm thy
+     
+     let getLemmaName coord | length prenex > coord = Just $ lcl_name (prenex !! coord)
+                            | otherwise = Nothing 
+     let getLemmaNames coords = catMaybes $ map getLemmaName coords
+
 
      putStrLn "Considering:"
      putStrLn $ "  " ++ (ppTerm (toTerm term))
      IO.hFlush IO.stdout
 
      ind_order <- getIndOrder args fm --[[2],[1],[0],[]]
+     let ind_order_pretty = map getLemmaNames ind_order
+     putStrLn $ "induction order from script:"++show ind_order_pretty
+
      let tree = freshPass (obligations args fm ind_order (prover_pre prover)) thy
 
      ptree :: Tree (Promise [Obligation Result]) <- T.traverse (promise args prover) tree
@@ -232,7 +240,7 @@ tryProve args prover fm thy =
          , all (isSuccess . ob_content) res
            -> do if null coords
                     then putStrLn $ "Proved without using induction"
-                    else putStrLn $ "Proved by induction on " ++ intercalate ", " (map (lcl_name . (prenex !!)) coords)
+                    else putStrLn $ "Proved by induction on " ++ intercalate ", " (getLemmaNames coords)
                  
                  -- try parsing prover output
                  let steps =
@@ -282,7 +290,6 @@ getIndOrder args f = do
   [(_name,_indvars,features)] <- formulasToFeatures [f]
   let process = (proc "python" ["./scripts/classify.py", show features, dataDir args]) { cwd = Just (workingDir args) }
   out <- readCreateProcess process ""
-  putStrLn $ "induction order from script:"++out
   return $ case readMaybe out of
     Nothing -> []
     Just xs -> xs
