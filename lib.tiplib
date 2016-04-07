@@ -1,0 +1,1397 @@
+(declare-datatypes (a)
+  ((list (nil) (cons (head a) (tail (list a))))))
+(declare-datatypes (a)
+  ((Tree (Leaf)
+     (Node (Node_0 (Tree a)) (Node_1 a) (Node_2 (Tree a))))))
+(declare-datatypes (a b) ((Pair (Pair2 (first a) (second b)))))
+(declare-datatypes () ((Nat (Z) (S (p Nat)))))
+(define-fun-rec
+  (par (a b)
+    (zip
+       ((x (list a)) (y (list b))) (list (Pair a b))
+       (match x
+         (case nil (as nil (list (Pair a b))))
+         (case (cons z x2)
+           (match y
+             (case nil (as nil (list (Pair a b))))
+             (case (cons x3 x4) (cons (Pair2 z x3) (zip x2 x4)))))))))
+(define-fun
+  (par (a b)
+    (zipConcat
+       ((x a) (y (list a)) (z (list b))) (list (Pair a b))
+       (match z
+         (case nil (as nil (list (Pair a b))))
+         (case (cons y2 ys) (cons (Pair2 x y2) (zip y ys)))))))
+(define-fun-rec
+  (par (a)
+    (takeWhile
+       ((x (=> a Bool)) (y (list a))) (list a)
+       (match y
+         (case nil (as nil (list a)))
+         (case (cons z xs)
+           (ite (@ x z) (cons z (takeWhile x xs)) (as nil (list a))))))))
+(define-fun-rec
+  (par (a)
+    (take
+       ((x Nat) (y (list a))) (list a)
+       (match x
+         (case Z (as nil (list a)))
+         (case (S z)
+           (match y
+             (case nil (as nil (list a)))
+             (case (cons x2 x3) (cons x2 (take z x3)))))))))
+(define-fun-rec
+  (par (a)
+    (qrev
+       ((x (list a)) (y (list a))) (list a)
+       (match x
+         (case nil y)
+         (case (cons z xs) (qrev xs (cons z y)))))))
+(define-fun-rec
+  plus
+    ((x Nat) (y Nat)) Nat
+    (match x
+      (case Z y)
+      (case (S z) (S (plus z y)))))
+(define-fun
+  (par (a)
+    (null
+       ((x (list a))) Bool
+       (match x
+         (case nil true)
+         (case (cons y z) false)))))
+(define-fun-rec
+  (par (a)
+    (mirror
+       ((x (Tree a))) (Tree a)
+       (match x
+         (case Leaf (as Leaf (Tree a)))
+         (case (Node l y r) (Node (mirror r) y (mirror l)))))))
+(define-fun-rec
+  min2
+    ((x Nat) (y Nat)) Nat
+    (match x
+      (case Z Z)
+      (case (S z)
+        (match y
+          (case Z Z)
+          (case (S y2) (S (min2 z y2)))))))
+(define-fun-rec
+  max2
+    ((x Nat) (y Nat)) Nat
+    (match x
+      (case Z y)
+      (case (S z)
+        (match y
+          (case Z (S z))
+          (case (S x2) (S (max2 z x2)))))))
+(define-fun-rec
+  (par (a b)
+    (map2
+       ((x (=> a b)) (y (list a))) (list b)
+       (match y
+         (case nil (as nil (list b)))
+         (case (cons z xs) (cons (@ x z) (map2 x xs)))))))
+(define-fun-rec
+  (par (a)
+    (length
+       ((x (list a))) Nat
+       (match x
+         (case nil Z)
+         (case (cons y xs) (S (length xs)))))))
+(define-fun-rec
+  le
+    ((x Nat) (y Nat)) Bool
+    (match x
+      (case Z true)
+      (case (S z)
+        (match y
+          (case Z false)
+          (case (S x2) (le z x2))))))
+(define-fun-rec
+  last
+    ((x (list Nat))) Nat
+    (match x
+      (case nil Z)
+      (case (cons y z)
+        (match z
+          (case nil y)
+          (case (cons x2 x3) (last (cons x2 x3)))))))
+(define-fun-rec
+  (par (a)
+    (height
+       ((x (Tree a))) Nat
+       (match x
+         (case Leaf Z)
+         (case (Node l y r) (S (max2 (height l) (height r))))))))
+(define-fun-rec
+  equal
+    ((x Nat) (y Nat)) Bool
+    (match x
+      (case Z
+        (match y
+          (case Z true)
+          (case (S z) false)))
+      (case (S x2)
+        (match y
+          (case Z false)
+          (case (S y2) (equal x2 y2))))))
+(define-fun-rec
+  (par (a)
+    (dropWhile
+       ((x (=> a Bool)) (y (list a))) (list a)
+       (match y
+         (case nil (as nil (list a)))
+         (case (cons z xs) (ite (@ x z) (dropWhile x xs) (cons z xs)))))))
+(define-fun-rec
+  (par (a)
+    (drop
+       ((x Nat) (y (list a))) (list a)
+       (match x
+         (case Z y)
+         (case (S z)
+           (match y
+             (case nil (as nil (list a)))
+             (case (cons x2 x3) (drop z x3))))))))
+(define-fun-rec
+  double
+    ((x Nat)) Nat
+    (match x
+      (case Z Z)
+      (case (S y) (S (S (double y))))))
+(define-fun-rec
+  count
+    ((x Nat) (y (list Nat))) Nat
+    (match y
+      (case nil Z)
+      (case (cons z ys)
+        (ite (equal x z) (S (count x ys)) (count x ys)))))
+(define-fun-rec
+  (par (a)
+    (append
+       ((x (list a)) (y (list a))) (list a)
+       (match x
+         (case nil y)
+         (case (cons z xs) (cons z (append xs y)))))))
+(define-fun-rec
+  (par (a)
+    (rev
+       ((x (list a))) (list a)
+       (match x
+         (case nil (as nil (list a)))
+         (case (cons y xs) (append (rev xs) (cons y (as nil (list a)))))))))
+(assert-proof
+  (par (x y)
+    lemma-100
+    (forall ((z (=> y x)) (x2 y))
+      (= (map2 z (cons x2 (as nil (list y))))
+        (cons (@ z x2) (as nil (list x)))))
+    ([lemma-91,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-99]
+      [])))
+(assert-proof
+  (par (x y)
+    lemma-101
+    (forall ((z (=> y x)) (x2 y) (x3 (list y)))
+      (= (cons (@ z x2) (map2 z x3)) (map2 z (cons x2 x3))))
+    ([lemma-91,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-99,
+      lemma-100]
+      [])))
+(assert-proof
+  (par (a)
+    lemma-102
+    (forall ((n Nat) (x a) (xs (list a)))
+      (= (take (S n) (cons x xs)) (cons x (take n xs))))
+    ([] [])))
+(assert-proof
+  (par (a b)
+    lemma-103
+    (forall ((x a) (xs (list a)) (ys (list b)))
+      (= (zip (cons x xs) ys) (zipConcat x xs ys)))
+    ([] [])))
+(assert-proof
+  (par (x y)
+    lemma-104
+    (forall ((z (list x)))
+      (= (zip z (as nil (list y))) (as nil (list (Pair x y)))))
+    ([lemma-103] [])))
+(assert-proof
+  (par (x y)
+    lemma-105
+    (forall ((z (list y)))
+      (= (zip (as nil (list x)) z) (as nil (list (Pair x y)))))
+    ([lemma-103, lemma-104] [])))
+(assert-proof
+  (par (x y)
+    lemma-106
+    (forall ((z x) (x2 y) (x3 (list x)) (x4 (list y)))
+      (= (zip (cons z x3) (cons x2 x4)) (cons (Pair2 z x2) (zip x3 x4))))
+    ([lemma-103, lemma-104, lemma-105] [])))
+(assert-proof
+  (par (x y)
+    lemma-107
+    (forall ((z x) (x2 (list x)))
+      (= (zipConcat z x2 (as nil (list y))) (as nil (list (Pair x y)))))
+    ([lemma-103, lemma-104, lemma-105, lemma-106] [])))
+(assert-proof
+  (par (x y)
+    lemma-108
+    (forall ((z x) (x2 (list x)) (x3 (list y)))
+      (= (zip (cons z x2) x3) (zipConcat z x2 x3)))
+    ([lemma-103, lemma-104, lemma-105, lemma-106, lemma-107] [])))
+(assert-proof
+  (par (x y)
+    lemma-109
+    (forall ((z (list x)) (x2 x) (x3 y))
+      (= (zipConcat x2 z (cons x3 (as nil (list y))))
+        (cons (Pair2 x2 x3) (as nil (list (Pair x y))))))
+    ([lemma-103, lemma-104, lemma-105, lemma-106, lemma-107, lemma-108]
+      [])))
+(assert-proof
+  (par (x y)
+    lemma-110
+    (forall ((z (list y)) (x2 x) (x3 y))
+      (= (zipConcat x2 (as nil (list x)) (cons x3 z))
+        (cons (Pair2 x2 x3) (as nil (list (Pair x y))))))
+    ([lemma-103,
+      lemma-104,
+      lemma-105,
+      lemma-106,
+      lemma-107,
+      lemma-108,
+      lemma-109]
+      [])))
+(assert-proof
+  (par (x y)
+    lemma-111
+    (forall ((z x) (x2 (list x)) (x3 y) (x4 (list y)))
+      (= (cons (Pair2 z x3) (zip x2 x4)) (zipConcat z x2 (cons x3 x4))))
+    ([lemma-103,
+      lemma-104,
+      lemma-105,
+      lemma-106,
+      lemma-107,
+      lemma-108,
+      lemma-109,
+      lemma-110]
+      [])))
+(assert-proof
+  (par (a b)
+    lemma-112
+    (forall ((x a) (y b) (xs (list a)) (ys (list b)))
+      (= (zip (cons x xs) (cons y ys)) (cons (Pair2 x y) (zip xs ys))))
+    ([] [])))
+(assert-proof
+  (par (a b)
+    lemma-113
+    (forall ((xs (list b)))
+      (= (zip (as nil (list a)) xs) (as nil (list (Pair a b)))))
+    ([] [])))
+(assert-proof
+  (par (x)
+    lemma-114 (= (mirror (as Leaf (Tree x))) (as Leaf (Tree x)))
+    ([] [])))
+(assert-proof
+  (par (x)
+    lemma-115 (forall ((y (Tree x))) (= (mirror (mirror y)) y))
+    ([lemma-114] [0])))
+(assert-proof
+  (par (x)
+    lemma-118 (= (height (as Leaf (Tree x))) Z)
+    ([lemma-114,
+      lemma-115,
+      lemma-125,
+      lemma-126,
+      lemma-65,
+      lemma-66,
+      lemma-67,
+      lemma-68,
+      lemma-69,
+      lemma-70,
+      lemma-71,
+      lemma-72]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-119
+    (forall ((y x) (z (Tree x)))
+      (= (height (Node z y z)) (S (height z))))
+    ([lemma-114,
+      lemma-115,
+      lemma-125,
+      lemma-126,
+      lemma-65,
+      lemma-66,
+      lemma-67,
+      lemma-68,
+      lemma-69,
+      lemma-70,
+      lemma-71,
+      lemma-72,
+      lemma-118]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-120
+    (forall ((y x) (z (Tree x)))
+      (= (height (Node z y (as Leaf (Tree x)))) (S (height z))))
+    ([lemma-114,
+      lemma-115,
+      lemma-125,
+      lemma-126,
+      lemma-65,
+      lemma-66,
+      lemma-67,
+      lemma-68,
+      lemma-69,
+      lemma-70,
+      lemma-71,
+      lemma-72,
+      lemma-118,
+      lemma-119]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-121
+    (forall ((y x) (z (Tree x)))
+      (= (height (Node (as Leaf (Tree x)) y z)) (S (height z))))
+    ([lemma-114,
+      lemma-115,
+      lemma-125,
+      lemma-126,
+      lemma-65,
+      lemma-66,
+      lemma-67,
+      lemma-68,
+      lemma-69,
+      lemma-70,
+      lemma-71,
+      lemma-72,
+      lemma-118,
+      lemma-119,
+      lemma-120]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-122
+    (forall ((y (Tree x)) (z x) (x2 (Tree x)))
+      (= (height (Node x2 z y)) (height (Node y z x2))))
+    ([lemma-114,
+      lemma-115,
+      lemma-125,
+      lemma-126,
+      lemma-65,
+      lemma-66,
+      lemma-67,
+      lemma-68,
+      lemma-69,
+      lemma-70,
+      lemma-71,
+      lemma-72,
+      lemma-118,
+      lemma-119,
+      lemma-120,
+      lemma-121]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-123
+    (forall ((y (Tree x))) (= (height (mirror y)) (height y)))
+    ([lemma-114,
+      lemma-115,
+      lemma-125,
+      lemma-126,
+      lemma-65,
+      lemma-66,
+      lemma-67,
+      lemma-68,
+      lemma-69,
+      lemma-70,
+      lemma-71,
+      lemma-72,
+      lemma-118,
+      lemma-119,
+      lemma-120,
+      lemma-121,
+      lemma-122]
+      [0])))
+(assert-proof
+  (par (a)
+    lemma-124
+    (forall ((b (Tree a))) (= (height (mirror b)) (height b)))
+    ([lemma-114,
+      lemma-115,
+      lemma-125,
+      lemma-126,
+      lemma-65,
+      lemma-66,
+      lemma-67,
+      lemma-68,
+      lemma-69,
+      lemma-70,
+      lemma-71,
+      lemma-72,
+      lemma-118,
+      lemma-119,
+      lemma-120,
+      lemma-121,
+      lemma-122,
+      lemma-123]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-125
+    (forall ((y (Tree x)) (z x))
+      (= (Node (as Leaf (Tree x)) z (mirror y))
+        (mirror (Node y z (as Leaf (Tree x))))))
+    ([lemma-114, lemma-115] [])))
+(assert-proof
+  (par (x)
+    lemma-126
+    (forall ((y (Tree x)) (z x) (x2 (Tree x)))
+      (= (Node (mirror x2) z (mirror y)) (mirror (Node y z x2))))
+    ([lemma-114, lemma-115, lemma-125] [])))
+(assert-proof
+  (lemma-127 (forall ((x Nat)) (= (plus x Z) x)) ([] [0])))
+(assert-proof
+  (lemma-128 (forall ((x Nat)) (= (plus Z x) x)) ([lemma-127] [])))
+(assert-proof
+  (par (x)
+    lemma-129
+    (forall ((y Nat) (z x))
+      (= (drop (plus y y) (cons z (as nil (list x))))
+        (drop y (cons z (as nil (list x))))))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-33,
+      lemma-34,
+      lemma-35,
+      lemma-20,
+      lemma-139]
+      [])))
+(assert-proof
+  (par (a)
+    lemma-130
+    (forall ((n Nat) (m Nat) (xs (list a)))
+      (= (drop n (drop m xs)) (drop (plus n m) xs)))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-33,
+      lemma-34,
+      lemma-35,
+      lemma-20,
+      lemma-139,
+      lemma-129]
+      [])))
+(assert-proof
+  (lemma-131 (forall ((x Nat) (y Nat)) (= (plus y x) (plus x y)))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-33,
+      lemma-34,
+      lemma-35,
+      lemma-20,
+      lemma-139,
+      lemma-129,
+      lemma-130]
+      [0])))
+(assert-proof
+  (lemma-132
+    (forall ((x Nat) (y Nat)) (= (plus (S x) y) (plus x (S y))))
+    ([lemma-127, lemma-128] [0])))
+(assert-proof
+  (lemma-133
+    (forall ((x Nat) (y Nat)) (= (S (plus x y)) (plus x (S y))))
+    ([lemma-127, lemma-128, lemma-132] [])))
+(assert-proof
+  (lemma-134
+    (forall ((x Nat) (y Nat) (z Nat))
+      (= (plus (plus x y) z) (plus x (plus y z))))
+    ([lemma-127, lemma-128, lemma-132, lemma-133] [0])))
+(assert-proof
+  (par (x)
+    lemma-139
+    (forall ((y Nat) (z Nat) (x2 (list x)))
+      (= (drop (plus y z) x2) (drop y (drop z x2))))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-33,
+      lemma-34,
+      lemma-35,
+      lemma-20]
+      [1])))
+(assert-proof
+  (lemma-140
+    (forall ((xs (list Nat)) (x Nat))
+      (=> (not (null xs)) (= (last (cons x xs)) (last xs))))
+    ([] [])))
+(assert-proof
+  (par (x)
+    lemma-141 (= (null (as nil (list x))) true) ([lemma-140] [])))
+(assert-proof
+  (par (x)
+    lemma-142 (forall ((y x) (z (list x))) (= (null (cons y z)) false))
+    ([lemma-140, lemma-141] [])))
+(assert-proof
+  (lemma-143 (forall ((m Nat) (n Nat)) (=> (le m n) (le m (S n))))
+    ([] [0])))
+(assert-proof
+  (lemma-149 (= (double Z) Z)
+    ([lemma-127, lemma-128, lemma-132, lemma-133, lemma-134] [])))
+(assert-proof
+  (lemma-150 (= (double (S Z)) (S (S Z)))
+    ([lemma-127, lemma-128, lemma-132, lemma-133, lemma-134, lemma-149]
+      [])))
+(assert-proof
+  (lemma-151 (forall ((x Nat)) (= (plus x x) (double x)))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-149,
+      lemma-150]
+      [0])))
+(assert-proof
+  (lemma-152 (forall ((x Nat)) (= (double x) (plus x x)))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-149,
+      lemma-150,
+      lemma-151]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-156
+    (forall ((y (list x)) (z (list x)))
+      (= (plus (length y) (length z)) (length (append y z))))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-163,
+      lemma-164,
+      lemma-21,
+      lemma-22,
+      lemma-23,
+      lemma-24]
+      [0])))
+(assert-proof
+  (par (a)
+    lemma-157
+    (forall ((x (list a)) (y (list a)))
+      (= (length (append x y)) (plus (length y) (length x))))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-163,
+      lemma-164,
+      lemma-21,
+      lemma-22,
+      lemma-23,
+      lemma-24,
+      lemma-156]
+      [0])))
+(assert-proof
+  (par (x)
+    lemma-159
+    (forall ((y (list x)) (z (list x)))
+      (= (length (append z y)) (length (append y z))))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-163,
+      lemma-164,
+      lemma-21,
+      lemma-22,
+      lemma-23,
+      lemma-24,
+      lemma-156,
+      lemma-157,
+      lemma-131]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-163 (= (length (as nil (list x))) Z)
+    ([lemma-127, lemma-128, lemma-132, lemma-133, lemma-134] [])))
+(assert-proof
+  (par (x)
+    lemma-164
+    (forall ((y x) (z (list x)))
+      (= (length (cons y z)) (S (length z))))
+    ([lemma-127, lemma-128, lemma-132, lemma-133, lemma-134, lemma-163]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-168 (= (rev (as nil (list x))) (as nil (list x)))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-163,
+      lemma-164,
+      lemma-21,
+      lemma-22,
+      lemma-23,
+      lemma-24]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-169
+    (forall ((y x))
+      (= (rev (cons y (as nil (list x)))) (cons y (as nil (list x)))))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-163,
+      lemma-164,
+      lemma-21,
+      lemma-22,
+      lemma-23,
+      lemma-24,
+      lemma-168]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-170
+    (forall ((y (list x)) (z (list x)))
+      (= (append (rev z) (rev y)) (rev (append y z))))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-163,
+      lemma-164,
+      lemma-21,
+      lemma-22,
+      lemma-23,
+      lemma-24,
+      lemma-168,
+      lemma-169]
+      [0])))
+(assert-proof
+  (par (x)
+    lemma-173 (forall ((y (list x))) (= (rev (rev y)) y))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-163,
+      lemma-164,
+      lemma-21,
+      lemma-22,
+      lemma-23,
+      lemma-24,
+      lemma-168,
+      lemma-169,
+      lemma-170,
+      lemma-156,
+      lemma-131]
+      [0])))
+(assert-proof
+  (par (x)
+    lemma-174 (forall ((y (list x))) (= (length (rev y)) (length y)))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-163,
+      lemma-164,
+      lemma-21,
+      lemma-22,
+      lemma-23,
+      lemma-24,
+      lemma-168,
+      lemma-169,
+      lemma-170,
+      lemma-156,
+      lemma-131,
+      lemma-173]
+      [0])))
+(assert-proof
+  (par (a)
+    lemma-176
+    (forall ((x (list a)) (y (list a)))
+      (= (length (rev (append x y))) (plus (length x) (length y))))
+    ([lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-163,
+      lemma-164,
+      lemma-21,
+      lemma-22,
+      lemma-23,
+      lemma-24,
+      lemma-168,
+      lemma-169,
+      lemma-170,
+      lemma-156,
+      lemma-131,
+      lemma-173,
+      lemma-174,
+      lemma-159]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-177 (forall ((y (list x))) (= (qrev (as nil (list x)) y) y))
+    ([] [])))
+(assert-proof
+  (par (x)
+    lemma-178
+    (forall ((y (list x)) (z x) (x2 (list x)))
+      (= (qrev (cons z y) x2) (qrev y (cons z x2))))
+    ([lemma-177] [])))
+(assert-proof
+  (par (x)
+    lemma-179
+    (forall ((y (list x)) (z (list x)))
+      (= (plus (length y) (length z)) (length (qrev y z))))
+    ([lemma-177,
+      lemma-178,
+      lemma-183,
+      lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-163,
+      lemma-164]
+      [0])))
+(assert-proof
+  (par (a)
+    lemma-18
+    (forall ((n Nat) (xs (list a)))
+      (= (append (take n xs) (drop n xs)) xs))
+    ([] [0])))
+(assert-proof
+  (par (a)
+    lemma-180
+    (forall ((x (list a)) (y (list a)))
+      (= (length (qrev x y)) (plus (length x) (length y))))
+    ([lemma-177,
+      lemma-178,
+      lemma-183,
+      lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-163,
+      lemma-164,
+      lemma-179]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-182
+    (forall ((y (list x)))
+      (= (length (qrev y (as nil (list x)))) (length y)))
+    ([lemma-177,
+      lemma-178,
+      lemma-183,
+      lemma-127,
+      lemma-128,
+      lemma-132,
+      lemma-133,
+      lemma-134,
+      lemma-163,
+      lemma-164,
+      lemma-179,
+      lemma-180,
+      lemma-131]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-183
+    (forall ((y (list x)) (z (list x)))
+      (= (qrev (qrev z y) (as nil (list x))) (qrev y z)))
+    ([lemma-177, lemma-178] [1])))
+(assert-proof
+  (par (a)
+    lemma-184
+    (forall ((x Nat) (y Nat) (z (list a)))
+      (= (drop x (drop y z)) (drop y (drop x z))))
+    ([] [2])))
+(assert-proof
+  (par (x)
+    lemma-19
+    (forall ((y Nat)) (= (take y (as nil (list x))) (as nil (list x))))
+    ([lemma-18] [])))
+(assert-proof
+  (par (x)
+    lemma-20
+    (forall ((y x) (z Nat) (x2 (list x)))
+      (= (drop (S z) (cons y x2)) (drop z x2)))
+    ([lemma-18,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-33,
+      lemma-34,
+      lemma-35]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-21 (forall ((y (list x))) (= (append y (as nil (list x))) y))
+    ([lemma-18,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-33,
+      lemma-34,
+      lemma-35,
+      lemma-20]
+      [0])))
+(assert-proof
+  (par (x)
+    lemma-22 (forall ((y (list x))) (= (append (as nil (list x)) y) y))
+    ([lemma-18,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-33,
+      lemma-34,
+      lemma-35,
+      lemma-20,
+      lemma-21]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-23
+    (forall ((y x) (z (list x)) (x2 (list x)))
+      (= (append (cons y z) x2) (cons y (append z x2))))
+    ([lemma-18,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-33,
+      lemma-34,
+      lemma-35,
+      lemma-20,
+      lemma-21,
+      lemma-22]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-24
+    (forall ((y (list x)) (z (list x)) (x2 (list x)))
+      (= (append (append y z) x2) (append y (append z x2))))
+    ([lemma-18,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-33,
+      lemma-34,
+      lemma-35,
+      lemma-20,
+      lemma-21,
+      lemma-22,
+      lemma-23]
+      [0])))
+(assert-proof
+  (par (x)
+    lemma-25
+    (forall ((y Nat) (z (list x)))
+      (= (drop y (take y z)) (as nil (list x))))
+    ([lemma-18,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-33,
+      lemma-34,
+      lemma-35,
+      lemma-20,
+      lemma-21,
+      lemma-22,
+      lemma-23,
+      lemma-24]
+      [0])))
+(assert-proof
+  (par (x)
+    lemma-26
+    (forall ((y (list x)))
+      (= (take (S Z) (append y y)) (take (S Z) y)))
+    ([lemma-18,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-33,
+      lemma-34,
+      lemma-35,
+      lemma-20,
+      lemma-21,
+      lemma-22,
+      lemma-23,
+      lemma-24,
+      lemma-25]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-27
+    (forall ((y Nat) (z (list x)))
+      (= (append (take y z) (drop y z)) z))
+    ([lemma-18,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-33,
+      lemma-34,
+      lemma-35,
+      lemma-20,
+      lemma-21,
+      lemma-22,
+      lemma-23,
+      lemma-24,
+      lemma-25,
+      lemma-26]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-28 (forall ((y (list x))) (= (take Z y) (as nil (list x))))
+    ([lemma-18, lemma-19] [])))
+(assert-proof
+  (par (x)
+    lemma-29
+    (forall ((y Nat) (z (list x))) (= (take y (take y z)) (take y z)))
+    ([lemma-18, lemma-19, lemma-28] [0])))
+(assert-proof
+  (par (x)
+    lemma-30
+    (forall ((y Nat) (z Nat) (x2 (list x)))
+      (= (take z (take y x2)) (take y (take z x2))))
+    ([lemma-18, lemma-19, lemma-28, lemma-29] [0])))
+(assert-proof
+  (par (x)
+    lemma-31
+    (forall ((y x) (z Nat) (x2 (list x)))
+      (= (take (S z) (cons y x2)) (cons y (take z x2))))
+    ([lemma-18, lemma-19, lemma-28, lemma-29, lemma-30] [])))
+(assert-proof
+  (par (x)
+    lemma-32
+    (forall ((y Nat) (z (list x)))
+      (= (take (S y) (take y z)) (take y z)))
+    ([lemma-18, lemma-19, lemma-28, lemma-29, lemma-30, lemma-31]
+      [0])))
+(assert-proof
+  (par (x)
+    lemma-33
+    (forall ((y Nat)) (= (drop y (as nil (list x))) (as nil (list x))))
+    ([lemma-18,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-34 (forall ((y (list x))) (= (drop Z y) y))
+    ([lemma-18,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-33]
+      [])))
+(assert-proof
+  (par (x)
+    lemma-35
+    (forall ((y Nat) (z Nat) (x2 (list x)))
+      (= (drop z (drop y x2)) (drop y (drop z x2))))
+    ([lemma-18,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-33,
+      lemma-34]
+      [2])))
+(assert-proof
+  (lemma-36
+    (forall ((n Nat) (xs (list Nat)))
+      (= (S (count n xs)) (count n (cons n xs))))
+    ([] [0])))
+(assert-proof
+  (lemma-37 (forall ((x Nat)) (= (equal x x) true))
+    ([lemma-36] [0])))
+(assert-proof
+  (lemma-38
+    (forall ((x Nat) (y (list Nat)))
+      (= (count (S x) (cons Z y)) (count (S x) y)))
+    ([lemma-36,
+      lemma-37,
+      lemma-39,
+      lemma-40,
+      lemma-41,
+      lemma-42,
+      lemma-43,
+      lemma-44,
+      lemma-45,
+      lemma-46]
+      [])))
+(assert-proof
+  (lemma-39 (forall ((x Nat) (y Nat)) (= (equal y x) (equal x y)))
+    ([lemma-36, lemma-37] [0])))
+(assert-proof
+  (lemma-40 (forall ((x Nat)) (= (equal x (S x)) false))
+    ([lemma-36, lemma-37, lemma-39] [0])))
+(assert-proof
+  (lemma-41 (forall ((x Nat)) (= (equal Z (S x)) false))
+    ([lemma-36, lemma-37, lemma-39, lemma-40] [])))
+(assert-proof
+  (lemma-42
+    (forall ((x Nat) (y Nat)) (= (equal (S x) (S y)) (equal x y)))
+    ([lemma-36, lemma-37, lemma-39, lemma-40, lemma-41] [])))
+(assert-proof
+  (lemma-43 (forall ((x Nat)) (= (count x (as nil (list Nat))) Z))
+    ([lemma-36, lemma-37, lemma-39, lemma-40, lemma-41, lemma-42] [])))
+(assert-proof
+  (lemma-44
+    (forall ((x Nat) (y (list Nat)))
+      (= (count x (cons x y)) (S (count x y))))
+    ([lemma-36,
+      lemma-37,
+      lemma-39,
+      lemma-40,
+      lemma-41,
+      lemma-42,
+      lemma-43]
+      [])))
+(assert-proof
+  (lemma-45
+    (forall ((x Nat) (y Nat))
+      (= (count y (cons x (as nil (list Nat))))
+        (count x (cons y (as nil (list Nat))))))
+    ([lemma-36,
+      lemma-37,
+      lemma-39,
+      lemma-40,
+      lemma-41,
+      lemma-42,
+      lemma-43,
+      lemma-44]
+      [])))
+(assert-proof
+  (lemma-46
+    (forall ((x Nat) (y (list Nat)))
+      (= (count (S x) (cons x y)) (count (S x) y)))
+    ([lemma-36,
+      lemma-37,
+      lemma-39,
+      lemma-40,
+      lemma-41,
+      lemma-42,
+      lemma-43,
+      lemma-44,
+      lemma-45]
+      [])))
+(assert-proof
+  (lemma-47
+    (forall ((n Nat) (x Nat) (xs (list Nat)))
+      (=> (= n x) (= (S (count n xs)) (count n (cons x xs)))))
+    ([] [0])))
+(assert-proof
+  (par (a)
+    lemma-48 (forall ((xs (list a))) (= (drop Z xs) xs)) ([] [])))
+(assert-proof
+  (par (a)
+    lemma-49
+    (forall ((n Nat) (x a) (xs (list a)))
+      (= (drop (S n) (cons x xs)) (drop n xs)))
+    ([] [])))
+(assert-proof
+  (lemma-50
+    (forall ((x Nat) (xs (list Nat)))
+      (=> (= xs (as nil (list Nat))) (= (last (cons x xs)) x)))
+    ([] [])))
+(assert-proof
+  (lemma-51 (= (last (as nil (list Nat))) Z) ([lemma-50] [])))
+(assert-proof
+  (lemma-52
+    (forall ((x Nat)) (= (last (cons x (as nil (list Nat)))) x))
+    ([lemma-50, lemma-51] [])))
+(assert-proof
+  (lemma-53 (forall ((x (list Nat))) (= (last (cons Z x)) (last x)))
+    ([lemma-50, lemma-51, lemma-52] [])))
+(assert-proof
+  (lemma-54 (forall ((n Nat)) (= (le n Z) (equal n Z))) ([] [])))
+(assert-proof
+  (lemma-55 (forall ((x Nat)) (= (le x x) true)) ([lemma-54] [0])))
+(assert-proof
+  (lemma-58 (forall ((x Nat)) (= (le x Z) (equal x Z)))
+    ([lemma-54,
+      lemma-55,
+      lemma-59,
+      lemma-60,
+      lemma-61,
+      lemma-62,
+      lemma-63,
+      lemma-37,
+      lemma-39,
+      lemma-40,
+      lemma-41,
+      lemma-42]
+      [])))
+(assert-proof
+  (lemma-59 (forall ((x Nat)) (= (le Z x) true))
+    ([lemma-54, lemma-55] [])))
+(assert-proof
+  (lemma-60 (forall ((x Nat)) (= (le x (S x)) true))
+    ([lemma-54, lemma-55, lemma-59] [0])))
+(assert-proof
+  (lemma-61 (forall ((x Nat)) (= (le (S x) x) false))
+    ([lemma-54, lemma-55, lemma-59, lemma-60] [0])))
+(assert-proof
+  (lemma-62 (forall ((x Nat)) (= (le (S x) Z) false))
+    ([lemma-54, lemma-55, lemma-59, lemma-60, lemma-61] [])))
+(assert-proof
+  (lemma-63 (forall ((x Nat) (y Nat)) (= (le (S x) (S y)) (le x y)))
+    ([lemma-54, lemma-55, lemma-59, lemma-60, lemma-61, lemma-62] [])))
+(assert-proof
+  (lemma-64
+    (forall ((a Nat) (b Nat) (c Nat))
+      (= (max2 (max2 a b) c) (max2 a (max2 b c))))
+    ([] [0])))
+(assert-proof
+  (lemma-65 (forall ((x Nat)) (= (max2 x x) x)) ([lemma-64] [0])))
+(assert-proof
+  (lemma-66 (forall ((x Nat)) (= (max2 x Z) x))
+    ([lemma-64, lemma-65] [])))
+(assert-proof
+  (lemma-67 (forall ((x Nat)) (= (max2 Z x) x))
+    ([lemma-64, lemma-65, lemma-66] [])))
+(assert-proof
+  (lemma-68 (forall ((x Nat) (y Nat)) (= (max2 y x) (max2 x y)))
+    ([lemma-64, lemma-65, lemma-66, lemma-67] [0])))
+(assert-proof
+  (lemma-69 (forall ((x Nat)) (= (max2 x (S x)) (S x)))
+    ([lemma-64, lemma-65, lemma-66, lemma-67, lemma-68] [0])))
+(assert-proof
+  (lemma-70
+    (forall ((x Nat) (y Nat)) (= (max2 x (max2 x y)) (max2 x y)))
+    ([lemma-64, lemma-65, lemma-66, lemma-67, lemma-68, lemma-69] [])))
+(assert-proof
+  (lemma-71
+    (forall ((x Nat) (y Nat) (z Nat))
+      (= (max2 (max2 x y) z) (max2 x (max2 y z))))
+    ([lemma-64,
+      lemma-65,
+      lemma-66,
+      lemma-67,
+      lemma-68,
+      lemma-69,
+      lemma-70]
+      [])))
+(assert-proof
+  (lemma-72
+    (forall ((x Nat) (y Nat)) (= (max2 (S x) (S y)) (S (max2 x y))))
+    ([lemma-64,
+      lemma-65,
+      lemma-66,
+      lemma-67,
+      lemma-68,
+      lemma-69,
+      lemma-70,
+      lemma-71]
+      [])))
+(assert-proof
+  (lemma-73 (forall ((a Nat) (b Nat)) (= (max2 a b) (max2 b a)))
+    ([] [0])))
+(assert-proof
+  (lemma-74 (forall ((a Nat) (b Nat)) (= (min2 a b) (min2 b a)))
+    ([] [0])))
+(assert-proof
+  (lemma-75 (forall ((x Nat)) (= (min2 x x) x)) ([lemma-74] [0])))
+(assert-proof
+  (lemma-76 (forall ((x Nat)) (= (min2 x Z) Z))
+    ([lemma-74, lemma-75] [])))
+(assert-proof
+  (lemma-77 (forall ((x Nat)) (= (min2 Z x) Z))
+    ([lemma-74, lemma-75, lemma-76] [])))
+(assert-proof
+  (lemma-78 (forall ((x Nat) (y Nat)) (= (min2 y x) (min2 x y)))
+    ([lemma-74, lemma-75, lemma-76, lemma-77] [])))
+(assert-proof
+  (lemma-79 (forall ((x Nat)) (= (min2 x (S x)) x))
+    ([lemma-74, lemma-75, lemma-76, lemma-77, lemma-78] [0])))
+(assert-proof
+  (lemma-80
+    (forall ((x Nat) (y Nat)) (= (min2 x (min2 x y)) (min2 x y)))
+    ([lemma-74, lemma-75, lemma-76, lemma-77, lemma-78, lemma-79]
+      [0])))
+(assert-proof
+  (lemma-81
+    (forall ((x Nat) (y Nat) (z Nat))
+      (= (min2 (min2 x y) z) (min2 x (min2 y z))))
+    ([lemma-74,
+      lemma-75,
+      lemma-76,
+      lemma-77,
+      lemma-78,
+      lemma-79,
+      lemma-80]
+      [1])))
+(assert-proof
+  (lemma-82
+    (forall ((x Nat) (y Nat)) (= (min2 (S x) (S y)) (S (min2 x y))))
+    ([lemma-74,
+      lemma-75,
+      lemma-76,
+      lemma-77,
+      lemma-78,
+      lemma-79,
+      lemma-80,
+      lemma-81]
+      [])))
+(assert-proof
+  (par (a)
+    lemma-83
+    (forall ((xs (list a)))
+      (= (dropWhile (lambda ((x a)) false) xs) xs))
+    ([] [])))
+(assert-proof
+  (par (x)
+    lemma-84
+    (forall ((y (=> x Bool)))
+      (= (dropWhile y (as nil (list x))) (as nil (list x))))
+    ([lemma-83] [])))
+(assert-proof
+  (par (x)
+    lemma-85
+    (forall ((y (=> x Bool)) (z (list x)))
+      (= (dropWhile y (dropWhile y z)) (dropWhile y z)))
+    ([lemma-83, lemma-84] [1])))
+(assert-proof
+  (par (a)
+    lemma-86
+    (forall ((xs (list a)))
+      (= (takeWhile (lambda ((x a)) true) xs) xs))
+    ([] [0])))
+(assert-proof
+  (par (x)
+    lemma-87
+    (forall ((y (=> x Bool)))
+      (= (takeWhile y (as nil (list x))) (as nil (list x))))
+    ([lemma-86] [])))
+(assert-proof
+  (par (x)
+    lemma-88
+    (forall ((y (=> x Bool)) (z (list x)))
+      (= (takeWhile y (takeWhile y z)) (takeWhile y z)))
+    ([lemma-86, lemma-87] [1])))
+(assert-proof
+  (par (x)
+    lemma-89
+    (forall ((y (=> x Bool)) (z (=> x Bool)) (x2 (list x)))
+      (= (takeWhile z (takeWhile y x2)) (takeWhile y (takeWhile z x2))))
+    ([lemma-86, lemma-87, lemma-88] [2])))
+(assert-proof
+  (par (a)
+    lemma-90 (forall ((xs (list a))) (= (take Z xs) (as nil (list a))))
+    ([] [])))
+(assert-proof
+  (par (a b)
+    lemma-91
+    (forall ((n Nat) (f (=> b a)) (xs (list b)))
+      (= (take n (map2 f xs)) (map2 f (take n xs))))
+    ([] [0])))
+(assert-proof
+  (par (x y)
+    lemma-93
+    (forall ((z (=> y x)) (x2 Nat) (x3 (list y)))
+      (= (take x2 (map2 z x3)) (map2 z (take x2 x3))))
+    ([lemma-91,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32,
+      lemma-99,
+      lemma-100,
+      lemma-101]
+      [])))
+(assert-proof
+  (par (x y)
+    lemma-99
+    (forall ((z (=> y x)))
+      (= (map2 z (as nil (list y))) (as nil (list x))))
+    ([lemma-91,
+      lemma-19,
+      lemma-28,
+      lemma-29,
+      lemma-30,
+      lemma-31,
+      lemma-32]
+      [])))
+(check-sat)

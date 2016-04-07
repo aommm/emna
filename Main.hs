@@ -270,7 +270,7 @@ getIndOrder f = do
   -- TODO Getting CWD in Haskell is f'ing impossible, hardcoded for now
   --cwd <- getProgPath
   --cwd <- getCurrentDirectory
-  let cwd = "/Users/aom/emna"
+  let cwd = "/Users/victorlindhe/masterthesis/emna"
   -- TODO remove data here
   let process = (proc "python" ["./scripts/classify.py", show features, "./step2/data"]) { cwd = Just cwd }
   out <- readCreateProcess process ""

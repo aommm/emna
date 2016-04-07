@@ -18,7 +18,8 @@ import Data.ByteString.Internal
 import Data.ByteString.Char8 (pack)
 
 import FeatureExtraction
-
+import SymbolicFeatureExtraction
+import AbstractFeatureExtraction
 
 -- Reads a library file to begin with
 main :: IO ()
@@ -32,11 +33,23 @@ main = do
             libraryString <- readFile filePath
             case parseLibrary libraryString of
                 Left msg      -> error $ "Parsing library failed:"++show msg
-                Right (Library _ _ ls) -> do
-                    features <- formulasToFeatures (M.elems ls)
-                    conn <- connectPostgreSQL (pack "dbname='hipspec' user='' password=''")
-                    clearDB conn
-                    insertLemmas conn features
-                    insertFeatures conn features
+                Right lib@(Library fs _ ls) -> do
+                    -- Prepping the database
+                    --conn <- connectPostgreSQL (pack "dbname='hipspec' user='hipspecuser' password='hipspecpassword'")
+                    --clearDB conn
+                    --insertLemmas conn (M.elems ls)
+
+                    -- Extracting features
+                    -- features <- getLemmaSymbols lib 2
+                    abstractLemmas <- getAbstractFunctions lib 4
+                    printList abstractLemmas
+                    -- insertFeatures conn features
                     putStrLn "finished"
 
+printList :: [(String, [String])] -> IO ()
+printList ((lemma, []):xss) = do
+    printList xss
+printList ((lemma, (f:fs)):xss) = do
+    putStrLn $ lemma ++ " = " ++ f
+    printList ((lemma, fs):xss)
+printList [] = return ()
