@@ -47,7 +47,8 @@ except:
 # (Doesn't count lemmas that don't use induction)
 def calculate_indvar_success(attempt):
 	# regex = 'Considering:\n\n(.*)\n\ninduction order from script:\[(\[[0-9]*\]).*\n\nProved by induction on ([a-zA-Z]*)'
-	regex = 'Considering:\n\n(.*)\n\ninduction order from script:\[(?:\[(?:\"([a-zA-Z]*)\")*\]).*\n\nProved by induction on ([a-zA-Z]*)'
+	# regex = 'Considering:\n\n(.*)\n\ninduction order from script:\[(?:\[(?:\"([a-zA-Z]*)\")*\]).*\n\nProved by induction on ([a-zA-Z]*)'
+	regex = 'Considering:\n\n(.*)\n\ninduction order from script:\[\[((?:\"[a-zA-Z]*\"(?:,\ ?)?)*)*\].*\n\nProved by induction on ((?:[a-zA-Z]*(?:,\ )?)*)'
 	matches = re.findall(regex, attempt['stdout'])
 	n_correct = 0
 	n_total = 0
@@ -67,7 +68,7 @@ for problem in problems:
 	print("proving "+problem_name)
 	# Run emna
 	start_time = timeit.default_timer()
-	output = sh.emna('--prover=z', '--output='+proof_path, problem_file, _ok_code=[0,1], _err=print_err, _out=print_out, _tty_out=False)
+	output = sh.emna('--prover=z', '--indvar=4', '--output='+proof_path, problem_file, _ok_code=[0,1], _err=print_err, _out=print_out, _tty_out=False)
 	elapsed = timeit.default_timer() - start_time
 	# Check result
 	isOk = output.exit_code == 0
