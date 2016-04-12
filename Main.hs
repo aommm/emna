@@ -53,7 +53,8 @@ import Waldmeister
 import qualified System.IO as IO
 import System.Console.CmdArgs
 import System.Process (readProcessWithExitCode, readCreateProcess, CmdSpec(RawCommand), CreateProcess(cwd,CreateProcess), proc )
-import System.Directory (makeAbsolute)
+import System.Directory (makeAbsolute, copyFile)
+import System.FilePath.Posix (takeBaseName, replaceBaseName)
 
 import FeatureExtraction (formulasToFeatures)
 
@@ -387,8 +388,15 @@ saveTheory args thy = do
     --print $ id $ (thy_funcs thy') !! 1
 
     putStrLn $ "saving theory to "++ filePath ++ "..."
-    writeFile filePath (libString)
+    writeFile filePath libString
     putStrLn "... done!"
+
+    let newName = (takeBaseName filePath) ++ "-" ++ (takeBaseName $ file args)
+    let filePath' = replaceBaseName filePath newName
+    putStrLn $ "saving backup of theory to "++ filePath' ++ "..."
+    writeFile filePath' libString
+    putStrLn "... done!"
+
     return ()
   where hasOutput _ = True
 

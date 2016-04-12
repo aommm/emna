@@ -27,6 +27,7 @@ executable emna
                        testing-feat,
                        QuickCheck,
                        directory >= 1.2.2,
+                       filepath,
                        mtl >=2.2 && <2.3,
                        postgresql-simple >= 0.5.1.2,
                        bytestring >= 0.10.6.0,
