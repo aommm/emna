@@ -62,6 +62,13 @@ def get_features():
   features_arr = v.fit_transform(features_list)
   return features_arr, v
 
+# Get all lemmas (same order as get_features())
+def get_lemmas():
+  cur = conn.cursor()
+  cur.execute("""SELECT * from hs_lemma ORDER BY name""")
+  rows = cur.fetchall()
+  return rows
+
 
 # Create array of classes (i.e. ["[0,1]", "[0]"])
 def get_classes():

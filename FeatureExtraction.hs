@@ -34,6 +34,7 @@ clearDB conn = do
     return ()
 
 -- Inserts a all the lemmas
+-- TODO: add "body" column to hs_lemma which stores prettyprinted version of lemma
 insertLemmas :: Connection -> [(String, [Int], [String])] -> IO ()
 insertLemmas conn [] = return ()
 insertLemmas conn ((lemma, vars, _):xs) = do
