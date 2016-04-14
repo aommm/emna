@@ -31,7 +31,7 @@ analyseAbstract ((lemmaName, features):xs) = do
     let nFeats = length features -- number of features
     let nDistFeats = length $ nub features -- number of distinct features
 
-    let f' = ["_length " ++ (show nFeats), "_lengthDistinct " ++ (show nDistFeats)]
+    let f' = ["_abstractLength " ++ (show nFeats), "_abstractLengthDistinct " ++ (show nDistFeats)]
 
     rest <- analyseAbstract xs
     return $ (lemmaName, f'):rest
@@ -39,22 +39,24 @@ analyseAbstract ((lemmaName, features):xs) = do
 analyseAbstractLemmaFeatures :: (Show a, Name a) => [(String, [String])] -> Map String (Formula a) -> IO ([(String, [String])])
 analyseAbstractLemmaFeatures [] _ = return []
 analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = do
+    [(name, f')] <- analyseAbstract [(lemmaName, features)]
 
     let iFDepth = innerFunctionDepth (fm_body $ fromJust $ M.lookup lemmaName ls)
     let iF = iFDepth >= 2
 
     rest <- analyseAbstractLemmaFeatures xs ls
-    return $ (lemmaName, ["_innerFunctionApplication " ++ (show iF), "_innerFunctionDepth " ++ (show iFDepth)]):rest
+    return $ (lemmaName, f' ++ ["_innerFunctionApplication " ++ (show iF), "_innerFunctionDepth " ++ (show iFDepth)]):rest
 
 analyseAbstractFunctionFeatures :: (Show a, Name a) => [(String, [String])] -> Map a (Function a) -> IO ([(String, [String])])
 analyseAbstractFunctionFeatures [] _ = return []
 analyseAbstractFunctionFeatures ((funcName, features):xs) fs = do
     let (_,function) = fromJust $ find (\(f,_) -> (varStr f) == funcName) (M.toList fs)
+    [(name, f')] <- analyseAbstract [(funcName, features)]
 
     let nArgs = numberOfArgs function
 
     rest <- analyseAbstractFunctionFeatures xs fs
-    return $ (funcName, ["_nArgs " ++ (show nArgs)]):rest
+    return $ (funcName, f' ++ ["_nArgs " ++ (show nArgs)]):rest
 
 numberOfArgs :: (Show a, Name a) => Function a -> Int
 numberOfArgs f = length $ func_args f

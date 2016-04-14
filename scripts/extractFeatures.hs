@@ -37,20 +37,32 @@ main = do
                 Left msg      -> error $ "Parsing library failed:"++show msg
                 Right lib@(Library fs _ ls) -> do
                     -- Prepping the database
-                    --conn <- connectPostgreSQL (pack "dbname='hipspec' user='hipspecuser' password='hipspecpassword'")
-                    --clearDB conn
-                    --insertLemmas conn (M.elems ls)
+                    conn <- connectPostgreSQL (pack "dbname='hipspec' user='hipspecuser' password='hipspecpassword'")
+                    clearDB conn
+                    insertLemmas conn (M.elems ls)
 
                     -- Extracting features
-                    -- features <- getLemmaSymbols lib 2
-                    features <- getAbstractLemmas lib 2
-                    putStrLn "\n\n\n\n\n\n\n\n\n"
-                    -- analyticalFeatures <- analyseLemmas features
-                    analyticalFeatures <- analyseAbstractLemmaFeatures features ls
-                    --printList analyticalFeatures
-                    printList analyticalFeatures
+                    let depth = 2
+                    lemmaSymbols <- getLemmaSymbols lib depth
+                    lemmaAbstract <- getAbstractLemmas lib depth
+                    functionSymbols <- getFunctionSymbols lib depth
+                    functionAbstract <- getAbstractFunctions lib depth
                     
-                    -- insertFeatures conn features
+                    putStrLn "\n\n\n\n\n\n\n\n\n"
+
+                    analyticalLemmaSymbols <- analyseSymbolicLemmaFeatures lemmaSymbols ls
+                    analyticalLemmaAbstracts <- analyseAbstractLemmaFeatures lemmaAbstract ls
+                    analyticalFunctionSymbols <- analyseSymbolicFunctionFeatures functionSymbols
+                    analyticalFunctionAbstracts <- analyseAbstractFunctionFeatures functionAbstract fs
+
+                    let lemma = preMerge lemmaSymbols $ preMerge lemmaAbstract $ preMerge analyticalLemmaSymbols analyticalLemmaAbstracts
+                    let function = preMerge functionSymbols $ preMerge functionAbstract $ preMerge analyticalFunctionSymbols analyticalFunctionAbstracts
+
+                    let features = mergeFeatures lemma function
+
+                    printList features
+
+                    insertFeatures conn features
                     putStrLn "finished"
 
 printList :: [(String, [String])] -> IO ()
@@ -61,3 +73,18 @@ printList ((lemma, (f:fs)):xss) = do
     putStrLn $ lemma ++ " = " ++ f
     printList ((lemma, fs):xss)
 printList [] = return ()
+
+preMerge :: [(String, [String])] -> [(String, [String])] -> [(String, [String])]
+preMerge xs ys = preMerge' (sort xs) (sort ys) -- We can assume the lists are equally long here
+
+preMerge' :: [(String, [String])] -> [(String, [String])] -> [(String, [String])]
+preMerge' xs ys = map (\((n, f1),(_, f2)) -> (n, nub $ f1 ++ f2)) $ zip xs ys
+
+-- Not sure about the complexity of this one hehe :-)
+mergeFeatures :: [(String, [String])] -> [(String, [String])] -> [(String, [String])]
+mergeFeatures ((n, feats):ls) fs = (n, extendedFeats):(mergeFeatures ls fs)
+    where
+        extendedFeats = feats ++ addedFeats
+        addedFeats = concat $ map (\(n', f) -> map (\(f') -> ("_func " ++ f')) f) funcsOfLemma
+        funcsOfLemma = filter (\(n', _) -> any (\featString -> featString == n') feats) fs -- finding the function features which has its key anywhere in the features of the lemma
+mergeFeatures [] _ = []

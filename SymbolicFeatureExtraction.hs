@@ -27,7 +27,6 @@ getLemmaSymbols :: (Show a, Name a) => Library a -> Int -> IO ([(String, [String
 getLemmaSymbols (Library fs dts ls) depth 
     | null ls = do return []
     | otherwise = do
-    putStrLn "hello"
     let (f:xs) = M.elems ls
     let (k:ks) = M.keys ls
     let name = fromJust $ getFmName f

@@ -51,7 +51,7 @@ analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = do
     let distributive = (if (same && not exactSame) then (isDistributive (fm_body $ fromJust $ M.lookup lemmaName ls)) else False)
 
     rest <- analyseSymbolicLemmaFeatures xs ls
-    return $ (lemmaName, ["_commutative " ++ (show commutative), "_associative " ++ (show associative), "_distributive " ++ (show distributive)]):rest
+    return $ (lemmaName, features' ++ ["_commutative " ++ (show commutative), "_associative " ++ (show associative), "_distributive " ++ (show distributive)]):rest
 
 -- Extracting features from each side of the equality sign and then comparing the length of the difference
 exactSameSymbols :: (Show a, Name a) => Expr a -> Bool
@@ -131,7 +131,7 @@ analyseSymbolicFunctionFeatures ((fName, features):xs) = do
     let rec = isRecursive fName features -- is the function recursive? Just looking for the function name among the features
 
     rest <- analyseSymbolicFunctionFeatures xs
-    return $ (fName, concat $ [features', ["recursive " ++ (show rec)]]):rest
+    return $ (fName, features' ++ ["recursive " ++ (show rec)]):rest
 
 isRecursive :: String -> [String] -> Bool
 isRecursive _ [] = False
