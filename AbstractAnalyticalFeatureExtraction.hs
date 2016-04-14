@@ -41,7 +41,7 @@ analyseAbstractLemmaFeatures [] _ = return []
 analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = do
 
     let iFDepth = innerFunctionDepth (fm_body $ fromJust $ M.lookup lemmaName ls)
-    let iF = iFDepth > 1
+    let iF = iFDepth >= 2
 
     rest <- analyseAbstractLemmaFeatures xs ls
     return $ (lemmaName, ["_innerFunctionApplication " ++ (show iF), "_innerFunctionDepth " ++ (show iFDepth)]):rest
@@ -64,7 +64,6 @@ innerFunctionDepth (Quant _ _ _ (Builtin Equal :@: [e1, e2])) = maximum [lhs, rh
     where
         lhs = innerFunctionDepth e1
         rhs = innerFunctionDepth e2
-
 innerFunctionDepth (Gbl (Global name typ args) :@: []) = 1
 innerFunctionDepth (Gbl (Global name typ args) :@: exps) = 1 + (maximum $ map innerFunctionDepth exps)
 innerFunctionDepth _ = 0

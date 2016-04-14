@@ -43,10 +43,10 @@ main = do
 
                     -- Extracting features
                     -- features <- getLemmaSymbols lib 2
-                    features <- getLemmaSymbols lib 2
+                    features <- getAbstractLemmas lib 2
                     putStrLn "\n\n\n\n\n\n\n\n\n"
                     -- analyticalFeatures <- analyseLemmas features
-                    analyticalFeatures <- analyseSymbolicLemmaFeatures features ls
+                    analyticalFeatures <- analyseAbstractLemmaFeatures features ls
                     --printList analyticalFeatures
                     printList analyticalFeatures
                     
