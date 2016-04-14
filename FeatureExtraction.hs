@@ -57,7 +57,7 @@ printTree sep (FNode id fs) = do putStrLn $ sep ++ id; mapM_ (printTree (sep ++ 
 extractSubTrees :: Int -> FNode String -> [FNode String]
 extractSubTrees depth f@(FNode id fs) = [thisSubTree] ++ otherSubTrees
     where
-        thisSubTree =  extractSubTree depth f --(FNode id (concat $ map (extractSubTrees (depth-1)) fs))
+        thisSubTree = extractSubTree depth f --(FNode id (concat $ map (extractSubTrees (depth-1)) fs))
         otherSubTrees = (concat $ map (extractSubTrees depth) fs)
 
 -- Extract one subtree

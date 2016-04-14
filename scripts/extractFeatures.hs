@@ -20,6 +20,8 @@ import Data.ByteString.Char8 (pack)
 import FeatureExtraction
 import SymbolicFeatureExtraction
 import AbstractFeatureExtraction
+import AbstractAnalyticalFeatureExtraction
+import AnalyticalFeatureExtraction
 
 -- Reads a library file to begin with
 main :: IO ()
@@ -41,8 +43,13 @@ main = do
 
                     -- Extracting features
                     -- features <- getLemmaSymbols lib 2
-                    abstractLemmas <- getAbstractFunctions lib 4
-                    printList abstractLemmas
+                    features <- getLemmaSymbols lib 2
+                    putStrLn "\n\n\n\n\n\n\n\n\n"
+                    -- analyticalFeatures <- analyseLemmas features
+                    analyticalFeatures <- analyseSymbolicLemmaFeatures features ls
+                    --printList analyticalFeatures
+                    printList analyticalFeatures
+                    
                     -- insertFeatures conn features
                     putStrLn "finished"
 

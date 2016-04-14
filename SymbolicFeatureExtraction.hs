@@ -34,7 +34,7 @@ getLemmaSymbols (Library fs dts ls) depth
 
     let tree = buildTree (fm_body f)
     let trees = extractSubTrees depth tree
-    let features = nub $ concat $ map extractFeatures trees
+    let features = concat $ map extractFeatures trees
 
     rest <- getLemmaSymbols (Library fs dts (M.fromList $ zip ks xs)) depth
     return $ (name, features):rest
