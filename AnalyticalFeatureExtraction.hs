@@ -48,9 +48,10 @@ analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = do
     let exactSame = exactSameSymbols (fm_body $ fromJust $ M.lookup lemmaName ls)
     let commutative = (if exactSame then (isCommutative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False)
     let associative = (if exactSame then (isAssociative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False)
+    let distributive = (if (same && not exactSame) then (isDistributive (fm_body $ fromJust $ M.lookup lemmaName ls)) else False)
 
     rest <- analyseSymbolicLemmaFeatures xs ls
-    return $ (lemmaName, ["_commutative " ++ (show commutative), "_associative " ++ (show associative)]):rest
+    return $ (lemmaName, ["_commutative " ++ (show commutative), "_associative " ++ (show associative), "_distributive " ++ (show distributive)]):rest
 
 -- Extracting features from each side of the equality sign and then comparing the length of the difference
 exactSameSymbols :: (Show a, Name a) => Expr a -> Bool
@@ -84,7 +85,7 @@ isAssociative _ = False
 
 isAssociative' :: (Show a, Name a) => Expr a -> Expr a -> Bool
 isAssociative' (Gbl (Global name1 _ _) :@: [fab,c]) (Gbl (Global name2 _ _) :@: [a,fbc])
-    | (isFunction fab 2) && (isFunction fbc 2) = name1 == name2 && namefab == namefbc && namefab == name1 && argumentsOk
+    | (isFunctionWithArgs fab 2) && (isFunctionWithArgs fbc 2) = name1 == name2 && namefab == namefbc && namefab == name1 && argumentsOk
     | otherwise = False
     where
         argumentsOk = (areTheSame a a') && (areTheSame b b') && (areTheSame c c')
@@ -92,9 +93,27 @@ isAssociative' (Gbl (Global name1 _ _) :@: [fab,c]) (Gbl (Global name2 _ _) :@: 
         (Gbl (Global namefbc _ _) :@: [b',c']) = fbc
 isAssociative' _ _ = False
 
-isFunction :: (Show a, Name a) => Expr a -> Int -> Bool
-isFunction (Gbl (Global _ _ _) :@: args) len = (length args == len)
-isFunction _ _ = False
+isDistributive :: (Show a, Name a) => Expr a -> Bool
+isDistributive (Quant _ _ _ (Builtin Equal :@: [e1, e2])) = isDistributive' e1 e2
+isDistributive _ = False
+
+isDistributive' :: (Show a, Name a) => Expr a -> Expr a -> Bool
+isDistributive' g1@(Gbl (Global _ _ _) :@: [f1]) g2@(Gbl (Global _ _ _) :@: args)
+    | isFunction f1 && (all isFunction args) = (all (areTheSame g1) args) && areTheSame f1 g2 && sameBottomArguments
+    | otherwise = False
+    where
+        sameBottomArguments = all (\(x,y) -> areTheSame x y) $ zip (sort f1args) (sort argsOfG)
+        f1'@(Gbl (Global _ _ _) :@: f1args) = f1
+        argsOfG = map (\(Gbl (Global _ _ _) :@: [arg]) -> arg) args
+isDistributive' _ _ = False
+
+isFunctionWithArgs :: (Show a, Name a) => Expr a -> Int -> Bool
+isFunctionWithArgs (Gbl (Global _ _ _) :@: args) len = (length args == len)
+isFunctionWithArgs _ _ = False
+
+isFunction :: (Show a, Name a) => Expr a -> Bool
+isFunction (Gbl (Global _ _ _) :@: _) = True
+isFunction _ = False
 
 areTheSame :: (Show a, Name a) => Expr a -> Expr a -> Bool
 areTheSame (Gbl (Global name1 _ _) :@: [x]) (Gbl (Global name2 _ _) :@: [y]) = name1 == name2

@@ -55,6 +55,7 @@ main = do
 
 printList :: [(String, [String])] -> IO ()
 printList ((lemma, []):xss) = do
+    putStrLn ""
     printList xss
 printList ((lemma, (f:fs)):xss) = do
     putStrLn $ lemma ++ " = " ++ f
