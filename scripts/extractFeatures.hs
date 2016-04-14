@@ -84,7 +84,7 @@ preMerge' xs ys = map (\((n, f1),(_, f2)) -> (n, nub $ f1 ++ f2)) $ zip xs ys
 mergeFeatures :: [(String, [String])] -> [(String, [String])] -> [(String, [String])]
 mergeFeatures ((n, feats):ls) fs = (n, extendedFeats):(mergeFeatures ls fs)
     where
-        extendedFeats = feats ++ addedFeats
+        extendedFeats = feats ++ (nub addedFeats)
         addedFeats = concat $ map (\(n', f) -> map (\(f') -> ("_func " ++ f')) f) funcsOfLemma
         funcsOfLemma = filter (\(n', _) -> any (\featString -> featString == n') feats) fs -- finding the function features which has its key anywhere in the features of the lemma
 mergeFeatures [] _ = []

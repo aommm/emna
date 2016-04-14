@@ -29,7 +29,7 @@ vectorizer_path = os.path.abspath(vectorizer_path)
 
 # Connect to db
 try:
-  conn = psycopg2.connect("dbname='hipspec' host='localhost'")
+  conn = psycopg2.connect("dbname='hipspec' host='localhost' username='hipspecuser' password='hipspecpassword'")
 except:
   print "I am unable to connect to the database"
   sys.exit(0)

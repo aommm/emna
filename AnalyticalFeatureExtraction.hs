@@ -46,12 +46,15 @@ analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = do
 
     let same = sameSymbols (fm_body $ fromJust $ M.lookup lemmaName ls)
     let exactSame = exactSameSymbols (fm_body $ fromJust $ M.lookup lemmaName ls)
-    let commutative = (if exactSame then (isCommutative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False)
-    let associative = (if exactSame then (isAssociative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False)
-    let distributive = (if (same && not exactSame) then (isDistributive (fm_body $ fromJust $ M.lookup lemmaName ls)) else False)
+    let commutative = ("_commutative", (if exactSame then (isCommutative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
+    let associative = ("_associative", (if exactSame then (isAssociative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
+    -- let distributive = (if (same && not exactSame) then (isDistributive (fm_body $ fromJust $ M.lookup lemmaName ls)) else False)
 
     rest <- analyseSymbolicLemmaFeatures xs ls
-    return $ (lemmaName, features' ++ ["_commutative " ++ (show commutative), "_associative " ++ (show associative), "_distributive " ++ (show distributive)]):rest
+    return $ (lemmaName, features' ++ (getBooleanFeatures [commutative, associative])):rest
+
+getBooleanFeatures :: [(String, Bool)] -> [String]
+getBooleanFeatures ls = map (\(y,b) -> y) $ filter (\(y,b) -> b) ls
 
 -- Extracting features from each side of the equality sign and then comparing the length of the difference
 exactSameSymbols :: (Show a, Name a) => Expr a -> Bool
@@ -128,10 +131,10 @@ analyseSymbolicFunctionFeatures ((fName, features):xs) = do
     fs <- analyseSymbolic [(fName, features)]
     let (_, features') = head fs
 
-    let rec = isRecursive fName features -- is the function recursive? Just looking for the function name among the features
+    let rec = ("_recursive", isRecursive fName features) -- is the function recursive? Just looking for the function name among the features
 
     rest <- analyseSymbolicFunctionFeatures xs
-    return $ (fName, features' ++ ["recursive " ++ (show rec)]):rest
+    return $ (fName, features' ++ (getBooleanFeatures [rec])):rest
 
 isRecursive :: String -> [String] -> Bool
 isRecursive _ [] = False
