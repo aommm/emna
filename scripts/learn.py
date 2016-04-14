@@ -82,7 +82,7 @@ def train(features, classes):
   clf.fit(features, classes)
   return clf
 
-def __main__():
+def main():
   print 'getting features from database'
   features, v = get_features()
   classes = get_classes()
@@ -96,5 +96,5 @@ def __main__():
   # testPrediction = clf.predict(features[0])
   # print 'predicting first datapoint as belonging to', testPrediction
 
-
-__main__()
+if __name__ == '__main__':
+  main()
