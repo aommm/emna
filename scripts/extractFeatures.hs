@@ -67,7 +67,7 @@ main = do
 
                     printList finalFeatures
 
-                    -- insertFeatures conn finalFeatures
+                    insertFeatures conn finalFeatures
                     putStrLn "finished"
 
 emptyLemmaList :: [String] -> [(String, [String])]
