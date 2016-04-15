@@ -25,38 +25,34 @@ import FeatureExtraction
 import qualified AbstractFeatureExtraction as AF
 
 -- Quick analysis of a feature set
-analyseAbstract :: [(String, [String])] -> IO ([(String, [String])])
-analyseAbstract [] = return []
-analyseAbstract ((lemmaName, features):xs) = do
-    let nFeats = length features -- number of features
-    let nDistFeats = length $ nub features -- number of distinct features
+analyseAbstract :: [(String, [String])] -> [(String, [String])]
+analyseAbstract [] = []
+analyseAbstract ((lemmaName, features):xs) = (lemmaName, f'):rest
+    where
+        rest = analyseAbstract xs
+        nFeats = length features -- number of features
+        nDistFeats = length $ nub features -- number of distinct features
+        f' = ["_abstractLength " ++ (show nFeats), "_abstractLengthDistinct " ++ (show nDistFeats)]
 
-    let f' = ["_abstractLength " ++ (show nFeats), "_abstractLengthDistinct " ++ (show nDistFeats)]
+analyseAbstractLemmaFeatures :: (Show a, Name a) => [(String, [String])] -> Map String (Formula a) -> [(String, [String])]
+analyseAbstractLemmaFeatures [] _ = []
+analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, f' ++ ["_innerFunctionApplication " ++ (show iF), "_innerFunctionDepth " ++ (show iFDepth)]):rest
+    where
+        rest = analyseAbstractLemmaFeatures xs ls
+        [(name, f')] = analyseAbstract [(lemmaName, features)]
+        iFDepth = innerFunctionDepth (fm_body $ fromJust $ M.lookup lemmaName ls)
+        iF = iFDepth >= 2
+    
 
-    rest <- analyseAbstract xs
-    return $ (lemmaName, f'):rest
-
-analyseAbstractLemmaFeatures :: (Show a, Name a) => [(String, [String])] -> Map String (Formula a) -> IO ([(String, [String])])
-analyseAbstractLemmaFeatures [] _ = return []
-analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = do
-    [(name, f')] <- analyseAbstract [(lemmaName, features)]
-
-    let iFDepth = innerFunctionDepth (fm_body $ fromJust $ M.lookup lemmaName ls)
-    let iF = iFDepth >= 2
-
-    rest <- analyseAbstractLemmaFeatures xs ls
-    return $ (lemmaName, f' ++ ["_innerFunctionApplication " ++ (show iF), "_innerFunctionDepth " ++ (show iFDepth)]):rest
-
-analyseAbstractFunctionFeatures :: (Show a, Name a) => [(String, [String])] -> Map a (Function a) -> IO ([(String, [String])])
-analyseAbstractFunctionFeatures [] _ = return []
-analyseAbstractFunctionFeatures ((funcName, features):xs) fs = do
-    let (_,function) = fromJust $ find (\(f,_) -> (varStr f) == funcName) (M.toList fs)
-    [(name, f')] <- analyseAbstract [(funcName, features)]
-
-    let nArgs = numberOfArgs function
-
-    rest <- analyseAbstractFunctionFeatures xs fs
-    return $ (funcName, f' ++ ["_nArgs " ++ (show nArgs)]):rest
+analyseAbstractFunctionFeatures :: (Show a, Name a) => [(String, [String])] -> Map a (Function a) -> [(String, [String])]
+analyseAbstractFunctionFeatures [] _ = []
+analyseAbstractFunctionFeatures ((funcName, features):xs) fs = (funcName, f' ++ ["_nArgs " ++ (show nArgs)]):rest
+    where
+        rest = analyseAbstractFunctionFeatures xs fs
+        (_,function) = fromJust $ find (\(f,_) -> (varStr f) == funcName) (M.toList fs)
+        [(name, f')] = analyseAbstract [(funcName, features)]
+        nArgs = numberOfArgs function
+    
 
 numberOfArgs :: (Show a, Name a) => Function a -> Int
 numberOfArgs f = length $ func_args f

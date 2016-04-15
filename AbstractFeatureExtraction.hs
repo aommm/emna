@@ -23,36 +23,32 @@ import Data.ByteString.Char8 (pack)
 import FeatureExtraction
 
 -- Going through each lemma of the library
-getAbstractLemmas :: (Show a, Name a) => Library a -> Int -> IO ([(String, [String])])
+getAbstractLemmas :: (Show a, Name a) => Library a -> Int -> [(String, [String])]
 getAbstractLemmas (Library fs dts ls) depth 
-    | null ls = do return []
-    | otherwise = do
-    let (f:xs) = M.elems ls
-    let (k:ks) = M.keys ls
-    let name = fromJust $ getFmName f
-
-    let tree = buildTree (fm_body f)
-    let trees = extractSubTrees depth tree
-    let features = map (\h -> "_abstract " ++ h) $ concat $ map extractFeatures trees
-
-    rest <- getAbstractLemmas (Library fs dts (M.fromList $ zip ks xs)) depth
-    return $ (name, features):rest
+    | null ls = []
+    | otherwise = (name, features):rest
+        where
+            rest = getAbstractLemmas (Library fs dts (M.fromList $ zip ks xs)) depth
+            (f:xs) = M.elems ls
+            (k:ks) = M.keys ls
+            name = fromJust $ getFmName f
+            tree = buildTree (fm_body f)
+            trees = extractSubTrees depth tree
+            features = map (\h -> "_abstract " ++ h) $ concat $ map extractFeatures trees
 
 -- Going through each lemma of the library
-getAbstractFunctions :: (Show a, Name a) => Library a -> Int -> IO ([(String, [String])])
+getAbstractFunctions :: (Show a, Name a) => Library a -> Int -> [(String, [String])]
 getAbstractFunctions (Library fs dts ls) depth 
-    | null fs = do return []
-    | otherwise = do
-    let (f:xs) = M.elems fs
-    let (k:ks) = M.keys fs
-    let name = varStr $ func_name f
-
-    let tree = buildTree (func_body f)
-    let trees = extractSubTrees depth tree
-    let features = map (\h -> "_abstract " ++ h) $ concat $ map extractFeatures trees
-
-    rest <- getAbstractFunctions (Library (M.fromList $ zip ks xs) dts ls) depth
-    return $ (name, features):rest
+    | null fs = []
+    | otherwise = (name, features):rest
+        where
+            rest = getAbstractFunctions (Library (M.fromList $ zip ks xs) dts ls) depth
+            (f:xs) = M.elems fs
+            (k:ks) = M.keys fs
+            name = varStr $ func_name f
+            tree = buildTree (func_body f)
+            trees = extractSubTrees depth tree
+            features = map (\h -> "_abstract " ++ h) $ concat $ map extractFeatures trees
 
 -- Builds a tree for an expression, recursively :)
 buildTree :: (Show a, Name a) => Expr a -> FNode String

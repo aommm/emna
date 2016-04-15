@@ -23,36 +23,32 @@ import Data.ByteString.Char8 (pack)
 import FeatureExtraction
 
 -- Going through each lemma of the library
-getLemmaSymbols :: (Show a, Name a) => Library a -> Int -> IO ([(String, [String])])
+getLemmaSymbols :: (Show a, Name a) => Library a -> Int -> [(String, [String])]
 getLemmaSymbols (Library fs dts ls) depth 
-    | null ls = do return []
-    | otherwise = do
-    let (f:xs) = M.elems ls
-    let (k:ks) = M.keys ls
-    let name = fromJust $ getFmName f
-
-    let tree = buildTree (fm_body f)
-    let trees = extractSubTrees depth tree
-    let features = concat $ map extractFeatures trees
-
-    rest <- getLemmaSymbols (Library fs dts (M.fromList $ zip ks xs)) depth
-    return $ (name, features):rest
+    | null ls = []
+    | otherwise = (name, features):rest
+        where
+            rest = getLemmaSymbols (Library fs dts (M.fromList $ zip ks xs)) depth
+            (f:xs) = M.elems ls
+            (k:ks) = M.keys ls
+            name = fromJust $ getFmName f
+            tree = buildTree (fm_body f)
+            trees = extractSubTrees depth tree
+            features = map (\y -> "_s_ " ++ y) $ concat $ map extractFeatures trees
 
 -- Going through each function of the library
-getFunctionSymbols :: (Show a, Name a) => Library a -> Int -> IO ([(String, [String])])
+getFunctionSymbols :: (Show a, Name a) => Library a -> Int -> [(String, [String])]
 getFunctionSymbols (Library fs dts ls) depth 
-    | null fs = do return []
-    | otherwise = do
-    let (f:xs) = M.elems fs
-    let (k:ks) = M.keys fs
-    let name = varStr $ func_name f
-    
-    let tree = buildTree (func_body f)
-    let trees = extractSubTrees depth tree
-    let features = nub $ concat $ map extractFeatures trees
-
-    rest <- getFunctionSymbols (Library (M.fromList $ zip ks xs) dts ls) depth
-    return $ (name, features):rest
+    | null fs = []
+    | otherwise = (name, features):rest
+        where
+            rest = getFunctionSymbols (Library (M.fromList $ zip ks xs) dts ls) depth
+            (f:xs) = M.elems fs
+            (k:ks) = M.keys fs
+            name = varStr $ func_name f
+            tree = buildTree (func_body f)
+            trees = extractSubTrees depth tree
+            features = nub $ concat $ map extractFeatures trees
     
 -- Builds a tree for an expression, recursively :)
 buildTree :: (Show a, Name a) => Expr a -> FNode String

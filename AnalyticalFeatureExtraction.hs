@@ -25,33 +25,31 @@ import FeatureExtraction
 import qualified SymbolicFeatureExtraction as SF
 
 -- Quick analysis of a feature set
-analyseSymbolic :: [(String, [String])] -> IO ([(String, [String])])
-analyseSymbolic [] = return []
-analyseSymbolic ((lemmaName, features):xs) = do
-    let nFeats = length features -- number of features
-    let nDistFeats = length $ nub features -- number of distinct features
-    let ratio = intdiv nDistFeats nFeats -- 
-    let mostPopular = most (freq features) -- most popular feature of the lemma
+analyseSymbolic :: [(String, [String])] -> [(String, [String])]
+analyseSymbolic [] = []
+analyseSymbolic ((lemmaName, features):xs) = (lemmaName, f'):rest
+    where
+        rest = analyseSymbolic xs
+        nFeats = length features -- number of features
+        nDistFeats = length $ nub features -- number of distinct features
+        ratio = intdiv nDistFeats nFeats -- 
+        mostPopular = most (freq features) -- most popular feature of the lemma
+        f' = ["_length " ++ (show nFeats), "_lengthDistinct " ++ (show nDistFeats), "_distinctRatio " ++ (printf "%.1f" $ ratio), "_popular " ++ mostPopular]
 
-    let f' = ["_length " ++ (show nFeats), "_lengthDistinct " ++ (show nDistFeats), "_distinctRatio " ++ (printf "%.1f" $ ratio), "_popular " ++ mostPopular]
-
-    rest <- analyseSymbolic xs
-    return $ (lemmaName, f'):rest
-
-analyseSymbolicLemmaFeatures :: (Show a, Name a) => [(String, [String])] -> Map String (Formula a) -> IO ([(String, [String])])
-analyseSymbolicLemmaFeatures [] _ = return []
-analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = do
-    fs <- analyseSymbolic [(lemmaName, features)]
-    let (_, features') = head fs
-
-    let same = sameSymbols (fm_body $ fromJust $ M.lookup lemmaName ls)
-    let exactSame = exactSameSymbols (fm_body $ fromJust $ M.lookup lemmaName ls)
-    let commutative = ("_commutative", (if exactSame then (isCommutative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
-    let associative = ("_associative", (if exactSame then (isAssociative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
+analyseSymbolicLemmaFeatures :: (Show a, Name a) => [(String, [String])] -> Map String (Formula a) ->  [(String, [String])]
+analyseSymbolicLemmaFeatures [] _ = []
+analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, features' ++ (getBooleanFeatures [commutative, associative])):rest
+    where
+        rest = analyseSymbolicLemmaFeatures xs ls
+        fs = analyseSymbolic [(lemmaName, features)]
+        (_, features') = head fs
+        same = sameSymbols (fm_body $ fromJust $ M.lookup lemmaName ls)
+        exactSame = exactSameSymbols (fm_body $ fromJust $ M.lookup lemmaName ls)
+        commutative = ("_commutative", (if exactSame then (isCommutative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
+        associative = ("_associative", (if exactSame then (isAssociative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
     -- let distributive = (if (same && not exactSame) then (isDistributive (fm_body $ fromJust $ M.lookup lemmaName ls)) else False)
 
-    rest <- analyseSymbolicLemmaFeatures xs ls
-    return $ (lemmaName, features' ++ (getBooleanFeatures [commutative, associative])):rest
+    
 
 getBooleanFeatures :: [(String, Bool)] -> [String]
 getBooleanFeatures ls = map (\(y,b) -> y) $ filter (\(y,b) -> b) ls
@@ -125,16 +123,14 @@ areTheSame (Lcl (Local name1 (TyCon _ _))) (Lcl (Local name2 (TyCon _ _))) = nam
 areTheSame (Lcl (Local name1 (TyVar _))) (Lcl (Local name2 (TyVar _))) = name1 == name2
 areTheSame _ _ = False
 
-analyseSymbolicFunctionFeatures :: [(String, [String])] -> IO ([(String, [String])])
-analyseSymbolicFunctionFeatures [] = return []
-analyseSymbolicFunctionFeatures ((fName, features):xs) = do
-    fs <- analyseSymbolic [(fName, features)]
-    let (_, features') = head fs
-
-    let rec = ("_recursive", isRecursive fName features) -- is the function recursive? Just looking for the function name among the features
-
-    rest <- analyseSymbolicFunctionFeatures xs
-    return $ (fName, features' ++ (getBooleanFeatures [rec])):rest
+analyseSymbolicFunctionFeatures :: [(String, [String])] -> [(String, [String])]
+analyseSymbolicFunctionFeatures [] = []
+analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, features' ++ (getBooleanFeatures [rec])):rest
+    where
+        rest = analyseSymbolicFunctionFeatures xs
+        fs = analyseSymbolic [(fName, features)]
+        (_, features') = head fs
+        rec = ("_recursive", isRecursive fName features) -- is the function recursive? Just looking for the function name among the features
 
 isRecursive :: String -> [String] -> Bool
 isRecursive _ [] = False
