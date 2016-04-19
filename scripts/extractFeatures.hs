@@ -33,6 +33,7 @@ main = do
     let depth = head $ tail args
     let schemes = drop 2 args
 
+    connString <- getConnString
     exists <- doesFileExist filePath
     case exists of
         False -> putStrLn "File not found"
@@ -42,7 +43,7 @@ main = do
                 Left msg      -> error $ "Parsing library failed:"++show msg
                 Right lib@(Library fs _ ls) -> do
                     -- Prepping the database
-                    conn <- connectPostgreSQL (pack "dbname='hipspec' user='hipspecuser' password='hipspecpassword'")
+                    conn <- connectPostgreSQL (pack connString)
                     clearDB conn
                     insertLemmas conn (M.elems ls)
 
@@ -132,3 +133,16 @@ mergeFeatures _ [] _ = []
 isSymbolicLemmaFeat :: String -> Bool
 isSymbolicLemmaFeat ('_':'s':'_':xs) = True
 isSymbolicLemmaFeat _ = False
+
+getConnString :: IO String
+getConnString = do
+    dbName <- lookupEnv "HS_DB_NAME"
+    dbHost <- lookupEnv "HS_DB_HOST"
+    dbUsername <- lookupEnv "HS_DB_USERNAME"
+    dbPassword <- lookupEnv "HS_DB_PASSWORD"
+    let dbName' = fromMaybe "hipspec" dbName
+    let dbHost' = fromMaybe "localhost" dbHost
+    let connString = "dbname='"++ dbName'++ "' host='"++ dbHost' ++"'"
+    let connStringUser = maybe "" (\s -> " username='"++ s ++"'") dbUsername
+    let connStringPass = maybe "" (\s -> " password='"++ s ++"'") dbPassword
+    return $ connString ++ connStringUser ++ connStringPass

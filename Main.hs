@@ -53,7 +53,8 @@ import Waldmeister
 import qualified System.IO as IO
 import System.Console.CmdArgs
 import System.Process (readProcessWithExitCode, readCreateProcess, CmdSpec(RawCommand), CreateProcess(cwd,CreateProcess), proc )
-import System.Directory (makeAbsolute)
+import System.Directory (makeAbsolute, copyFile)
+import System.FilePath.Posix (takeBaseName, replaceBaseName)
 
 import FeatureExtraction (formulasToFeatures)
 
@@ -69,7 +70,9 @@ data Args =
     , timeout :: Double
     , filenames :: Bool
     , prover    :: String
-    , output    :: Maybe String
+    , output    :: String
+    , workingDir :: String
+    , dataDir   :: String
     }
   deriving (Show,Data,Typeable)
 
@@ -83,26 +86,37 @@ defArgs =
     , timeout = 1     &= name "t" &= help "Timeout in seconds (default 1)"
     , filenames = False           &= help "Print out filenames of theories"
     , prover = "w"                &= help "Prover (waldmeister/z3)"
-    , output = Nothing &= name "o" &= help "Proof output file"
+    , output = "" &= name "o" &= help "Proof output file (default: dataDir/lib.tiplib)"
+    -- v Workaround: store cwd here since getCurrentDirectory crashes in some fns
+    , workingDir = ""         &= help "Working directory for scripts (default: cwd)" 
+    , dataDir = "" &= name "d" &= help "Path to data directory (default: cwd/data)"
     }
   &= program "emna" &= summary "simple inductive prover with proof output"
 
 -- Parse command line arguments
 parseArgs :: IO Args
 parseArgs = do
+  cwd <- getCurrentDirectory 
   args <- cmdArgs defArgs
-  if isJust (output args)
-    then do
-      -- dereference hej to path/to/cwd/hej
-      -- TODO: doesn't defererence ~, . or ..
-      let (Just path) = output args
-      path' <- makeAbsolute path
-      return args {output = Just path'}
-    else do
-      return args
+  -- Process 'dataDir'
+  let dataDir' = if dataDir args == ""
+                  then cwd ++ "/data"
+                  else dataDir args
+  -- Process 'output'
+  let output' = if output args == ""
+                 then dataDir' ++ "/lib.tiplib"
+                 else output args
+
+  -- make paths absolute
+  -- dereference hej to path/to/cwd/hej
+  -- TODO: doesn't defererence ~, . or ..
+  dataDir'' <- makeAbsolute dataDir'
+  output'' <- makeAbsolute output'
+  return args {output = output'', dataDir = dataDir'', workingDir = cwd}
+
 
 main :: IO ()
-main = do
+main = do  
   args@Args{..} <- parseArgs
   x <- readHaskellOrTipFile file defaultParams{ extra_names = extra }
   case x of
@@ -167,15 +181,15 @@ loop args prover thy = go False conjs [] thy{ thy_asserts = assums }
   go b     (c:cs) q thy =
     do (str,m_result) <- tryProve args prover c thy
        case m_result of
-         Just proof@(lemmas,coords) ->
+         Just proof ->
            do let lms = thy_asserts thy
               let n = (length lms)
               g <- go True cs q thy{ thy_asserts = makeProved n c proof:lms }
               case g of
                 Right m -> return $
                   Right $ do putStrLn $ pad (show n) 2 ++ ": " ++ rpad str 40 ++
-                                     if null lemmas then ""
-                                        else " using " ++ intercalate ", " (map show lemmas)
+                                     if null (lemmasUsed proof) then ""
+                                        else " using " ++ intercalate ", " (map show (lemmasUsed proof))
                              m
                 l -> return l
          Nothing -> go b    cs (c:q) thy
@@ -196,13 +210,20 @@ extractQuantifiedLocals fm thy =
 tryProve :: Name a => Args -> Prover -> Formula a -> Theory a -> IO (String, Maybe ProofSketch)
 tryProve args prover fm thy =
   do let (prenex,term) = extractQuantifiedLocals fm thy
+     
+     let getLemmaName coord | length prenex > coord = Just $ lcl_name (prenex !! coord)
+                            | otherwise = Nothing 
+     let getLemmaNames coords = catMaybes $ map getLemmaName coords
+
 
      putStrLn "Considering:"
      putStrLn $ "  " ++ (ppTerm (toTerm term))
      IO.hFlush IO.stdout
 
-     -- TODO: get ind_order from classify.py
-     ind_order <- getIndOrder fm --[[2],[1],[0],[]]
+     ind_order <- getIndOrder args fm --[[2],[1],[0],[]]
+     let ind_order_pretty = map getLemmaNames ind_order
+     putStrLn $ "induction order from script:"++show ind_order_pretty
+
      let tree = freshPass (obligations args fm ind_order (prover_pre prover)) thy
 
      ptree :: Tree (Promise [Obligation Result]) <- T.traverse (promise args prover) tree
@@ -220,7 +241,7 @@ tryProve args prover fm thy =
          , all (isSuccess . ob_content) res
            -> do if null coords
                     then putStrLn $ "Proved without using induction"
-                    else putStrLn $ "Proved by induction on " ++ intercalate ", " (map (lcl_name . (prenex !!)) coords)
+                    else putStrLn $ "Proved by induction on " ++ intercalate ", " (getLemmaNames coords)
                  
                  -- try parsing prover output
                  let steps =
@@ -240,7 +261,8 @@ tryProve args prover fm thy =
                  let lemmas' = usort lemmas
                      -- Name lemmas locally first; will probably be translated later
                      lemmaNames = map (\l -> "lemma-"++show l) lemmas'
-                 return $ Just (lemmaNames, coords)
+                 -- TODO: not hardcoded provers
+                 return $ Just $ ProofSketch lemmaNames coords Structural "z3-4.4.0" "emna-0.1"
 
          | otherwise
            -> do putStrLn $ "Confusion :("
@@ -264,17 +286,11 @@ tryProve args prover fm thy =
 
      return (ppTerm (toTerm term), if null res then Nothing else mresult)
 
-getIndOrder :: Name a => Formula a -> IO ([[Int]])
-getIndOrder f = do
+getIndOrder :: Name a => Args -> Formula a -> IO ([[Int]])
+getIndOrder args f = do
   [(_name,_indvars,features)] <- formulasToFeatures [f]
-  -- TODO Getting CWD in Haskell is f'ing impossible, hardcoded for now
-  --cwd <- getProgPath
-  --cwd <- getCurrentDirectory
-  let cwd = "/Users/victorlindhe/masterthesis/emna"
-  -- TODO remove data here
-  let process = (proc "python" ["./scripts/classify.py", show features, "./step2/data"]) { cwd = Just cwd }
+  let process = (proc "python" ["./scripts/classify.py", show features, dataDir args]) { cwd = Just (workingDir args) }
   out <- readCreateProcess process ""
-  putStrLn $ "induction order from script:"++out
   return $ case readMaybe out of
     Nothing -> []
     Just xs -> xs
@@ -345,7 +361,7 @@ saveTheory args thy = do
 
     -- TODO: only absolute path works here, why!?
     -- http://stackoverflow.com/questions/21765570/haskell-compilation-with-an-input-file-error-openfile-does-not-exist-no-such
-    let (Just filePath) = output args
+    let filePath = output args
     -- maybe read existing library
     exists <- doesFileExist filePath
     library <- if exists
@@ -372,10 +388,17 @@ saveTheory args thy = do
     --print $ id $ (thy_funcs thy') !! 1
 
     putStrLn $ "saving theory to "++ filePath ++ "..."
-    writeFile filePath (libString)
+    writeFile filePath libString
     putStrLn "... done!"
+
+    let newName = (takeBaseName filePath) ++ "-" ++ (takeBaseName $ file args)
+    let filePath' = replaceBaseName filePath newName
+    putStrLn $ "saving backup of theory to "++ filePath' ++ "..."
+    writeFile filePath' libString
+    putStrLn "... done!"
+
     return ()
-  where hasOutput = isJust . output
+  where hasOutput _ = True
 
 
 data Prover = Prover

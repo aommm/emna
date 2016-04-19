@@ -25,11 +25,20 @@ vectorizer_path = os.path.join(data_path, 'vectorizer.pkl')
 classifier_path = os.path.abspath(classifier_path) # prettify
 vectorizer_path = os.path.abspath(vectorizer_path)
 
-
+db_name = os.getenv('HS_DB_NAME', 'hipspec')
+db_host = os.getenv('HS_DB_HOST', 'localhost')
+db_username = os.getenv('HS_DB_USERNAME', None)
+db_password = os.getenv('HS_DB_PASSWORD', None)
 
 # Connect to db
 try:
-  conn = psycopg2.connect("dbname='hipspec' host='localhost' username='hipspecuser' password='hipspecpassword'")
+  conn_string = "dbname='"+db_name+"' host='"+db_host+"'"
+  if db_username is not None:
+    conn_string = conn_string + " username='"+db_username+"'"
+  if db_password is not None:
+    conn_string = conn_string + " password='"+db_password+"'"
+  print "connString:"+conn_string
+  conn = psycopg2.connect(conn_string)
 except:
   print "I am unable to connect to the database"
   sys.exit(0)
@@ -53,6 +62,13 @@ def get_features():
   features_arr = v.fit_transform(features_list)
   return features_arr, v
 
+# Get all lemmas (same order as get_features())
+def get_lemmas():
+  cur = conn.cursor()
+  cur.execute("""SELECT * from hs_lemma ORDER BY name""")
+  rows = cur.fetchall()
+  return rows
+
 
 # Create array of classes (i.e. ["[0,1]", "[0]"])
 def get_classes():
@@ -73,7 +89,7 @@ def train(features, classes):
   clf.fit(features, classes)
   return clf
 
-def __main__():
+def main():
   print 'getting features from database'
   features, v = get_features()
   classes = get_classes()
@@ -87,5 +103,5 @@ def __main__():
   # testPrediction = clf.predict(features[0])
   # print 'predicting first datapoint as belonging to', testPrediction
 
-
-__main__()
+if __name__ == '__main__':
+  main()

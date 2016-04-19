@@ -47,7 +47,7 @@ insertFeatures conn ((lemma, features):xs) = do
     insertFeatures conn xs
 
 getInductionVariables :: Name a => Info a -> [Int]
-getInductionVariables (Lemma _ _ (Just (_, vars))) = vars
+getInductionVariables (Lemma _ _ (Just p)) = indVars p
 
 -- Printing a tree using indentation
 printTree :: String -> FNode String -> IO ()
