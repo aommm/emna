@@ -56,7 +56,7 @@ import System.Process (readProcessWithExitCode, readCreateProcess, CmdSpec(RawCo
 import System.Directory (makeAbsolute, copyFile)
 import System.FilePath.Posix (takeBaseName, replaceBaseName)
 
-import FeatureExtraction (formulasToFeatures)
+import ExtractionPoint (formulasToFeatures)
 
 import qualified Data.Map as M
 import Data.Map (Map)
@@ -220,7 +220,7 @@ tryProve args prover fm thy =
      putStrLn $ "  " ++ (ppTerm (toTerm term))
      IO.hFlush IO.stdout
 
-     ind_order <- getIndOrder args fm --[[2],[1],[0],[]]
+     ind_order <- getIndOrder args fm thy --[[2],[1],[0],[]]
      let ind_order_pretty = map getLemmaNames ind_order
      putStrLn $ "induction order from script:"++show ind_order_pretty
 
@@ -262,7 +262,7 @@ tryProve args prover fm thy =
                      -- Name lemmas locally first; will probably be translated later
                      lemmaNames = map (\l -> "lemma-"++show l) lemmas'
                  -- TODO: not hardcoded provers
-                 return $ Just $ ProofSketch lemmaNames coords Structural "z3-4.4.0" "emna-0.1"
+                 return $ Just (lemmaNames, coords) -- ProofSketch lemmaNames coords Structural "z3-4.4.0" "emna-0.1"
 
          | otherwise
            -> do putStrLn $ "Confusion :("
@@ -286,9 +286,9 @@ tryProve args prover fm thy =
 
      return (ppTerm (toTerm term), if null res then Nothing else mresult)
 
-getIndOrder :: Name a => Args -> Formula a -> IO ([[Int]])
-getIndOrder args f = do
-  [(_name,_indvars,features)] <- formulasToFeatures [f]
+getIndOrder :: Name a => Args -> Formula a -> Theory a -> IO ([[Int]])
+getIndOrder args f thy = do
+  [(_,features)] <- formulasToFeatures [f] (thyToLib thy)
   let process = (proc "python" ["./scripts/classify.py", show features, dataDir args]) { cwd = Just (workingDir args) }
   out <- readCreateProcess process ""
   return $ case readMaybe out of

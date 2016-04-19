@@ -47,7 +47,7 @@ insertFeatures conn ((lemma, features):xs) = do
     insertFeatures conn xs
 
 getInductionVariables :: Name a => Info a -> [Int]
-getInductionVariables (Lemma _ _ (Just p)) = indVars p
+getInductionVariables (Lemma _ _ (Just (_,vars))) = vars
 
 -- Printing a tree using indentation
 printTree :: String -> FNode String -> IO ()
@@ -88,3 +88,39 @@ combine' xs1 x = (map (mergeStrings x) xs1) ++ [x] ++ xs1
 -- return "rev, list"
 mergeStrings :: String -> String -> String
 mergeStrings x1 x2 = x2 ++ ", " ++ x1
+
+
+emptyLemmaList :: [String] -> [(String, [String])]
+emptyLemmaList ls = zip ls (take (length ls) (repeat []))
+
+generateHalf :: [[(String, [String])]] -> [(String, [String])]
+generateHalf [] = []
+generateHalf ls = foldl preMerge (head ls) (tail ls)
+
+printList :: [(String, [String])] -> IO ()
+printList ((lemma, []):xss) = do
+    putStrLn ""
+    printList xss
+printList ((lemma, (f:fs)):xss) = do
+    putStrLn $ lemma ++ " = " ++ f
+    printList ((lemma, fs):xss)
+printList [] = return ()
+
+preMerge :: [(String, [String])] -> [(String, [String])] -> [(String, [String])]
+preMerge xs ys = preMerge' (sort xs) (sort ys) -- We can assume the lists are equally long here
+
+preMerge' :: [(String, [String])] -> [(String, [String])] -> [(String, [String])]
+preMerge' xs ys = map (\((n, f1),(_, f2)) -> (n, nub $ f1 ++ f2)) $ zip xs ys
+
+-- Not sure about the complexity of this one hehe :-)
+mergeFeatures :: Bool -> [(String, [String])] -> [(String, [String])] -> [(String, [String])]
+mergeFeatures sslf ((n, feats):ls) fs = (n, extendedFeats):(mergeFeatures sslf ls fs)
+    where
+        extendedFeats = (filter (\y -> (not sslf && not (isSymbolicLemmaFeat y)) || sslf) feats) ++ (nub addedFeats)
+        addedFeats = concat $ map (\(n', f) -> map (\(f') -> ("_func " ++ f')) f) funcsOfLemma
+        funcsOfLemma = filter (\(n', _) -> any (\featString -> (featString == "_s_ " ++ n')) feats) fs -- finding the function features which has its key anywhere in the features of the lemma
+mergeFeatures _ [] _ = []
+
+isSymbolicLemmaFeat :: String -> Bool
+isSymbolicLemmaFeat ('_':'s':'_':xs) = True
+isSymbolicLemmaFeat _ = False
