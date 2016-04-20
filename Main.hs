@@ -156,6 +156,16 @@ instance Name I where
   freshNamed s      = refresh (I undefined s)
   getUnique (I u _) = u
 
+data Prover = Prover
+  { prover_cmd    :: String -> Double -> (String,[String])
+  , prover_ext    :: String
+  , prover_pre    :: [StandardPass]
+  , prover_post   :: [StandardPass]
+  , prover_pretty :: forall a . Name a => Theory a -> Theory a -> (Doc,AxInfo)
+  , prover_pipe   :: AxInfo -> ProcessResult -> Result
+  }
+
+
 isUserAsserted :: Formula a -> Bool
 isUserAsserted f = case (fm_info f) of
                      UserAsserted _ -> True
@@ -207,7 +217,7 @@ extractQuantifiedLocals fm thy =
              forallView $ fm_body $ head $ thy_asserts $ fmap (\ (Ren x) -> x)
              $ niceRename thy thy{thy_asserts = [fm], thy_funcs=[]}
 
-tryProve :: Name a => Args -> Prover -> Formula a -> Theory a -> IO (String, Maybe ProofSketch)
+tryProve :: (Show a, Name a) => Args -> Prover -> Formula a -> Theory a -> IO (String, Maybe ProofSketch)
 tryProve args prover fm thy =
   do let (prenex,term) = extractQuantifiedLocals fm thy
      
@@ -262,7 +272,7 @@ tryProve args prover fm thy =
                      -- Name lemmas locally first; will probably be translated later
                      lemmaNames = map (\l -> "lemma-"++show l) lemmas'
                  -- TODO: not hardcoded provers
-                 return $ Just (lemmaNames, coords) -- ProofSketch lemmaNames coords Structural "z3-4.4.0" "emna-0.1"
+                 return $ Just $ ProofSketch lemmaNames coords Structural "z3-4.4.0" "emna-0.1"
 
          | otherwise
            -> do putStrLn $ "Confusion :("
@@ -286,7 +296,7 @@ tryProve args prover fm thy =
 
      return (ppTerm (toTerm term), if null res then Nothing else mresult)
 
-getIndOrder :: Name a => Args -> Formula a -> Theory a -> IO ([[Int]])
+getIndOrder :: (Show a, Name a) => Args -> Formula a -> Theory a -> IO ([[Int]])
 getIndOrder args f thy = do
   [(_,features)] <- formulasToFeatures [f] (thyToLib thy)
   let process = (proc "python" ["./scripts/classify.py", show features, dataDir args]) { cwd = Just (workingDir args) }
@@ -399,16 +409,6 @@ saveTheory args thy = do
 
     return ()
   where hasOutput _ = True
-
-
-data Prover = Prover
-  { prover_cmd    :: String -> Double -> (String,[String])
-  , prover_ext    :: String
-  , prover_pre    :: [StandardPass]
-  , prover_post   :: [StandardPass]
-  , prover_pretty :: forall a . Name a => Theory a -> Theory a -> (Doc,AxInfo)
-  , prover_pipe   :: AxInfo -> ProcessResult -> Result
-  }
 
 promise :: Name a => Args -> Prover -> Obligation (Theory a) -> IO (Promise [Obligation Result])
 promise params Prover{..} (Obligation info thy) =
