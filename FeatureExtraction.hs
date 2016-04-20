@@ -35,29 +35,29 @@ clearDB conn = do
 
 -- Inserts a all the lemmas
 -- TODO: add "body" column to hs_lemma which stores prettyprinted version of lemma
-insertLemmas :: Connection -> [(String, [Int], [String])] -> IO ()
+insertLemmas :: Connection -> [(String, [Int], [String], String)] -> IO ()
 insertLemmas conn [] = return ()
-insertLemmas conn ((lemma, vars, _):xs) = do
-    execute conn "insert into hs_lemma (name, indvars) values (?, ?) " [lemma, ("{" ++ (intercalate "," (map show vars)) ++ "}")]
+insertLemmas conn ((lemma, vars, _, body):xs) = do
+    execute conn "insert into hs_lemma (name, indvars, body) values (?, ?, ?) " [lemma, ("{" ++ (intercalate "," (map show vars)) ++ "}"), body]
     insertLemmas conn xs
 
 -- Inserts all the features
-insertFeatures :: Connection -> [(String, [Int], [String])] -> IO ()
+insertFeatures :: Connection -> [(String, [Int], [String], String)] -> IO ()
 insertFeatures conn [] = return ()
-insertFeatures conn ((lemma, _, features):xs) = do
+insertFeatures conn ((lemma, _indvars, features, _body):xs) = do
     let values = zip (take (length features) (repeat lemma)) features
     executeMany conn "insert into hs_lemma_feature (lemma, feature) values (?,?)" values
     insertFeatures conn xs
 
 -- Going through each lemma of the library
-formulasToFeatures :: Name a => [Formula a] -> IO ([(String, [Int], [String])])
+formulasToFeatures :: Name a => [Formula a] -> IO ([(String, [Int], [String], String)])
 formulasToFeatures [] = return []
 formulasToFeatures (f:xs) = do
     let tree = buildTree (fm_body f)
     let trees = extractSubTrees 3 tree
     let features = nub $ concat $ map extractFeatures trees
     rest <- formulasToFeatures xs
-    return $ ((fromJust $ getFmName f), (getInductionVariables $ fm_info f), features):rest
+    return $ ((fromJust $ getFmName f), (getInductionVariables $ fm_info f), features, ppRender (fm_body f)):rest
 
 getInductionVariables :: Name a => Info a -> [Int]
 getInductionVariables (Lemma _ _ (Just p)) = indVars p

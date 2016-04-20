@@ -288,7 +288,7 @@ tryProve args prover fm thy =
 
 getIndOrder :: Name a => Args -> Formula a -> IO ([[Int]])
 getIndOrder args f = do
-  [(_name,_indvars,features)] <- formulasToFeatures [f]
+  [(_name,_indvars,features,_body)] <- formulasToFeatures [f]
   let process = (proc "python" ["./scripts/classify.py", show features, dataDir args]) { cwd = Just (workingDir args) }
   out <- readCreateProcess process ""
   return $ case readMaybe out of
