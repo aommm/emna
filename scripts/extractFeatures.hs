@@ -33,8 +33,9 @@ main = do
             libraryString <- readFile filePath
             case parseLibrary libraryString of
                 Left msg      -> error $ "Parsing library failed:"++show msg
-                Right (Library _ _ ls) -> do
-                    features <- formulasToFeatures (M.elems ls)
+                Right lib@(Library _ _ ls) -> do
+                    let thy = libToThy lib
+                    features <- formulasToFeatures (M.elems ls) thy
                     conn <- connectPostgreSQL (pack "dbname='hipspec' user='' password=''")
                     clearDB conn
                     insertLemmas conn features

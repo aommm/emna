@@ -56,6 +56,7 @@ import System.Process (readProcessWithExitCode, readCreateProcess, CmdSpec(RawCo
 import System.Directory (makeAbsolute, copyFile)
 import System.FilePath.Posix (takeBaseName, replaceBaseName)
 
+import Utils
 import FeatureExtraction (formulasToFeatures)
 
 import qualified Data.Map as M
@@ -161,9 +162,6 @@ isUserAsserted f = case (fm_info f) of
                      UserAsserted _ -> True
                      _              -> False
 
-showFormula :: Name a => Formula a -> Theory a -> String
-showFormula fm thy = ppTerm $ toTerm $ snd $ extractQuantifiedLocals fm thy
-
 loop :: (Name a, Show a) => Args -> Prover -> Theory a -> IO (Either [String] (IO ()))
 loop args prover thy = go False conjs [] thy{ thy_asserts = assums }
   where
@@ -202,12 +200,8 @@ makeProved i (Formula _ _ tvs b) p = Formula Assert (Lemma i (Just lemmaName) (J
 formulaVars :: Formula a -> [Local a]
 formulaVars = fst . forallView . fm_body
 
-extractQuantifiedLocals :: Name a => Formula a -> Theory a -> ([Local String], Expr String)
-extractQuantifiedLocals fm thy =
-             forallView $ fm_body $ head $ thy_asserts $ fmap (\ (Ren x) -> x)
-             $ niceRename thy thy{thy_asserts = [fm], thy_funcs=[]}
 
-tryProve :: Name a => Args -> Prover -> Formula a -> Theory a -> IO (String, Maybe ProofSketch)
+tryProve :: (Name a, Show a) => Args -> Prover -> Formula a -> Theory a -> IO (String, Maybe ProofSketch)
 tryProve args prover fm thy =
   do let (prenex,term) = extractQuantifiedLocals fm thy
      
@@ -220,7 +214,7 @@ tryProve args prover fm thy =
      putStrLn $ "  " ++ (ppTerm (toTerm term))
      IO.hFlush IO.stdout
 
-     ind_order <- getIndOrder args fm --[[2],[1],[0],[]]
+     ind_order <- getIndOrder args fm thy --[[2],[1],[0],[]]
      let ind_order_pretty = map getLemmaNames ind_order
      putStrLn $ "induction order from script:"++show ind_order_pretty
 
@@ -286,9 +280,9 @@ tryProve args prover fm thy =
 
      return (ppTerm (toTerm term), if null res then Nothing else mresult)
 
-getIndOrder :: Name a => Args -> Formula a -> IO ([[Int]])
-getIndOrder args f = do
-  [(_name,_indvars,features,_body)] <- formulasToFeatures [f]
+getIndOrder :: (Show a, Name a) => Args -> Formula a -> Theory a -> IO ([[Int]])
+getIndOrder args f thy = do
+  [(_name,_indvars,features,_body)] <- formulasToFeatures [f] thy 
   let process = (proc "python" ["./scripts/classify.py", show features, dataDir args]) { cwd = Just (workingDir args) }
   out <- readCreateProcess process ""
   return $ case readMaybe out of
@@ -584,88 +578,4 @@ prettyInfo i =
     UserAsserted (Just i) -> show i
     _                 -> ""
 
-newtype Ren = Ren String
-  deriving (Eq,Ord,Show)
-
-instance PrettyVar Ren where
-  varStr (Ren s) = case s of
-                     "x" -> "v"
-                     _   -> s
-
-data Prod f g a = [a] :*: g a
-  deriving (Eq,Ord,Show,Functor,Traversable,Foldable)
-
-sND (_ :*: b) = b
-
-niceRename :: (Ord a,PrettyVar a) => Theory a -> Theory a -> Theory Ren
-niceRename thy_orig thy =
-  sND $
-  fmap Ren $
-  renameWith (disambig $ suggestWithTypes lcl_rn gbl_rn thy_orig thy)
-             (concat interesting :*: thy)
-  where
-  interesting =
-    sortBy (flip $ comparing length)
-      [ [ k2 `asTypeOf` k
-        | Gbl (Global k2 (PolyType _ [] _) _) :@: _ <- as
-        , varStr k2 `notElem` constructors
-        ]
-      | Formula Prove _ _ fm <- thy_asserts thy
-      , Gbl (Global k _ _) :@: as <- universeBi fm
-      , varStr k `elem` constructors
-      ]
-
-  lcl_rn (Local x t)
-    | is "tree" t = "p"
-    | is "list" t = "xs"
-    | is "nat" t  = "n"
-    | is "bool" t = "p"
-    | otherwise   = "x"
-
-  is s t =
-    case fmap varStr t of
-      TyCon list _ -> s `isInfixOf` map toLower list
-      _ -> False
-
-  constructors =
-    [ varStr k
-    | (k,ConstructorInfo{}) <- M.toList (Tip.Scope.globals (scope thy_orig))
-    ]
-
-  gbl_rn a _ | varStr a `elem` constructors = varStr a
-  gbl_rn a (FunctionInfo (PolyType _ [] t))
-    | not (any ((>= 2) . length) interesting)
-      || or [ a `elem` xs | xs <- interesting, length xs >= 2 ]
-       = case () of
-           () | is "list" t -> "as" -- check that a is element in a list with >=2 elements
-              | otherwise   -> "a"  -- in the interesting list
-    | otherwise = lcl_rn (Local a t)
-  gbl_rn a _ = varStr a
-
-suggestWithTypes ::
-  (Ord a, PrettyVar a) =>
-  (Local a -> String) ->
-  (a -> GlobalInfo a -> String) ->
-  Theory a ->
-  Theory a ->
-  (a -> String)
-suggestWithTypes lcl_rn gbl_rn thy_orig thy =
-  \ a ->
-   case M.lookup a all_locals_orig of
-     Just t -> lcl_rn (Local a t)
-     Nothing ->
-       case lookupGlobal a scp_orig of
-         Just gi -> gbl_rn a gi
-         Nothing ->
-           case M.lookup a all_locals of
-             Just t -> lcl_rn (Local a t)
-             Nothing ->
-               case lookupGlobal a scp of
-                 Just gi -> gbl_rn a gi
-                 Nothing -> varStr a
-  where
-  all_locals_orig = M.fromList [ (x,t) | Local x t <- universeBi thy_orig ]
-  scp_orig        = scope thy_orig
-  all_locals      = M.fromList [ (x,t) | Local x t <- universeBi thy ]
-  scp             = scope thy
 

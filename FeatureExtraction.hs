@@ -19,8 +19,7 @@ import Control.Monad
 import Database.PostgreSQL.Simple
 import Data.ByteString.Internal
 import Data.ByteString.Char8 (pack)
-
-
+import Utils
 
 -- Tree structure
 data FNode a = FNode a [FNode a]
@@ -50,14 +49,15 @@ insertFeatures conn ((lemma, _indvars, features, _body):xs) = do
     insertFeatures conn xs
 
 -- Going through each lemma of the library
-formulasToFeatures :: Name a => [Formula a] -> IO ([(String, [Int], [String], String)])
-formulasToFeatures [] = return []
-formulasToFeatures (f:xs) = do
+formulasToFeatures :: (Name a, Show a) => [Formula a] -> Theory a -> IO ([(String, [Int], [String], String)])
+formulasToFeatures [] _ = return []
+formulasToFeatures (f:xs) thy = do
     let tree = buildTree (fm_body f)
     let trees = extractSubTrees 3 tree
     let features = nub $ concat $ map extractFeatures trees
-    rest <- formulasToFeatures xs
-    return $ ((fromJust $ getFmName f), (getInductionVariables $ fm_info f), features, ppRender (fm_body f)):rest
+    rest <- formulasToFeatures xs thy
+    return $ ((fromJust $ getFmName f), (getInductionVariables $ fm_info f), features, showFormula f thy):rest
+    --return $ ((fromJust $ getFmName f), (getInductionVariables $ fm_info f), features, (ppTerm (toTerm (fm_body f)))):rest
 
 getInductionVariables :: Name a => Info a -> [Int]
 getInductionVariables (Lemma _ _ (Just p)) = indVars p
