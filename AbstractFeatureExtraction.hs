@@ -23,26 +23,28 @@ import Data.ByteString.Char8 (pack)
 import FeatureExtraction
 
 -- Going through each lemma of the library
-getAbstractLemmas :: (Show a, Name a) => Library a -> Int -> [(String, [String])]
-getAbstractLemmas (Library fs dts ls) depth 
+getAbstractLemmas :: (Show a, Name a) => Map String (Formula a) -> Int -> [(String, [String])]
+getAbstractLemmas ls depth 
     | null ls = []
     | otherwise = (name, features):rest
         where
-            rest = getAbstractLemmas (Library fs dts (M.fromList $ zip ks xs)) depth
+            rest = getAbstractLemmas (M.fromList $ zip ks xs) depth
             (f:xs) = M.elems ls
             (k:ks) = M.keys ls
-            name = fromJust $ getFmName f
+            name = case getFmName f of
+                Nothing -> "current"
+                Just nome -> nome
             tree = buildTree (fm_body f)
             trees = extractSubTrees depth tree
             features = map (\h -> "_abstract " ++ h) $ concat $ map extractFeatures trees
 
 -- Going through each lemma of the library
-getAbstractFunctions :: (Show a, Name a) => Library a -> Int -> [(String, [String])]
-getAbstractFunctions (Library fs dts ls) depth 
+getAbstractFunctions :: (Show a, Name a) => Map a (Function a) -> Int -> [(String, [String])]
+getAbstractFunctions fs depth 
     | null fs = []
     | otherwise = (name, features):rest
         where
-            rest = getAbstractFunctions (Library (M.fromList $ zip ks xs) dts ls) depth
+            rest = getAbstractFunctions (M.fromList $ zip ks xs) depth
             (f:xs) = M.elems fs
             (k:ks) = M.keys fs
             name = varStr $ func_name f

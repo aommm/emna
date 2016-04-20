@@ -56,7 +56,7 @@ import System.Process (readProcessWithExitCode, readCreateProcess, CmdSpec(RawCo
 import System.Directory (makeAbsolute, copyFile)
 import System.FilePath.Posix (takeBaseName, replaceBaseName)
 
-import ExtractionPoint (formulasToFeatures)
+import ExtractionPoint (runSchemesConjecture)
 
 import qualified Data.Map as M
 import Data.Map (Map)
@@ -298,7 +298,8 @@ tryProve args prover fm thy =
 
 getIndOrder :: (Show a, Name a) => Args -> Formula a -> Theory a -> IO ([[Int]])
 getIndOrder args f thy = do
-  [(_,features)] <- formulasToFeatures [f] (thyToLib thy)
+  let (Library fs _ _) = thyToLib thy
+  features <- runSchemesConjecture f fs ["ls","la","fs","fa","ala","als","afs","afa"] 3
   let process = (proc "python" ["./scripts/classify.py", show features, dataDir args]) { cwd = Just (workingDir args) }
   out <- readCreateProcess process ""
   return $ case readMaybe out of

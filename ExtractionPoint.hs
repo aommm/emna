@@ -26,48 +26,32 @@ import AbstractFeatureExtraction
 import AbstractAnalyticalFeatureExtraction
 import AnalyticalFeatureExtraction
 
--- Runs all the schemes on a set of lemmas and functions
-formulasToFeatures :: (Show a, Name a) => [Formula a] -> Library a -> IO ([(String, [String])])
-formulasToFeatures ls lib = do
-    let iDepth = 3
-    let features = runExtractionSchemes ["la","ls","fs","fa"] iDepth lib
-    let totalFeatures = runAnalyticSchemes ["ala","als","afs","afa"] features iDepth lib
-    let visibleExtractionSchemes = ["la","ls","fs","fa"]
+runSchemesLibrary :: (Show a, Name a) => Map String (Formula a) -> Map a (Function a) -> [String] -> Int -> IO ([(String, [String])])
+runSchemesLibrary fms funcs schemes depth = do
+    let ls = getLemmaSymbols fms depth
 
-    let lemmaFeats = map (\(k,v) -> v) $ filter (\(k,_) -> k `elem` ["ls", "la", "ala", "als"] && (k `elem` visibleExtractionSchemes || k `elem` ["ala", "als"] || k == "ls")) $ M.toList totalFeatures
-    let functionFeats = map (\(k,v) -> v) $ filter (\(k,_) -> k `elem` ["fs", "fa", "afa", "afs"] && (k `elem` visibleExtractionSchemes || k `elem` ["afa", "afs"])) $ M.toList totalFeatures
+    let la = (if (elem "la" schemes || elem "ala" schemes) then (getAbstractLemmas fms depth) else [])
+    let fs = (if (elem "fs" schemes || elem "afs" schemes) then (getFunctionSymbols funcs depth) else [])
+    let fa = (if (elem "fa" schemes || elem "afa" schemes) then (getAbstractFunctions funcs depth) else [])
 
-    let lemmaNames = map (\l -> fromJust $ getFmName l) ls
+    let als = (if (elem "als" schemes) then (analyseSymbolicLemmaFeatures ls fms) else [])
+    let ala = (if (elem "ala" schemes) then (analyseAbstractLemmaFeatures la fms) else [])
+    let afs = (if (elem "afs" schemes) then (analyseSymbolicFunctionFeatures fs) else [])
+    let afa = (if (elem "afa" schemes) then (analyseAbstractFunctionFeatures fa funcs) else [])
+
+    let lemmaFeats = map snd $ filter (\(k,_) -> elem k schemes || k == "ls") $ filter (\(_,v) -> length v > 0) [("ls",ls),("la",la),("als",als),("ala",ala)]
+    let functionFeats = map snd $ filter (\(k,_) -> elem k schemes) $ filter (\(_,v) -> length v > 0) [("afs",afs),("afa",afa),("fs",fs),("fa",fa)]
+
+    putStrLn $ show afa
+
+    let lemmaNames = M.keys fms
 
     let firstHalf = (if length lemmaFeats == 0 then (emptyLemmaList lemmaNames) else (generateHalf lemmaFeats))
     let secondHalf = generateHalf functionFeats
 
-    return $ mergeFeatures True firstHalf secondHalf
+    return $ mergeFeatures ("ls" `elem` schemes) firstHalf secondHalf
 
-runAnalyticSchemes :: (Show a, Name a) => [String] -> Map String [(String, [String])] -> Int -> Library a -> Map String [(String, [String])]
-runAnalyticSchemes ("afa":xs) feats depth lib@(Library fs _ ls) = M.insert "afa" (analyseAbstractFunctionFeatures (fromJust $ M.lookup "fa" feats) fs) (runAnalyticSchemes xs feats depth lib)
-runAnalyticSchemes ("afs":xs) feats depth lib@(Library fs _ ls) = M.insert "afs" (analyseSymbolicFunctionFeatures (fromJust $ M.lookup "fs" feats)) (runAnalyticSchemes xs feats depth lib)
-runAnalyticSchemes ("ala":xs) feats depth lib@(Library fs _ ls) = M.insert "ala" (analyseAbstractLemmaFeatures (fromJust $ M.lookup "la" feats) ls) (runAnalyticSchemes xs feats depth lib)
-runAnalyticSchemes ("als":xs) feats depth lib@(Library fs _ ls) = M.insert "als" (analyseSymbolicLemmaFeatures (fromJust $ M.lookup "ls" feats) ls) (runAnalyticSchemes xs feats depth lib)
-runAnalyticSchemes [] feats _ _ = feats
-
-runExtractionSchemes :: (Show a, Name a) => [String] -> Int -> Library a -> Map String [(String, [String])]
-runExtractionSchemes ("fs":xs) depth lib = M.insert "fs" (getFunctionSymbols lib depth) (runExtractionSchemes xs depth lib)
-runExtractionSchemes ("fa":xs) depth lib = M.insert "fa" (getAbstractFunctions lib depth) (runExtractionSchemes xs depth lib)
-runExtractionSchemes ("la":xs) depth lib = trace ("getting abstract lemmas") $ M.insert "la" (getAbstractLemmas lib depth) (runExtractionSchemes xs depth lib)
-runExtractionSchemes ("ls":xs) depth lib = M.insert "ls" (getLemmaSymbols lib depth) (runExtractionSchemes xs depth lib)
-runExtractionSchemes _ _ _ = M.empty
-
-getExtractionSchemes :: [String] -> [String]
-getExtractionSchemes ("fa":xs) = nub $ ("fa"):(getExtractionSchemes xs)
-getExtractionSchemes ("fs":xs) = nub $ ("fs"):(getExtractionSchemes xs)
-getExtractionSchemes ("la":xs) = nub $ ("la"):(getExtractionSchemes xs)
-getExtractionSchemes ("ls":xs) = nub $ ("ls"):(getExtractionSchemes xs)
-
-getExtractionSchemes ("ala":xs) = nub $ ("la"):(getExtractionSchemes xs)
-getExtractionSchemes ("afs":xs) = nub $ ("fs"):("ls"):(getExtractionSchemes xs)
-getExtractionSchemes ("afa":xs) = nub $ ("fa"):(getExtractionSchemes xs)
-getExtractionSchemes ("als":xs) = nub $ ("ls"):(getExtractionSchemes xs)
-
-getExtractionSchemes (_:xs) = getExtractionSchemes xs
-getExtractionSchemes [] = []
+runSchemesConjecture :: (Show a, Name a) => Formula a -> Map a (Function a) -> [String] -> Int -> IO ([String])
+runSchemesConjecture f funcs schemes depth = do 
+    list <- runSchemesLibrary (M.fromList [("current", f)]) funcs schemes depth
+    return $ snd $ head $ list

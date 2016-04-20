@@ -23,26 +23,26 @@ import Data.ByteString.Char8 (pack)
 import FeatureExtraction
 
 -- Going through each lemma of the library
-getLemmaSymbols :: (Show a, Name a) => Library a -> Int -> [(String, [String])]
-getLemmaSymbols (Library fs dts ls) depth 
+getLemmaSymbols :: (Show a, Name a) => Map String (Formula a) -> Int -> [(String, [String])]
+getLemmaSymbols ls depth
     | null ls = []
     | otherwise = (name, features):rest
         where
-            rest = getLemmaSymbols (Library fs dts (M.fromList $ zip ks xs)) depth
+            rest = getLemmaSymbols (M.fromList $ zip ks xs) depth
             (f:xs) = M.elems ls
             (k:ks) = M.keys ls
-            name = fromJust $ getFmName f
+            name = k
             tree = buildTree (fm_body f)
             trees = extractSubTrees depth tree
             features = map (\y -> "_s_ " ++ y) $ concat $ map extractFeatures trees
 
 -- Going through each function of the library
-getFunctionSymbols :: (Show a, Name a) => Library a -> Int -> [(String, [String])]
-getFunctionSymbols (Library fs dts ls) depth 
+getFunctionSymbols :: (Show a, Name a) => Map a (Function a) -> Int -> [(String, [String])]
+getFunctionSymbols fs depth 
     | null fs = []
     | otherwise = (name, features):rest
         where
-            rest = getFunctionSymbols (Library (M.fromList $ zip ks xs) dts ls) depth
+            rest = getFunctionSymbols (M.fromList $ zip ks xs) depth
             (f:xs) = M.elems fs
             (k:ks) = M.keys fs
             name = varStr $ func_name f

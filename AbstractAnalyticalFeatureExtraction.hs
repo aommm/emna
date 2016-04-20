@@ -43,7 +43,6 @@ analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, f' ++ [
         iFDepth = innerFunctionDepth (fm_body $ fromJust $ M.lookup lemmaName ls)
         iF = iFDepth >= 2
     
-
 analyseAbstractFunctionFeatures :: (Show a, Name a) => [(String, [String])] -> Map a (Function a) -> [(String, [String])]
 analyseAbstractFunctionFeatures [] _ = []
 analyseAbstractFunctionFeatures ((funcName, features):xs) fs = (funcName, f' ++ ["_nArgs " ++ (show nArgs)]):rest
