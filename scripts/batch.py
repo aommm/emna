@@ -23,9 +23,11 @@ err = ''
 out = ''
 def print_err(s):
 	global err
+	s = s.replace('\b', '')
 	err = err + '\n' + s
 def print_out(s):
 	global out
+	s = s.replace('\b', '')
 	out = out + '\n' + s
 
 # Get all files to process
