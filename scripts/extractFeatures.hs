@@ -42,10 +42,6 @@ main = do
             libraryString <- readFile filePath
             case parseLibrary libraryString of
                 Left msg      -> error $ "Parsing library failed:"++show msg
-                --Right lib@(Library _ _ ls) -> do
-                
-                --    features <- formulasToFeatures (M.elems ls) thy
-                --    conn <- connectPostgreSQL (pack "dbname='hipspec' user='' password=''")
                 Right lib@(Library fs _ ls) -> do
                     -- Prepping the database
                     conn <- connectPostgreSQL (pack connString)
