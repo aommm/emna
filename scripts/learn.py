@@ -77,7 +77,7 @@ def get_classes():
   cur.execute("""SELECT * from hs_lemma ORDER BY name""")
   rows = cur.fetchall()
   # Extract classes
-  classes_list = [str(indvars) for [lemma, indvars] in rows]
+  classes_list = [str(indvars) for [lemma, indvars, body] in rows]
   # Convert to numerical thingy
   classes_arr = numpy.array(list(classes_list))
   return classes_arr    
