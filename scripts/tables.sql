@@ -5,7 +5,8 @@
 -- TODO: add body or something?
 CREATE TABLE hs_lemma (
   name TEXT NOT NULL PRIMARY KEY,
-  indvars integer[] NOT NULL DEFAULT '{}'
+  indvars integer[] NOT NULL DEFAULT '{}',
+  body TEXT NOT NULL
 );
 
 -- Which lemmas use other lemmas in their proofs
@@ -24,7 +25,7 @@ CREATE TABLE hs_lemma_feature (
 
 -------------------------------------------------------------------------------
 -- Dummy data
-
+/*
 -- Lemmas
 INSERT INTO hs_lemma VALUES('lemma-0', '{0}');
 INSERT INTO hs_lemma VALUES('lemma-1', '{1}');
@@ -42,3 +43,4 @@ INSERT INTO hs_lemma_feature VALUES('lemma-1', 'rev');
 INSERT INTO hs_lemma_feature VALUES('lemma-1', 'List');
 INSERT INTO hs_lemma_feature VALUES('lemma-2', 'Nat');
 INSERT INTO hs_lemma_feature VALUES('lemma-2', '+');
+*/

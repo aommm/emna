@@ -19,6 +19,7 @@ import Control.Monad
 import Database.PostgreSQL.Simple
 import Data.ByteString.Internal
 import Data.ByteString.Char8 (pack)
+import Utils
 
 -- Tree structure
 data FNode a = FNode a [FNode a]
@@ -31,12 +32,26 @@ clearDB conn = do
     execute_ conn "delete from hs_lemma" 
     return ()
 
+
+---- Inserts a all the lemmas
+---- TODO: add "body" column to hs_lemma which stores prettyprinted version of lemma
+--insertLemmas :: Connection -> [(String, [Int], [String], String)] -> IO ()
+--insertLemmas conn [] = return ()
+--insertLemmas conn ((lemma, vars, _, body):xs) = do
+--    execute conn "insert into hs_lemma (name, indvars, body) values (?, ?, ?) " [lemma, ("{" ++ (intercalate "," (map show vars)) ++ "}"), body]
+--    insertLemmas conn xs
+
+---- Inserts all the features
+--insertFeatures :: Connection -> [(String, [Int], [String], String)] -> IO ()
+--insertFeatures conn [] = return ()
+--insertFeatures conn ((lemma, _indvars, features, _body):xs) = do
+
 -- Inserts a list of lemmas with their induction variables
-insertLemmas :: Name a => Connection -> [Formula a] -> IO ()
-insertLemmas conn [] = return ()
-insertLemmas conn (f:xs) = do
-    execute conn "insert into hs_lemma (name, indvars) values (?, ?) " [(fromJust $ getFmName f), ("{" ++ (intercalate "," (map show (getInductionVariables $ fm_info f))) ++ "}")]
-    insertLemmas conn xs
+insertLemmas :: Name a => Connection -> [Formula a] -> Theory a -> IO ()
+insertLemmas conn [] _ = return ()
+insertLemmas conn (f:xs) thy = do
+    execute conn "insert into hs_lemma (name, indvars, body) values (?, ?, ?) " [(fromJust $ getFmName f), ("{" ++ (intercalate "," (map show (getInductionVariables $ fm_info f))) ++ "}"), showFormula f thy ]
+    insertLemmas conn xs thy
 
 -- Inserts a list of features
 insertFeatures :: Connection -> [(String, [String])] -> IO ()
@@ -45,6 +60,17 @@ insertFeatures conn ((lemma, features):xs) = do
     let values = zip (take (length features) (repeat lemma)) features
     executeMany conn "insert into hs_lemma_feature (lemma, feature) values (?,?)" values
     insertFeatures conn xs
+
+---- Going through each lemma of the library
+--formulasToFeatures :: (Name a, Show a) => [Formula a] -> Theory a -> IO ([(String, [Int], [String], String)])
+--formulasToFeatures [] _ = return []
+--formulasToFeatures (f:xs) thy = do
+--    let tree = buildTree (fm_body f)
+--    let trees = extractSubTrees 3 tree
+--    let features = nub $ concat $ map extractFeatures trees
+--    rest <- formulasToFeatures xs thy
+--    return $ ((fromJust $ getFmName f), (getInductionVariables $ fm_info f), features, showFormula f thy):rest
+--    --return $ ((fromJust $ getFmName f), (getInductionVariables $ fm_info f), features, (ppTerm (toTerm (fm_body f)))):rest
 
 getInductionVariables :: Name a => Info a -> [Int]
 getInductionVariables (Lemma _ _ (Just ps)) = indVars ps

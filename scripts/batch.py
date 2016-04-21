@@ -23,9 +23,11 @@ err = ''
 out = ''
 def print_err(s):
 	global err
+	s = s.replace('\b', '')
 	err = err + '\n' + s
 def print_out(s):
 	global out
+	s = s.replace('\b', '')
 	out = out + '\n' + s
 
 # Get all files to process
@@ -59,12 +61,24 @@ def calculate_indvar_success(attempt):
 	attempt['lemma_indvar_total'] = n_total
 	attempt['lemma_indvar_correct'] =  n_correct
 
+# Removes trailing slash from string s, if any. Returns the new string
+def remove_trailing_slash(s):
+	if len(s)==0:
+		return s
+	if s[len(s)-1]=='/':
+		return s[0:-1]
+	return s
 
 # Run emna for each file
 for problem in problems:
 	total += 1
 	problem_name = os.path.splitext(problem)[0]
 	problem_file = join(dir_path, problem)
+	# If this dir/problem is present in batch.log, skip it
+	already_done = [item for item in outputList if remove_trailing_slash(item['dir']) == remove_trailing_slash(dir_path) and item['name'] == problem_name]
+	if len(already_done)>0 and already_done[0]['ok']:
+		print "skipping "+problem_name
+		continue
 	print("proving "+problem_name)
 	# Run emna
 	start_time = timeit.default_timer()
