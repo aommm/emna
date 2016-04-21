@@ -22,10 +22,14 @@ def compute_score():
 def process_combination(args,i,n):
   print "%i/%i" % (i,n)
   # remove ""
-  args = [arg for arg in args if arg <> ""] 
+  args = [arg for arg in args if arg <> ""]
+  # If no feature extraction schemes, abort
+  if len(args) < 3:
+    return False
   # Populate SQL db with features for this scheme
   extractFeatures = sh.Command("./scripts/extractFeatures")
   out = extractFeatures(*args)
+  print "invoked extractFeatures with args",args
   # Compute how good it was
   scores = compute_score()
   # print "Running with arguments", args
@@ -44,6 +48,7 @@ def main():
   n = len(arg_combinations)
   print "Evaluating %i feature extraction schemes..." % n
   results = [process_combination(args,i,n) for i,args in enumerate(arg_combinations)]
+  results = filter(results) # remove False values
   results_sorted = sorted(results, key=operator.itemgetter("mean"))
   print ""
   print "Index\tAverage score\t\tFeature extraction arguments"
