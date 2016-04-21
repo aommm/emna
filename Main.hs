@@ -56,7 +56,7 @@ import System.Process (readProcessWithExitCode, readCreateProcess, CmdSpec(RawCo
 import System.Directory (makeAbsolute, copyFile)
 import System.FilePath.Posix (takeBaseName, replaceBaseName)
 
-import FeatureExtraction (formulasToFeatures)
+import ExtractionPoint (runSchemesConjecture)
 
 import qualified Data.Map as M
 import Data.Map (Map)
@@ -156,6 +156,16 @@ instance Name I where
   freshNamed s      = refresh (I undefined s)
   getUnique (I u _) = u
 
+data Prover = Prover
+  { prover_cmd    :: String -> Double -> (String,[String])
+  , prover_ext    :: String
+  , prover_pre    :: [StandardPass]
+  , prover_post   :: [StandardPass]
+  , prover_pretty :: forall a . Name a => Theory a -> Theory a -> (Doc,AxInfo)
+  , prover_pipe   :: AxInfo -> ProcessResult -> Result
+  }
+
+
 isUserAsserted :: Formula a -> Bool
 isUserAsserted f = case (fm_info f) of
                      UserAsserted _ -> True
@@ -207,7 +217,7 @@ extractQuantifiedLocals fm thy =
              forallView $ fm_body $ head $ thy_asserts $ fmap (\ (Ren x) -> x)
              $ niceRename thy thy{thy_asserts = [fm], thy_funcs=[]}
 
-tryProve :: Name a => Args -> Prover -> Formula a -> Theory a -> IO (String, Maybe ProofSketch)
+tryProve :: (Show a, Name a) => Args -> Prover -> Formula a -> Theory a -> IO (String, Maybe ProofSketch)
 tryProve args prover fm thy =
   do let (prenex,term) = extractQuantifiedLocals fm thy
      
@@ -220,7 +230,7 @@ tryProve args prover fm thy =
      putStrLn $ "  " ++ (ppTerm (toTerm term))
      IO.hFlush IO.stdout
 
-     ind_order <- getIndOrder args fm --[[2],[1],[0],[]]
+     ind_order <- getIndOrder args fm thy --[[2],[1],[0],[]]
      let ind_order_pretty = map getLemmaNames ind_order
      putStrLn $ "induction order from script:"++show ind_order_pretty
 
@@ -286,9 +296,10 @@ tryProve args prover fm thy =
 
      return (ppTerm (toTerm term), if null res then Nothing else mresult)
 
-getIndOrder :: Name a => Args -> Formula a -> IO ([[Int]])
-getIndOrder args f = do
-  [(_name,_indvars,features)] <- formulasToFeatures [f]
+getIndOrder :: (Show a, Name a) => Args -> Formula a -> Theory a -> IO ([[Int]])
+getIndOrder args f thy = do
+  let (Library fs _ _) = thyToLib thy
+  features <- runSchemesConjecture f fs ["ls","la","fs","fa","ala","als","afs","afa"] 3
   let process = (proc "python" ["./scripts/classify.py", show features, dataDir args]) { cwd = Just (workingDir args) }
   out <- readCreateProcess process ""
   return $ case readMaybe out of
@@ -399,16 +410,6 @@ saveTheory args thy = do
 
     return ()
   where hasOutput _ = True
-
-
-data Prover = Prover
-  { prover_cmd    :: String -> Double -> (String,[String])
-  , prover_ext    :: String
-  , prover_pre    :: [StandardPass]
-  , prover_post   :: [StandardPass]
-  , prover_pretty :: forall a . Name a => Theory a -> Theory a -> (Doc,AxInfo)
-  , prover_pipe   :: AxInfo -> ProcessResult -> Result
-  }
 
 promise :: Name a => Args -> Prover -> Obligation (Theory a) -> IO (Promise [Obligation Result])
 promise params Prover{..} (Obligation info thy) =
