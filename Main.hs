@@ -57,7 +57,7 @@ import System.Directory (makeAbsolute, copyFile)
 import System.FilePath.Posix (takeBaseName, replaceBaseName)
 
 import Utils
-import FeatureExtraction (formulasToFeatures)
+import ExtractionPoint (runSchemesConjecture)
 
 import qualified Data.Map as M
 import Data.Map (Map)
@@ -157,6 +157,16 @@ instance Name I where
   freshNamed s      = refresh (I undefined s)
   getUnique (I u _) = u
 
+data Prover = Prover
+  { prover_cmd    :: String -> Double -> (String,[String])
+  , prover_ext    :: String
+  , prover_pre    :: [StandardPass]
+  , prover_post   :: [StandardPass]
+  , prover_pretty :: forall a . Name a => Theory a -> Theory a -> (Doc,AxInfo)
+  , prover_pipe   :: AxInfo -> ProcessResult -> Result
+  }
+
+
 isUserAsserted :: Formula a -> Bool
 isUserAsserted f = case (fm_info f) of
                      UserAsserted _ -> True
@@ -201,7 +211,7 @@ formulaVars :: Formula a -> [Local a]
 formulaVars = fst . forallView . fm_body
 
 
-tryProve :: (Name a, Show a) => Args -> Prover -> Formula a -> Theory a -> IO (String, Maybe ProofSketch)
+tryProve :: (Show a, Name a) => Args -> Prover -> Formula a -> Theory a -> IO (String, Maybe ProofSketch)
 tryProve args prover fm thy =
   do let (prenex,term) = extractQuantifiedLocals fm thy
      
@@ -282,7 +292,9 @@ tryProve args prover fm thy =
 
 getIndOrder :: (Show a, Name a) => Args -> Formula a -> Theory a -> IO ([[Int]])
 getIndOrder args f thy = do
-  [(_name,_indvars,features,_body)] <- formulasToFeatures [f] thy 
+  --[(_name,_indvars,features,_body)] <- formulasToFeatures [f] thy 
+  let (Library fs _ _) = thyToLib thy
+  features <- runSchemesConjecture f fs ["ls","la","fs","fa","ala","als","afs","afa"] 3
   let process = (proc "python" ["./scripts/classify.py", show features, dataDir args]) { cwd = Just (workingDir args) }
   out <- readCreateProcess process ""
   return $ case readMaybe out of
@@ -393,16 +405,6 @@ saveTheory args thy = do
 
     return ()
   where hasOutput _ = True
-
-
-data Prover = Prover
-  { prover_cmd    :: String -> Double -> (String,[String])
-  , prover_ext    :: String
-  , prover_pre    :: [StandardPass]
-  , prover_post   :: [StandardPass]
-  , prover_pretty :: forall a . Name a => Theory a -> Theory a -> (Doc,AxInfo)
-  , prover_pipe   :: AxInfo -> ProcessResult -> Result
-  }
 
 promise :: Name a => Args -> Prover -> Obligation (Theory a) -> IO (Promise [Obligation Result])
 promise params Prover{..} (Obligation info thy) =

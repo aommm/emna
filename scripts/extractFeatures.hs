@@ -8,6 +8,7 @@ import Tip.Library
 import Data.Map (Map)
 import qualified Data.Map as M
 import Tip.Types
+import Tip.Fresh
 import Tip.Pretty
 import Data.Maybe
 import Data.List
@@ -16,15 +17,23 @@ import Control.Monad
 import Database.PostgreSQL.Simple
 import Data.ByteString.Internal
 import Data.ByteString.Char8 (pack)
+import Data.Char
 
+import ExtractionPoint
 import FeatureExtraction
-
+import SymbolicFeatureExtraction
+import AbstractFeatureExtraction
+import AbstractAnalyticalFeatureExtraction
+import AnalyticalFeatureExtraction
 
 -- Reads a library file to begin with
 main :: IO ()
 main = do
     args <- getArgs
     let filePath = head args
+    let depth = head $ tail args
+    let schemes = drop 2 args
+
     connString <- getConnString
     exists <- doesFileExist filePath
     case exists of
@@ -33,14 +42,23 @@ main = do
             libraryString <- readFile filePath
             case parseLibrary libraryString of
                 Left msg      -> error $ "Parsing library failed:"++show msg
-                Right lib@(Library _ _ ls) -> do
-                    let thy = libToThy lib
-                    features <- formulasToFeatures (M.elems ls) thy
-                    conn <- connectPostgreSQL (pack "dbname='hipspec' user='' password=''")
+                --Right lib@(Library _ _ ls) -> do
+                
+                --    features <- formulasToFeatures (M.elems ls) thy
+                --    conn <- connectPostgreSQL (pack "dbname='hipspec' user='' password=''")
+                Right lib@(Library fs _ ls) -> do
+                    -- Prepping the database
+                    conn <- connectPostgreSQL (pack connString)
                     clearDB conn
-                    insertLemmas conn features
-                    insertFeatures conn features
+                    let thy = libToThy lib
+                    insertLemmas conn (M.elems ls) thy
+
+                    finalFeatures <- runSchemesLibrary ls fs schemes (digitToInt (head depth))
+                    printList finalFeatures
+
+                    insertFeatures conn finalFeatures
                     putStrLn "finished"
+
 
 getConnString :: IO String
 getConnString = do
@@ -54,4 +72,3 @@ getConnString = do
     let connStringUser = maybe "" (\s -> " username='"++ s ++"'") dbUsername
     let connStringPass = maybe "" (\s -> " password='"++ s ++"'") dbPassword
     return $ connString ++ connStringUser ++ connStringPass
-
