@@ -44,14 +44,14 @@ main = do
                 Left msg      -> error $ "Parsing library failed:"++show msg
                 Right lib@(Library fs _ ls) -> do
                     -- Prepping the database
-                    -- conn <- connectPostgreSQL (pack connString)
-                    --clearDB conn
-                    --insertLemmas conn (M.elems ls)
+                    conn <- connectPostgreSQL (pack connString)
+                    clearDB conn
+                    insertLemmas conn (M.elems ls)
 
                     finalFeatures <- runSchemesLibrary ls fs schemes (digitToInt (head depth))
                     printList finalFeatures
 
-                    -- insertFeatures conn finalFeatures
+                    insertFeatures conn finalFeatures
                     putStrLn "finished"
 
 
