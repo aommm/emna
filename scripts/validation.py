@@ -41,14 +41,15 @@ def process_combination(args,i,n):
 def main():
   # Loop over all possible feature extraction schemes
   # TODO: any point with depth=0?
-  all_args = [["./data/lib.tiplib"], range(2,6),
+  all_args = [["./data/lib.tiplib"], range(2,3),
     ["","fa"], ["","fs"], ["","la"], ["", "ls"], ["","ala"], ["","afa"], ["","afs"], ["","als"]]
   # all_args = [["./data/lib.tiplib"], range(1,5), ["","fa"], ["","fs"], ["","la"], ["", "ls"]]
   arg_combinations = list(itertools.product(*all_args))
   n = len(arg_combinations)
   print "Evaluating %i feature extraction schemes..." % n
   results = [process_combination(args,i,n) for i,args in enumerate(arg_combinations)]
-  results = filter(results) # remove False values
+  # results = [process_combination(arg_combinations[100],1,2), process_combination(arg_combinations[10],2,2)]
+  results = [result for result in results if result <> False] # remove False values
   results_sorted = sorted(results, key=operator.itemgetter("mean"))
   print ""
   print "Index\tAverage score\t\tFeature extraction arguments"
