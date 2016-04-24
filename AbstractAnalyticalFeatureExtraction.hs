@@ -25,7 +25,7 @@ import FeatureExtraction
 import qualified AbstractFeatureExtraction as AF
 
 -- Quick analysis of a feature set
-analyseAbstract :: [(String, [String])] -> [(String, [String])]
+analyseAbstract :: [(String, [Feat])] -> [(String, [String])]
 analyseAbstract [] = []
 analyseAbstract ((lemmaName, features):xs) = (lemmaName, f'):rest
     where
@@ -34,25 +34,24 @@ analyseAbstract ((lemmaName, features):xs) = (lemmaName, f'):rest
         nDistFeats = length $ nub features -- number of distinct features
         f' = ["_abstractLength " ++ (show nFeats), "_abstractLengthDistinct " ++ (show nDistFeats)]
 
-analyseAbstractLemmaFeatures :: (Show a, Name a) => [(String, [String])] -> Map String (Formula a) -> [(String, [String])]
+analyseAbstractLemmaFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map String (Formula a) -> [(String, [Feat])]
 analyseAbstractLemmaFeatures [] _ = []
-analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> "_ala " ++ s) $ f' ++ ["_innerFunctionApplication " ++ (show iF), "_innerFunctionDepth " ++ (show iFDepth)]):rest
+analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "ala")) $ f' ++ ["_innerFunctionApplication " ++ (show iF), "_innerFunctionDepth " ++ (show iFDepth)]):rest
     where
         rest = analyseAbstractLemmaFeatures xs ls
         [(name, f')] = analyseAbstract [(lemmaName, features)]
         iFDepth = innerFunctionDepth (fm_body $ fromJust $ M.lookup lemmaName ls)
         iF = iFDepth >= 2
     
-analyseAbstractFunctionFeatures :: (Show a, Name a) => [(String, [String])] -> Map a (Function a) -> [(String, [String])]
+analyseAbstractFunctionFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map a (Function a) -> [(String, [Feat])]
 analyseAbstractFunctionFeatures [] _ = []
-analyseAbstractFunctionFeatures ((funcName, features):xs) fs = (funcName, map (\s -> "_afa " ++ s) $ f' ++ ["_nArgs " ++ (show nArgs)]):rest
+analyseAbstractFunctionFeatures ((funcName, features):xs) fs = (funcName, map (\s -> (s, "afa")) $ f' ++ ["_nArgs " ++ (show nArgs)]):rest
     where
         rest = analyseAbstractFunctionFeatures xs fs
         (_,function) = fromJust $ find (\(f,_) -> (varStr f) == funcName) (M.toList fs)
         [(name, f')] = analyseAbstract [(funcName, features)]
         nArgs = numberOfArgs function
     
-
 numberOfArgs :: (Show a, Name a) => Function a -> Int
 numberOfArgs f = length $ func_args f
 

@@ -45,14 +45,15 @@ main = do
                 Right lib@(Library fs _ ls) -> do
                     (Library fs' _ ls') <- filterNonInductiveLemmas lib
                     -- Prepping the database
+                    putStrLn connString
                     conn <- connectPostgreSQL (pack connString)
                     clearDB conn
                     insertLemmas conn (M.elems ls')
 
-                    putStrLn $ "Filtered lemmas: " ++ (show ls')
+                    -- putStrLn $ "Filtered lemmas: " ++ (show ls')
 
                     finalFeatures <- runSchemesLibrary ls' fs' schemes (digitToInt (head depth))
-                    printList finalFeatures
+                    -- printList finalFeatures
 
                     insertFeatures conn finalFeatures
                     putStrLn "finished"
@@ -71,6 +72,6 @@ getConnString = do
     let dbName' = fromMaybe "hipspec" dbName
     let dbHost' = fromMaybe "localhost" dbHost
     let connString = "dbname='"++ dbName'++ "' host='"++ dbHost' ++"'"
-    let connStringUser = maybe "" (\s -> " username='"++ s ++"'") dbUsername
+    let connStringUser = maybe "" (\s -> " user='"++ s ++"'") dbUsername
     let connStringPass = maybe "" (\s -> " password='"++ s ++"'") dbPassword
     return $ connString ++ connStringUser ++ connStringPass

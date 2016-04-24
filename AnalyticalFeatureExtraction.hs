@@ -25,7 +25,7 @@ import FeatureExtraction
 import qualified SymbolicFeatureExtraction as SF
 
 -- Quick analysis of a feature set
-analyseSymbolic :: [(String, [String])] -> [(String, [String])]
+analyseSymbolic :: [(String, [Feat])] -> [(String, [String])]
 analyseSymbolic [] = []
 analyseSymbolic ((lemmaName, features):xs) = (lemmaName, f'):rest
     where
@@ -33,12 +33,12 @@ analyseSymbolic ((lemmaName, features):xs) = (lemmaName, f'):rest
         nFeats = length features -- number of features
         nDistFeats = length $ nub features -- number of distinct features
         ratio = intdiv nDistFeats nFeats -- 
-        mostPopular = most (freq features) -- most popular feature of the lemma
+        (mostPopular,_) = most (freq features) -- most popular feature of the lemma
         f' = ["_length " ++ (show nFeats), "_lengthDistinct " ++ (show nDistFeats), "_distinctRatio " ++ (printf "%.1f" $ ratio), "_popular " ++ mostPopular]
 
-analyseSymbolicLemmaFeatures :: (Show a, Name a) => [(String, [String])] -> Map String (Formula a) -> [(String, [String])]
+analyseSymbolicLemmaFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map String (Formula a) -> [(String, [Feat])]
 analyseSymbolicLemmaFeatures [] _ = []
-analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> "_als " ++ s) $ features' ++ (getBooleanFeatures [commutative, associative])):rest
+analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "als")) $ features' ++ (getBooleanFeatures [commutative, associative])):rest
     where
         rest = analyseSymbolicLemmaFeatures xs ls
         fs = analyseSymbolic [(lemmaName, features)]
@@ -49,9 +49,9 @@ analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s
         associative = ("_associative", (if exactSame then (isAssociative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
     -- let distributive = (if (same && not exactSame) then (isDistributive (fm_body $ fromJust $ M.lookup lemmaName ls)) else False)
 
-analyseSymbolicFunctionFeatures :: [(String, [String])] -> [(String, [String])]
+analyseSymbolicFunctionFeatures :: [(String, [Feat])] -> [(String, [Feat])]
 analyseSymbolicFunctionFeatures [] = []
-analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, map (\s -> "_afs " ++ s) $ features' ++ (getBooleanFeatures [rec])):rest
+analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, map (\s -> (s, "afs")) $ features' ++ (getBooleanFeatures [rec])):rest
     where
         rest = analyseSymbolicFunctionFeatures xs
         fs = analyseSymbolic [(fName, features)]
@@ -130,24 +130,24 @@ areTheSame (Lcl (Local name1 (TyCon _ _))) (Lcl (Local name2 (TyCon _ _))) = nam
 areTheSame (Lcl (Local name1 (TyVar _))) (Lcl (Local name2 (TyVar _))) = name1 == name2
 areTheSame _ _ = False
 
-isRecursive :: String -> [String] -> Bool
+isRecursive :: String -> [Feat] -> Bool
 isRecursive _ [] = False
-isRecursive f' (f:fs)
+isRecursive f' ((f,_):fs)
     | f' == f = True
     | otherwise = isRecursive f' fs
 
-most :: [(Int, String)] -> String
+most :: [(Int, Feat)] -> Feat
 most list = f
     where
         (_,f) = head $ sortBy mostSorter list
 
-mostSorter :: (Int, String) -> (Int, String) -> Ordering
+mostSorter :: (Int, Feat) -> (Int, Feat) -> Ordering
 mostSorter (a,_) (b,_) 
     | a > b = LT
     | a < b = GT
     | otherwise = EQ
 
-freq :: [String] -> [(Int, String)]
+freq :: [Feat] -> [(Int, Feat)]
 freq l = map (\i -> (length i, head i)) (group (sort l))
 
 intdiv :: Int -> Int -> Float

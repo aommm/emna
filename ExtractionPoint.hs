@@ -26,7 +26,7 @@ import AbstractFeatureExtraction
 import AbstractAnalyticalFeatureExtraction
 import AnalyticalFeatureExtraction
 
-runSchemesLibrary :: (Show a, Name a) => Map String (Formula a) -> Map a (Function a) -> [String] -> Int -> IO ([(String, [String])])
+runSchemesLibrary :: (Show a, Name a) => Map String (Formula a) -> Map a (Function a) -> [String] -> Int -> IO ([(String, [Feat])])
 runSchemesLibrary fms funcs schemes depth = do
     let ls = getLemmaSymbols fms depth
 
@@ -42,8 +42,6 @@ runSchemesLibrary fms funcs schemes depth = do
     let lemmaFeats = map snd $ filter (\(k,_) -> elem k schemes || k == "ls") $ filter (\(_,v) -> length v > 0) [("ls",ls),("la",la),("als",als),("ala",ala)]
     let functionFeats = map snd $ filter (\(k,_) -> elem k schemes) $ filter (\(_,v) -> length v > 0) [("afs",afs),("afa",afa),("fs",fs),("fa",fa)]
 
-    putStrLn $ show afa
-
     let lemmaNames = M.keys fms
 
     let firstHalf = (if length lemmaFeats == 0 then (emptyLemmaList lemmaNames) else (generateHalf lemmaFeats))
@@ -51,7 +49,7 @@ runSchemesLibrary fms funcs schemes depth = do
 
     return $ mergeFeatures ("ls" `elem` schemes) firstHalf secondHalf
 
-runSchemesConjecture :: (Show a, Name a) => Formula a -> Map a (Function a) -> [String] -> Int -> IO ([String])
+runSchemesConjecture :: (Show a, Name a) => Formula a -> Map a (Function a) -> [String] -> Int -> IO ([Feat])
 runSchemesConjecture f funcs schemes depth = do 
     list <- runSchemesLibrary (M.fromList [("current", f)]) funcs schemes depth
     return $ snd $ head $ list
