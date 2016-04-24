@@ -5,18 +5,26 @@ import itertools
 import sh
 import operator
 
+from sklearn.base import BaseEstimator
+from sklearn import svm
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.feature_extraction import DictVectorizer
 from sklearn import cross_validation
 
 from learn import get_features, get_classes
 
+def create_weights(features):
+  print features
+
 def compute_score():
   """Computes the score for the features currently in the database using cross-validation"""
   clf = BernoulliNB()
+  #clf = svm.SVC(kernel="linear")
   features, v = get_features()
   classes = get_classes()
-  result = cross_validation.cross_val_score(clf, features, classes, cv=5)
+  #print features
+  #print v.inverse_transform(features)
+  result = cross_validation.cross_val_score(clf, features, classes, cv=5) # fit_params={'sample_weight':}
   return result
 
 def process_combination(args,i,n):

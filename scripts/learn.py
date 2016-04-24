@@ -55,12 +55,34 @@ def get_features():
   for [lemma, feature] in rows:
     if not lemma in features:
       features[lemma] = dict()
-    features[lemma][feature] = 1 # TODO check if already exists, should keep count?
+    print feature
+    features[lemma][feature] = get_feature_weight(feature) # TODO check if already exists, should keep count?
   # Convert to numerical thingy
   features_list = [features[lemma] for lemma in features]
   v = DictVectorizer()
   features_arr = v.fit_transform(features_list)
   return features_arr, v
+
+def get_feature_weight(feature):
+  if "_s_" in feature: # ls
+    return 1
+  elif ("_abstract" in feature) and (not ("_func" in feature)): # la
+    return 1
+  elif ("_func" in feature) and (not ("_abstract" in feature)) and (not ("_afs" in feature)) and (not ("_afa" in feature)): # fs
+    return 1
+  elif ("_func _abstract" in feature): # fa
+    return 1
+  elif ("_als" in feature):
+    return 20
+  elif ("_afa" in feature):
+    return 20
+  elif ("_afs" in feature):
+    return 20
+  elif ("_ala" in feature):
+    return 20
+  else:
+    return 0
+
 
 # Get all lemmas (same order as get_features())
 def get_lemmas():

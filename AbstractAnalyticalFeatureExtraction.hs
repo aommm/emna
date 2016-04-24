@@ -36,7 +36,7 @@ analyseAbstract ((lemmaName, features):xs) = (lemmaName, f'):rest
 
 analyseAbstractLemmaFeatures :: (Show a, Name a) => [(String, [String])] -> Map String (Formula a) -> [(String, [String])]
 analyseAbstractLemmaFeatures [] _ = []
-analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, f' ++ ["_innerFunctionApplication " ++ (show iF), "_innerFunctionDepth " ++ (show iFDepth)]):rest
+analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> "_ala " ++ s) $ f' ++ ["_innerFunctionApplication " ++ (show iF), "_innerFunctionDepth " ++ (show iFDepth)]):rest
     where
         rest = analyseAbstractLemmaFeatures xs ls
         [(name, f')] = analyseAbstract [(lemmaName, features)]
@@ -45,7 +45,7 @@ analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, f' ++ [
     
 analyseAbstractFunctionFeatures :: (Show a, Name a) => [(String, [String])] -> Map a (Function a) -> [(String, [String])]
 analyseAbstractFunctionFeatures [] _ = []
-analyseAbstractFunctionFeatures ((funcName, features):xs) fs = (funcName, f' ++ ["_nArgs " ++ (show nArgs)]):rest
+analyseAbstractFunctionFeatures ((funcName, features):xs) fs = (funcName, map (\s -> "_afa " ++ s) $ f' ++ ["_nArgs " ++ (show nArgs)]):rest
     where
         rest = analyseAbstractFunctionFeatures xs fs
         (_,function) = fromJust $ find (\(f,_) -> (varStr f) == funcName) (M.toList fs)

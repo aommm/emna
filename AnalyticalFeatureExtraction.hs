@@ -38,7 +38,7 @@ analyseSymbolic ((lemmaName, features):xs) = (lemmaName, f'):rest
 
 analyseSymbolicLemmaFeatures :: (Show a, Name a) => [(String, [String])] -> Map String (Formula a) -> [(String, [String])]
 analyseSymbolicLemmaFeatures [] _ = []
-analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, features' ++ (getBooleanFeatures [commutative, associative])):rest
+analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> "_als " ++ s) $ features' ++ (getBooleanFeatures [commutative, associative])):rest
     where
         rest = analyseSymbolicLemmaFeatures xs ls
         fs = analyseSymbolic [(lemmaName, features)]
@@ -51,7 +51,7 @@ analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, feature
 
 analyseSymbolicFunctionFeatures :: [(String, [String])] -> [(String, [String])]
 analyseSymbolicFunctionFeatures [] = []
-analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, features' ++ (getBooleanFeatures [rec])):rest
+analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, map (\s -> "_afs " ++ s) $ features' ++ (getBooleanFeatures [rec])):rest
     where
         rest = analyseSymbolicFunctionFeatures xs
         fs = analyseSymbolic [(fName, features)]
