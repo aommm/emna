@@ -46,6 +46,9 @@ def process_combination(args,i,n):
   scores = compute_score(args)
   return {"args": args, "mean": scores.mean(), "deviation": scores.std()*2}
 
+def do_step(r,j,n,arg_combinations):
+  prepare(r)
+  return [process_combination(args,i + j*len(arg_combinations),n) for i,args in enumerate(arg_combinations)]
 
 def main():
   # Loop over all possible feature extraction schemes
@@ -53,7 +56,7 @@ def main():
 
   all_schemes = "fa fs la ls ala afa afs als"
   scheme_combos = ["","fa"], ["","fs"], ["","la"], ["", "ls"], ["","ala"], ["","afa"], ["","afs"], ["","als"]
-  depth_range = range(2,6)
+  depth_range = range(2,3)
   arg_combinations = list(itertools.product(*scheme_combos))
   n = len(depth_range)*len(arg_combinations)
   results = []
@@ -61,8 +64,7 @@ def main():
   print "Processing %i extraction scheme combinations" % n
     
   for j,r in enumerate(depth_range):
-    prepare(r)
-    results = results + [process_combination(args,i + j*len(arg_combinations),n) for i,args in enumerate(arg_combinations)]
+    results = results + do_step(r,j,n,arg_combinations)
   
   #print results
 
