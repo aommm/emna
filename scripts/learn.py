@@ -45,25 +45,14 @@ except:
 
 
 # Create feature matrix
-def get_features(schemes):
-  # Get from db
-  cur = conn.cursor()
-
-  cites = []
-  for s in schemes:
-    cites.append("'%s'" % s)
-
-  cur.execute("""SELECT lemma,feature,scheme from hs_lemma_feature WHERE scheme IN (%s) ORDER BY lemma""" % ",".join(cites))
-  #cur.execute("""SELECT * from hs_lemma_feature ORDER BY lemma""")
-  
-  rows = cur.fetchall()
-  # Create dict
+def get_features(schemes,rows):
   features = dict()
   for [lemma, feature, scheme] in rows:
-    if not lemma in features:
-      features[lemma] = dict()
-    # print feature
-    features[lemma][feature] = 1 # TODO check if already exists, should keep count?
+    if scheme in schemes:
+      if not lemma in features:
+        features[lemma] = dict()
+      # print feature
+      features[lemma][feature] = 1 # TODO check if already exists, should keep count?
 
   # Convert to numerical thingy
   #print features
@@ -71,6 +60,12 @@ def get_features(schemes):
   v = DictVectorizer()
   features_arr = v.fit_transform(features_list)
   return features_arr, v
+
+def load_features():
+  cur = conn.cursor()
+  cur.execute("""SELECT lemma,feature,scheme from hs_lemma_feature ORDER BY lemma""")
+  rows = cur.fetchall()
+  return rows
 
 # Get all lemmas (same order as get_features())
 def get_lemmas():

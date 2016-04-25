@@ -11,16 +11,16 @@ from sklearn.naive_bayes import BernoulliNB
 from sklearn.feature_extraction import DictVectorizer
 from sklearn import cross_validation
 
-from learn import get_features, get_classes
+from learn import get_features, get_classes, load_features
 
 def create_weights(features):
   print features
 
-def compute_score(schemes,classes):
+def compute_score(schemes,classes,rows):
   """Computes the score for the features currently in the database using cross-validation"""
   clf = BernoulliNB()
   #clf = svm.SVC(kernel="linear")
-  features, v = get_features(schemes)
+  features, v = get_features(schemes,rows)
     
   # print features
   result = cross_validation.cross_val_score(clf, features, classes, cv=5)
@@ -34,7 +34,7 @@ def prepare(depth):
   # extractFeatures(completeArgs)
   # ./data/lib.tiplib 5 fa fs la ls ala afa afs als
 
-def process_combination(args,i,n,classes):
+def process_combination(args,i,n,classes,rows):
   print "%i/%i" % (i,n)
   # remove ""
   args = [arg for arg in args if arg <> ""]
@@ -42,13 +42,14 @@ def process_combination(args,i,n,classes):
   if len(args) < 1:
     return False
   # Compute how good it was
-  scores = compute_score(args,classes)
+  scores = compute_score(args,classes,rows)
   return {"args": args, "mean": scores.mean(), "deviation": scores.std()*2}
 
 def do_step(r,j,n,arg_combinations):
   prepare(r)
   classes = get_classes() # once per depth is sufficient
-  return [process_combination(args,i + j*len(arg_combinations),n,classes) for i,args in enumerate(arg_combinations)]
+  featureRows = load_features()
+  return [process_combination(args,i + j*len(arg_combinations),n,classes,featureRows) for i,args in enumerate(arg_combinations)]
 
 def main():
   # Loop over all possible feature extraction schemes
@@ -56,7 +57,7 @@ def main():
 
   all_schemes = "fa fs la ls ala afa afs als"
   scheme_combos = ["","fa"], ["","fs"], ["","la"], ["", "ls"], ["","ala"], ["","afa"], ["","afs"], ["","als"]
-  depth_range = range(2,3)
+  depth_range = range(2,6)
   arg_combinations = list(itertools.product(*scheme_combos))
   n = len(depth_range)*len(arg_combinations)
   results = []
