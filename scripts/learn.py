@@ -53,21 +53,20 @@ def get_features(schemes):
   for s in schemes:
     cites.append("'%s'" % s)
 
-  cur.execute("""SELECT lemma,feature from hs_lemma_feature WHERE scheme IN (%s) ORDER BY lemma""" % ",".join(cites))
+  cur.execute("""SELECT lemma,feature,scheme from hs_lemma_feature WHERE scheme IN (%s) ORDER BY lemma""" % ",".join(cites))
   #cur.execute("""SELECT * from hs_lemma_feature ORDER BY lemma""")
   
-  print """SELECT lemma,feature from hs_lemma_feature WHERE scheme IN (%s) ORDER BY lemma""" % ",".join(cites)
-
   rows = cur.fetchall()
   # Create dict
   features = dict()
-  for [lemma, feature] in rows:
+  for [lemma, feature, scheme] in rows:
     if not lemma in features:
       features[lemma] = dict()
     # print feature
     features[lemma][feature] = 1 # TODO check if already exists, should keep count?
+
   # Convert to numerical thingy
-  print features
+  #print features
   features_list = [features[lemma] for lemma in features]
   v = DictVectorizer()
   features_arr = v.fit_transform(features_list)

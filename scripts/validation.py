@@ -21,18 +21,19 @@ def compute_score(schemes):
   clf = BernoulliNB()
   #clf = svm.SVC(kernel="linear")
   features, v = get_features(schemes)
-  classes = get_classes()
-  #print features
-  print v.inverse_transform(features)
-  print classes
+  classes = get_classes() # once per depth is sufficient
+    
+  # print features
   result = cross_validation.cross_val_score(clf, features, classes, cv=5)
-  return "result"
+  return result
 
 def prepare(depth):
   print "Running extractFeatures for all schemes at depth %i" % depth
   extractFeatures = sh.Command("./scripts/extractFeatures")
   completeArgs = "./data/lib.tiplib %i fa fs la ls ala afa afs als" % depth
-  out = extractFeatures(completeArgs)
+  os.system("./scripts/extractFeatures ./data/lib.tiplib %i fa fs la ls ala afa afs als" % depth)
+  # extractFeatures(completeArgs)
+  # ./data/lib.tiplib 5 fa fs la ls ala afa afs als
 
 def process_combination(args,i,n):
   print "%i/%i" % (i,n)
@@ -43,11 +44,7 @@ def process_combination(args,i,n):
     return False
   # Compute how good it was
   scores = compute_score(args)
-  # print "Running with arguments", args
-  # print scores
-  # return scores
-  return "hej"
-  #return {"args": args, "mean": scores.mean(), "deviation": scores.std()*2}
+  return {"args": args, "mean": scores.mean(), "deviation": scores.std()*2}
 
 
 def main():
@@ -56,30 +53,27 @@ def main():
 
   all_schemes = "fa fs la ls ala afa afs als"
   scheme_combos = ["","fa"], ["","fs"], ["","la"], ["", "ls"], ["","ala"], ["","afa"], ["","afs"], ["","als"]
-  depth_range = range(2,3)
+  depth_range = range(2,6)
   arg_combinations = list(itertools.product(*scheme_combos))
-  n = 1*len(arg_combinations)
+  n = len(depth_range)*len(arg_combinations)
   results = []
 
   print "Processing %i extraction scheme combinations" % n
     
   for j,r in enumerate(depth_range):
     prepare(r)
-    [process_combination(args,i + j*len(arg_combinations),n) for i,args in enumerate(arg_combinations)]
-    
-
-
-  # all_args = [["./data/lib.tiplib"], range(1,5), ["","fa"], ["","fs"], ["","la"], ["", "ls"]]
-    
+    results = results + [process_combination(args,i + j*len(arg_combinations),n) for i,args in enumerate(arg_combinations)]
+  
+  #print results
 
   # results = [process_combination(arg_combinations[100],1,2), process_combination(arg_combinations[10],2,2)]
-  #results = [result for result in results if result <> False] # remove False values
-  #results_sorted = sorted(results, key=operator.itemgetter("mean"))
+  results = [result for result in results if result <> False] # remove False values
+  results_sorted = sorted(results, key=operator.itemgetter("mean"))
   #print ""
-  #print "Index\tAverage score\t\tFeature extraction arguments"
-  #for i,result in enumerate(results_sorted):
-  #  nice_str = "%i.\t%0.2f (+/- %0.2f)\t\t" % (i, result['mean'], result['deviation'])
-  #  print nice_str, result['args']
+  print "Index\tAverage score\t\tFeature extraction arguments"
+  for i,result in enumerate(results_sorted):
+    nice_str = "%i.\t%0.2f (+/- %0.2f)\t\t" % (i, result['mean'], result['deviation'])
+    print nice_str, result['args']
 
 if __name__ == '__main__':
   main()
