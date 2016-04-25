@@ -16,12 +16,11 @@ from learn import get_features, get_classes
 def create_weights(features):
   print features
 
-def compute_score(schemes):
+def compute_score(schemes,classes):
   """Computes the score for the features currently in the database using cross-validation"""
   clf = BernoulliNB()
   #clf = svm.SVC(kernel="linear")
   features, v = get_features(schemes)
-  classes = get_classes() # once per depth is sufficient
     
   # print features
   result = cross_validation.cross_val_score(clf, features, classes, cv=5)
@@ -35,7 +34,7 @@ def prepare(depth):
   # extractFeatures(completeArgs)
   # ./data/lib.tiplib 5 fa fs la ls ala afa afs als
 
-def process_combination(args,i,n):
+def process_combination(args,i,n,classes):
   print "%i/%i" % (i,n)
   # remove ""
   args = [arg for arg in args if arg <> ""]
@@ -43,12 +42,13 @@ def process_combination(args,i,n):
   if len(args) < 1:
     return False
   # Compute how good it was
-  scores = compute_score(args)
+  scores = compute_score(args,classes)
   return {"args": args, "mean": scores.mean(), "deviation": scores.std()*2}
 
 def do_step(r,j,n,arg_combinations):
   prepare(r)
-  return [process_combination(args,i + j*len(arg_combinations),n) for i,args in enumerate(arg_combinations)]
+  classes = get_classes() # once per depth is sufficient
+  return [process_combination(args,i + j*len(arg_combinations),n,classes) for i,args in enumerate(arg_combinations)]
 
 def main():
   # Loop over all possible feature extraction schemes
