@@ -21,8 +21,6 @@ def compute_score(schemes,classes,rows):
   clf = BernoulliNB()
   #clf = svm.SVC(kernel="linear")
   features, v = get_features(schemes,rows)
-    
-  # print features
   result = cross_validation.cross_val_score(clf, features, classes, cv=5)
   return result
 
@@ -34,7 +32,7 @@ def prepare(depth):
   # extractFeatures(completeArgs)
   # ./data/lib.tiplib 5 fa fs la ls ala afa afs als
 
-def process_combination(args,i,n,classes,rows):
+def process_combination(args,i,n,classes,rows,depth):
   print "%i/%i" % (i,n)
   # remove ""
   args = [arg for arg in args if arg <> ""]
@@ -43,13 +41,13 @@ def process_combination(args,i,n,classes,rows):
     return False
   # Compute how good it was
   scores = compute_score(args,classes,rows)
-  return {"args": args, "mean": scores.mean(), "deviation": scores.std()*2}
+  return {"args": args, "mean": scores.mean(), "deviation": scores.std()*2, "depth": depth}
 
 def do_step(r,j,n,arg_combinations):
   prepare(r)
   classes = get_classes() # once per depth is sufficient
   featureRows = load_features()
-  return [process_combination(args,i + j*len(arg_combinations),n,classes,featureRows) for i,args in enumerate(arg_combinations)]
+  return [process_combination(args,i + j*len(arg_combinations),n,classes,featureRows,r) for i,args in enumerate(arg_combinations)]
 
 def main():
   # Loop over all possible feature extraction schemes
@@ -57,7 +55,7 @@ def main():
 
   all_schemes = "fa fs la ls ala afa afs als"
   scheme_combos = ["","fa"], ["","fs"], ["","la"], ["", "ls"], ["","ala"], ["","afa"], ["","afs"], ["","als"]
-  depth_range = range(2,6)
+  depth_range = range(2,4)
   arg_combinations = list(itertools.product(*scheme_combos))
   n = len(depth_range)*len(arg_combinations)
   results = []
@@ -75,7 +73,7 @@ def main():
   #print ""
   print "Index\tAverage score\t\tFeature extraction arguments"
   for i,result in enumerate(results_sorted):
-    nice_str = "%i.\t%0.2f (+/- %0.2f)\t\t" % (i, result['mean'], result['deviation'])
+    nice_str = "%i.\t%0.2f (+/- %0.2f)\td = %i\t\t" % (i, result['mean'], result['deviation'], result['depth'])
     print nice_str, result['args']
 
 if __name__ == '__main__':
