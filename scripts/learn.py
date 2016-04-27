@@ -45,14 +45,14 @@ except:
 
 
 # Create feature matrix
-def get_features(schemes,rows):
+def get_features(schemes,rows,wp):
   features = dict()
   for [lemma, feature, scheme] in rows:
     if scheme in schemes:
       if not lemma in features:
         features[lemma] = dict()
       # print feature
-      features[lemma][feature] = 1 # TODO check if already exists, should keep count?
+      features[lemma][feature] = get_weight(scheme,wp) # TODO check if already exists, should keep count?
 
   # Convert to numerical thingy
   #print features
@@ -60,6 +60,18 @@ def get_features(schemes,rows):
   v = DictVectorizer()
   features_arr = v.fit_transform(features_list)
   return features_arr, v
+
+def get_weight(scheme,wp):
+  if scheme in ["ls","fs"]:
+    return wp[0]
+  elif scheme in ["la","fa"]:
+    return wp[1]
+  elif scheme in ["als","afs"]:
+    return wp[2]
+  elif scheme in ["ala","afa"]:
+    return wp[3]
+  else:
+    return 0
 
 def load_features():
   cur = conn.cursor()

@@ -16,11 +16,23 @@ from learn import get_features, get_classes, load_features
 def create_weights(features):
   print features
 
-def compute_score(schemes,classes,rows):
+def compute_score(schemes,classes,rows,ml,wp):
   """Computes the score for the features currently in the database using cross-validation"""
-  clf = BernoulliNB()
-  #clf = svm.SVC(kernel="linear")
-  features, v = get_features(schemes,rows)
+  
+  #if ml == "nb":
+  #  clf = BernoulliNB()
+  if ml == "linearsvc":
+    clf = svm.LinearSVC()
+  elif ml == "rbfsvc":
+    clf = svm.SVC() # rbf by default
+  elif ml == "polysvc":
+    clf = svm.SVC(kernel="poly")
+  elif ml == "sigmoidsvc":
+    clf = svm.SVC(kernel="sigmoid")
+  else:
+    clf = svm.SVC(kernel="linear")
+
+  features, v = get_features(schemes,rows,wp)
   result = cross_validation.cross_val_score(clf, features, classes, cv=5)
   return result
 
@@ -32,22 +44,28 @@ def prepare(depth):
   # extractFeatures(completeArgs)
   # ./data/lib.tiplib 5 fa fs la ls ala afa afs als
 
-def process_combination(args,i,n,classes,rows,depth):
-  print "%i/%i" % (i,n)
+def process_combination(args,i,n,classes,rows,depth,ml,wp):
   # remove ""
   args = [arg for arg in args if arg <> ""]
   # If no feature extraction schemes, abort
   if len(args) < 1:
     return False
   # Compute how good it was
-  scores = compute_score(args,classes,rows)
-  return {"args": args, "mean": scores.mean(), "deviation": scores.std()*2, "depth": depth}
+  scores = compute_score(args,classes,rows,ml,wp)
+  return {"args": args, "mean": scores.mean(), "deviation": scores.std()*2, "depth": depth, "engine": ml, "wp":wp }
 
-def do_step(r,j,n,arg_combinations):
+def do_step(r,j,n,arg_combinations,mls,wps):
+  print "Depth %i" % r 
   prepare(r)
   classes = get_classes() # once per depth is sufficient
   featureRows = load_features()
-  return [process_combination(args,i + j*len(arg_combinations),n,classes,featureRows,r) for i,args in enumerate(arg_combinations)]
+  results = []
+  for ml in mls:
+    for wp in wps:
+      print "Doing %s with %i,%i,%i,%i" % (ml,wp[0],wp[1],wp[2],wp[3])
+      results = results + [process_combination(args,i + j*len(arg_combinations),n,classes,featureRows,r,ml,wp) for i,args in enumerate(arg_combinations)]
+  
+  return results
 
 def main():
   # Loop over all possible feature extraction schemes
@@ -55,15 +73,18 @@ def main():
 
   all_schemes = "fa fs la ls ala afa afs als"
   scheme_combos = ["","fa"], ["","fs"], ["","la"], ["", "ls"], ["","ala"], ["","afa"], ["","afs"], ["","als"]
+  mls = ["lsvc","rbfsvc","linearsvc","polysvc","sigmoidsvc"]
+  weight_combos = [[1,10],[1,10],[1,10],[1,10]]
+  weight_permutations = list(itertools.product(*weight_combos))
   depth_range = range(2,4)
   arg_combinations = list(itertools.product(*scheme_combos))
-  n = len(depth_range)*len(arg_combinations)
+  n = len(weight_permutations)*len(mls)*len(depth_range)*len(arg_combinations)
   results = []
 
   print "Processing %i extraction scheme combinations" % n
     
   for j,r in enumerate(depth_range):
-    results = results + do_step(r,j,n,arg_combinations)
+    results = results + do_step(r,j,n,arg_combinations,mls,weight_permutations)
   
   #print results
 
@@ -73,7 +94,7 @@ def main():
   #print ""
   print "Index\tAverage score\t\tFeature extraction arguments"
   for i,result in enumerate(results_sorted):
-    nice_str = "%i.\t%0.2f (+/- %0.2f)\td = %i\t\t" % (i, result['mean'], result['deviation'], result['depth'])
+    nice_str = "%i.\t%0.2f (+/- %0.2f)\t\td = %i\t\t%s\t\t%i,%i,%i,%i\t\t" % (i, result['mean'], result['deviation'], result['depth'], result['engine'], result['wp'][0], result['wp'][1], result['wp'][2], result['wp'][3])
     print nice_str, result['args']
 
 if __name__ == '__main__':
