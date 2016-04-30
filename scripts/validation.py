@@ -8,6 +8,8 @@ import operator
 from sklearn.base import BaseEstimator
 from sklearn import svm
 from sklearn.naive_bayes import BernoulliNB
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import GaussianNB
 from sklearn.feature_extraction import DictVectorizer
 from sklearn import cross_validation
 
@@ -19,20 +21,44 @@ def create_weights(features):
 def compute_score(schemes,classes,rows,ml,wp):
   """Computes the score for the features currently in the database using cross-validation"""
   
-  #if ml == "nb":
-  #  clf = BernoulliNB()
-  if ml == "linearsvc":
-    clf = svm.LinearSVC()
-  elif ml == "rbfsvc":
-    clf = svm.SVC() # rbf by default
-  elif ml == "polysvc":
-    clf = svm.SVC(kernel="poly")
-  elif ml == "sigmoidsvc":
-    clf = svm.SVC(kernel="sigmoid")
-  else:
+  if ml == "linear":
     clf = svm.SVC(kernel="linear")
+  elif ml == "rbf":
+    clf = svm.SVC(kernel="rbf")
+  elif ml == "poly":
+    clf = svm.SVC(kernel="poly")
+  elif ml == "sigmoid":
+    clf = svm.SVC(kernel="sigmoid")
 
   features, v = get_features(schemes,rows,wp)
+
+  original_features = v.inverse_transform(features)
+
+  totalFeatures = dict()
+
+  for row,f in enumerate(features):
+    rowArray = features[row].toarray()[0]
+
+    c = 0
+    for col,ff in enumerate(rowArray):
+      if rowArray[col] <> 0:
+        key = original_features[row].keys()[c]
+        c = c + 1
+
+        if not key in totalFeatures:
+          totalFeatures[key] = col
+        else:
+          print "%i and %i" % (col, totalFeatures[key])
+          if col <> totalFeatures[key]:
+            print "Warning for %s" % (key)
+        
+  print totalFeatures
+        
+  # list total features in a dictionary typ
+
+  # We want the coordinates of 1s so we can check what feature that was
+  # print features.toarray()
+
   result = cross_validation.cross_val_score(clf, features, classes, cv=5)
   return result
 
@@ -58,6 +84,10 @@ def do_step(r,j,n,arg_combinations,mls,wps):
   print "Depth %i" % r 
   prepare(r)
   classes = get_classes() # once per depth is sufficient
+
+  for c in classes:
+    print c
+
   featureRows = load_features()
   results = []
   for ml in mls:
@@ -73,8 +103,8 @@ def main():
 
   all_schemes = "fa fs la ls ala afa afs als"
   scheme_combos = ["","fa"], ["","fs"], ["","la"], ["", "ls"], ["","ala"], ["","afa"], ["","afs"], ["","als"]
-  mls = ["lsvc","rbfsvc","linearsvc","polysvc","sigmoidsvc"]
-  weight_combos = [[1,10],[1,10],[1,10],[1,10]]
+  mls = ["linear","rbf","sigmoid","poly"]
+  weight_combos = [[1],[1],[1],[1]]
   weight_permutations = list(itertools.product(*weight_combos))
   depth_range = range(2,4)
   arg_combinations = list(itertools.product(*scheme_combos))

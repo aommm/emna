@@ -48,11 +48,11 @@ main = do
                     putStrLn connString
                     conn <- connectPostgreSQL (pack connString)
                     clearDB conn
-                    insertLemmas conn (M.elems ls')
+                    insertLemmas conn (M.elems ls)
 
                     -- putStrLn $ "Filtered lemmas: " ++ (show ls')
 
-                    finalFeatures <- runSchemesLibrary ls' fs' schemes (digitToInt (head depth))
+                    finalFeatures <- runSchemesLibrary ls fs schemes (digitToInt (head depth))
                     -- printList finalFeatures
 
                     insertFeatures conn finalFeatures

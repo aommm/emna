@@ -37,7 +37,9 @@ clearDB conn = do
 insertLemmas :: Name a => Connection -> [Formula a] -> IO ()
 insertLemmas conn [] = return ()
 insertLemmas conn (f:xs) = do
-    execute conn "insert into hs_lemma (name, indvars) values (?, ?) " [(fromJust $ getFmName f), ("{" ++ (intercalate "," (map show (getInductionVariables $ fm_info f))) ++ "}")]
+    let indVariables = getInductionVariables $ fm_info f
+    let finalIndVars = if (length indVariables > 0) then [0] else []
+    execute conn "insert into hs_lemma (name, indvars) values (?, ?) " [(fromJust $ getFmName f), ("{" ++ (intercalate "," (map show finalIndVars)) ++ "}")]
     insertLemmas conn xs
 
 -- Inserts a list of features
