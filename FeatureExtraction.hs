@@ -48,6 +48,10 @@ insertFeatures conn ((lemma, features):xs) = do
     executeMany conn "insert into hs_lemma_feature (lemma, feature) values (?,?)" values
     insertFeatures conn xs
 
+removeDuplicates :: [(String, [String])] -> [(String, [String])]
+removeDuplicates ((lemma, feats):xs) = (lemma, nub feats):(removeDuplicates xs)
+removeDuplicates [] = []
+
 getInductionVariables :: Name a => Info a -> [Int]
 getInductionVariables (Lemma _ _ (Just ps)) = indVars ps
 

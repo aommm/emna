@@ -49,7 +49,8 @@ main = do
                     let thy = libToThy lib
                     insertLemmas conn (M.elems ls) thy
 
-                    finalFeatures <- runSchemesLibrary ls fs schemes (digitToInt (head depth))
+                    finals <- runSchemesLibrary ls fs schemes (digitToInt (head depth))
+                    let finalFeatures = removeDuplicates finals
                     printList finalFeatures
 
                     insertFeatures conn finalFeatures
