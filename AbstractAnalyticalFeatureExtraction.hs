@@ -32,11 +32,11 @@ analyseAbstract ((lemmaName, features):xs) = (lemmaName, f'):rest
         rest = analyseAbstract xs
         nFeats = length features -- number of features
         nDistFeats = length $ nub features -- number of distinct features
-        f' = ["_abstractLength " ++ (show nFeats), "_abstractLengthDistinct " ++ (show nDistFeats)]
+        f' = []
 
 analyseAbstractLemmaFeatures :: (Show a, Name a) => [(String, [String])] -> Map String (Formula a) -> [(String, [String])]
 analyseAbstractLemmaFeatures [] _ = []
-analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, f' ++ ["_innerFunctionApplication " ++ (show iF), "_innerFunctionDepth " ++ (show iFDepth)]):rest
+analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, f' ++ ["_innerFunctionApplication " ++ (show iF)]):rest
     where
         rest = analyseAbstractLemmaFeatures xs ls
         [(name, f')] = analyseAbstract [(lemmaName, features)]

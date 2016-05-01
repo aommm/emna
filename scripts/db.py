@@ -15,7 +15,7 @@ db_password = os.getenv('HS_DB_PASSWORD', None)
 try:
   conn_string = "dbname='"+db_name+"' host='"+db_host+"'"
   if db_username is not None:
-    conn_string = conn_string + " username='"+db_username+"'"
+    conn_string = conn_string + " user='"+db_username+"'"
   if db_password is not None:
     conn_string = conn_string + " password='"+db_password+"'"
   print "connString:"+conn_string
@@ -41,7 +41,7 @@ def get_features():
   features_list = [features[lemma] for lemma in features]
   v = DictVectorizer()
   features_arr = v.fit_transform(features_list)
-  return features_arr, v
+  return features_arr, v, features
 
 # Get all lemmas (same order as get_features())
 def get_lemmas():

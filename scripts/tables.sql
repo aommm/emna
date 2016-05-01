@@ -22,6 +22,9 @@ CREATE TABLE hs_lemma_feature (
   feature TEXT NOT NULL
 );
 
+GRANT ALL PRIVILEGES ON hs_lemma TO hipspecuser;
+GRANT ALL PRIVILEGES ON hs_lemma_using TO hipspecuser;
+GRANT ALL PRIVILEGES ON hs_lemma_feature TO hipspecuser;
 
 -------------------------------------------------------------------------------
 -- Dummy data

@@ -34,7 +34,8 @@ analyseSymbolic ((lemmaName, features):xs) = (lemmaName, f'):rest
         nDistFeats = length $ nub features -- number of distinct features
         ratio = intdiv nDistFeats nFeats -- 
         mostPopular = most (freq features) -- most popular feature of the lemma
-        f' = ["_length " ++ (show nFeats), "_lengthDistinct " ++ (show nDistFeats), "_distinctRatio " ++ (printf "%.1f" $ ratio), "_popular " ++ mostPopular]
+        -- f' = ["_length " ++ (show nFeats), "_lengthDistinct " ++ (show nDistFeats), "_distinctRatio " ++ (printf "%.1f" $ ratio), "_popular " ++ mostPopular]
+        f' = []
 
 analyseSymbolicLemmaFeatures :: (Show a, Name a) => [(String, [String])] -> Map String (Formula a) -> [(String, [String])]
 analyseSymbolicLemmaFeatures [] _ = []
@@ -47,6 +48,9 @@ analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, feature
         exactSame = exactSameSymbols (fm_body $ fromJust $ M.lookup lemmaName ls)
         commutative = ("_commutative", (if exactSame then (isCommutative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
         associative = ("_associative", (if exactSame then (isAssociative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
+        -- mainF = mainFunction (fm_body $ fromJust $ M.lookup lemmaName ls)
+        -- rightMainFunction = ("_leftMainFunction", mainFunction (fm_body $ fromJust $ M.lookup lemmaName ls))
+        -- hasList = ("_hasList", hasList (fm_body $ fromJust $ M.lookup lemmaName ls))
     -- let distributive = (if (same && not exactSame) then (isDistributive (fm_body $ fromJust $ M.lookup lemmaName ls)) else False)
 
 analyseSymbolicFunctionFeatures :: [(String, [String])] -> [(String, [String])]
@@ -57,6 +61,16 @@ analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, features' ++ (g
         fs = analyseSymbolic [(fName, features)]
         (_, features') = head fs
         rec = ("_recursive", isRecursive fName features) -- is the function recursive? Just looking for the function name among the features
+
+mainFunction :: (Show a, Name a) => Expr a -> String
+mainFunction (Quant _ _ _ (Builtin Equal :@: [e1, e2]))
+    | lhsMain == rhsMain = lhsMain
+    | otherwise = "none"
+    where
+        lhsMain = mainFunction e1
+        rhsMain = mainFunction e2
+mainFunction (Gbl (Global name1 _ _) :@: _) = varStr name1
+mainFunction _ = "var"
 
 getBooleanFeatures :: [(String, Bool)] -> [String]
 getBooleanFeatures ls = map (\(y,b) -> y) $ filter (\(y,b) -> b) ls

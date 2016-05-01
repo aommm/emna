@@ -6,15 +6,22 @@ from itertools import groupby
 from operator import itemgetter
 import sys
 import sh
+import numpy
 
 n_clusters = None
 
 def run():
+  #init=numpy.array([[1,0,0], [0,1,0], [0,0,1]])
   clf = KMeans(n_clusters=n_clusters)
-  features,v = get_features()
+  features,v,featuresDict = get_features()
+
+  #print v.get_feature_names()
+  #print features
+
   # clf.fit(features)
   x = clf.fit_predict(features)
-  # v.inverse_transform()
+
+  # featureDict = v.inverse_transform(features)
   # print len(x)
   # print features.shape
   # print features[111]
@@ -27,8 +34,32 @@ def run():
   for key, group in groupby(xy, getClass):
     print "------------------------------------"
     print 'Cluster', key
+
+    groupFeats = dict()
+    n = 0
+
     for x in group:
-      print x[1][2],'\n'
+      #print x
+      #print x[1][0]
+      #print x[1][2]
+      n = n + 1
+      if x[1][0] in featuresDict:
+        feats = featuresDict[x[1][0]].keys()
+        for f in feats:
+          if f not in groupFeats:
+            groupFeats[f] = 1
+          else:
+            groupFeats[f] = groupFeats[f] + 1
+        #print '\n'
+
+    print "Cluster summary: "
+    print "%i number of lemmas" % (n)
+
+    for k in groupFeats.keys():
+      if groupFeats[k] > 0:
+        print k + (" %i" % groupFeats[k]) + (", %i percent" % int((float(groupFeats[k])/n)*100))
+
+
     # print [x for x in group]
     # listOfThings = " and ".join([thing[1] for thing in group])
     # print key + ":  " + listOfThings + "."
@@ -38,6 +69,7 @@ def run_extract_features(args):
   # Populate SQL db with features for this scheme
   extractFeatures = sh.Command("./scripts/extractFeatures")
   out = extractFeatures(*args)
+  #print out
   print "invoked extractFeatures with args",args
 
 
