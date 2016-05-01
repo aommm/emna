@@ -43,7 +43,9 @@ main = do
             case parseLibrary libraryString of
                 Left msg      -> error $ "Parsing library failed:"++show msg
                 Right lib@(Library fs _ ls) -> do
+                    (Library fs' _ ls') <- filterNonInductiveLemmas lib
                     -- Prepping the database
+                    putStrLn connString
                     conn <- connectPostgreSQL (pack connString)
                     clearDB conn
                     let thy = libToThy lib
@@ -56,6 +58,10 @@ main = do
                     insertFeatures conn finalFeatures
                     putStrLn "finished"
 
+filterNonInductiveLemmas :: Library a -> IO (Library a)
+filterNonInductiveLemmas (Library fs dts ls) = do
+    let filteredLemmas = filter (\(name,(Formula _ (Lemma _ _ (Just ps)) _ _)) -> length (indVars ps) > 0) $ M.toList ls
+    return (Library fs dts (M.fromList filteredLemmas))
 
 getConnString :: IO String
 getConnString = do

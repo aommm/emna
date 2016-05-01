@@ -23,7 +23,7 @@ import Data.ByteString.Char8 (pack)
 import FeatureExtraction
 
 -- Going through each lemma of the library
-getLemmaSymbols :: (Show a, Name a) => Map String (Formula a) -> Int -> [(String, [String])]
+getLemmaSymbols :: (Show a, Name a) => Map String (Formula a) -> Int -> [(String, [Feat])]
 getLemmaSymbols ls depth
     | null ls = []
     | otherwise = (name, features):rest
@@ -34,10 +34,10 @@ getLemmaSymbols ls depth
             name = k
             tree = buildTree (fm_body f)
             trees = extractSubTrees depth tree
-            features = map (\y -> "_s_ " ++ y) $ concat $ map extractFeatures trees
+            features = map (\y -> (y, "ls")) $ concat $ map extractFeatures trees
 
 -- Going through each function of the library
-getFunctionSymbols :: (Show a, Name a) => Map a (Function a) -> Int -> [(String, [String])]
+getFunctionSymbols :: (Show a, Name a) => Map a (Function a) -> Int -> [(String, [Feat])]
 getFunctionSymbols fs depth 
     | null fs = []
     | otherwise = (name, features):rest
@@ -48,7 +48,7 @@ getFunctionSymbols fs depth
             name = varStr $ func_name f
             tree = buildTree (func_body f)
             trees = extractSubTrees depth tree
-            features = nub $ concat $ map extractFeatures trees
+            features = map (\y -> (y, "fs")) $ nub $ concat $ map extractFeatures trees
     
 -- Builds a tree for an expression, recursively :)
 buildTree :: (Show a, Name a) => Expr a -> FNode String

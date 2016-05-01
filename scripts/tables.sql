@@ -3,6 +3,11 @@
 -- Table definitions
 
 -- TODO: add body or something?
+
+DROP TABLE hs_lemma_using;
+DROP TABLE hs_lemma_feature;
+DROP TABLE hs_lemma;
+
 CREATE TABLE hs_lemma (
   name TEXT NOT NULL PRIMARY KEY,
   indvars integer[] NOT NULL DEFAULT '{}',
@@ -19,7 +24,8 @@ CREATE TABLE hs_lemma_using (
 -- The features extracted from a lemma
 CREATE TABLE hs_lemma_feature (
   lemma TEXT NOT NULL REFERENCES hs_lemma(name),
-  feature TEXT NOT NULL
+  feature TEXT NOT NULL,
+  scheme TEXT NOT NULL
 );
 
 GRANT ALL PRIVILEGES ON hs_lemma TO hipspecuser;

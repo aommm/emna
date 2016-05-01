@@ -25,6 +25,8 @@ import Utils
 data FNode a = FNode a [FNode a]
     deriving (Eq,Ord,Show)
 
+type Feat = (String, String) -- Feature string and what scheme
+
 clearDB :: Connection -> IO ()
 clearDB conn = do
     execute_ conn "delete from hs_lemma_feature"
@@ -37,18 +39,21 @@ clearDB conn = do
 insertLemmas :: Name a => Connection -> [Formula a] -> Theory a -> IO ()
 insertLemmas conn [] _ = return ()
 insertLemmas conn (f:xs) thy = do
-    execute conn "insert into hs_lemma (name, indvars, body) values (?, ?, ?) " [(fromJust $ getFmName f), ("{" ++ (intercalate "," (map show (getInductionVariables $ fm_info f))) ++ "}"), showFormula f thy ]
+    let indVariables = getInductionVariables $ fm_info f
+    let finalIndVars = if (length indVariables > 0) then [0] else []
+    execute conn "insert into hs_lemma (name, indvars, body) values (?, ?, ?) " [(fromJust $ getFmName f), ("{" ++ (intercalate "," (map show finalIndVars)) ++ "}"), showFormula f thy ]
     insertLemmas conn xs thy
 
 -- Inserts a list of features
-insertFeatures :: Connection -> [(String, [String])] -> IO ()
+insertFeatures :: Connection -> [(String, [Feat])] -> IO ()
 insertFeatures conn [] = return ()
 insertFeatures conn ((lemma, features):xs) = do
-    let values = zip (take (length features) (repeat lemma)) features
-    executeMany conn "insert into hs_lemma_feature (lemma, feature) values (?,?)" values
+    let (flist, slist) = unzip features
+    let values = zip3 (take (length features) (repeat lemma)) flist slist
+    executeMany conn "insert into hs_lemma_feature (lemma, feature, scheme) values (?,?,?)" values
     insertFeatures conn xs
 
-removeDuplicates :: [(String, [String])] -> [(String, [String])]
+removeDuplicates :: [(String, [Feat])] -> [(String, [Feat])]
 removeDuplicates ((lemma, feats):xs) = (lemma, nub feats):(removeDuplicates xs)
 removeDuplicates [] = []
 
@@ -96,37 +101,37 @@ mergeStrings :: String -> String -> String
 mergeStrings x1 x2 = x2 ++ ", " ++ x1
 
 
-emptyLemmaList :: [String] -> [(String, [String])]
+emptyLemmaList :: [String] -> [(String, [Feat])]
 emptyLemmaList ls = zip ls (take (length ls) (repeat []))
 
-generateHalf :: [[(String, [String])]] -> [(String, [String])]
+generateHalf :: [[(String, [Feat])]] -> [(String, [Feat])]
 generateHalf [] = []
 generateHalf ls = foldl preMerge (head ls) (tail ls)
 
-printList :: [(String, [String])] -> IO ()
+printList :: [(String, [Feat])] -> IO ()
 printList ((lemma, []):xss) = do
     putStrLn ""
     printList xss
-printList ((lemma, (f:fs)):xss) = do
-    putStrLn $ lemma ++ " = " ++ f
+printList ((lemma, ((fString, fScheme):fs)):xss) = do
+    putStrLn $ lemma ++ " = " ++ fString ++ ", " ++ fScheme
     printList ((lemma, fs):xss)
 printList [] = return ()
 
-preMerge :: [(String, [String])] -> [(String, [String])] -> [(String, [String])]
+preMerge :: [(String, [Feat])] -> [(String, [Feat])] -> [(String, [Feat])]
 preMerge xs ys = preMerge' (sort xs) (sort ys) -- We can assume the lists are equally long here
 
-preMerge' :: [(String, [String])] -> [(String, [String])] -> [(String, [String])]
+preMerge' :: [(String, [Feat])] -> [(String, [Feat])] -> [(String, [Feat])]
 preMerge' xs ys = map (\((n, f1),(_, f2)) -> (n, nub $ f1 ++ f2)) $ zip xs ys
 
 -- Not sure about the complexity of this one hehe :-)
-mergeFeatures :: Bool -> [(String, [String])] -> [(String, [String])] -> [(String, [String])]
+mergeFeatures :: Bool -> [(String, [Feat])] -> [(String, [Feat])] -> [(String, [Feat])]
 mergeFeatures sslf ((n, feats):ls) fs = (n, extendedFeats):(mergeFeatures sslf ls fs)
     where
         extendedFeats = (filter (\y -> (not sslf && not (isSymbolicLemmaFeat y)) || sslf) feats) ++ (nub addedFeats)
-        addedFeats = concat $ map (\(n', f) -> map (\(f') -> ("_func " ++ f')) f) funcsOfLemma
-        funcsOfLemma = filter (\(n', _) -> any (\featString -> (featString == "_s_ " ++ n')) feats) fs -- finding the function features which has its key anywhere in the features of the lemma
+        addedFeats = concat $ map (\(n', f) -> f) funcsOfLemma
+        funcsOfLemma = filter (\(n', _) -> any (\(_, scheme) -> scheme == "ls") feats) fs -- finding the function features which has its key anywhere in the features of the lemma
 mergeFeatures _ [] _ = []
 
-isSymbolicLemmaFeat :: String -> Bool
-isSymbolicLemmaFeat ('_':'s':'_':xs) = True
+isSymbolicLemmaFeat :: Feat -> Bool
+isSymbolicLemmaFeat (_, "ls") = True
 isSymbolicLemmaFeat _ = False

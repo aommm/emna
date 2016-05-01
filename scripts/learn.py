@@ -24,7 +24,6 @@ vectorizer_path = os.path.join(data_path, 'vectorizer.pkl')
 classifier_path = os.path.abspath(classifier_path) # prettify
 vectorizer_path = os.path.abspath(vectorizer_path)
 
-
 # Trains on features/classes. Returns a classifier
 def train(features, classes):
   clf = BernoulliNB()
