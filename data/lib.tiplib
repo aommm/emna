@@ -2931,7 +2931,7 @@
       lemma-61,
       lemma-62,
       lemma-63]
-      [1, 0] structural z3-4.4.0 emna-0.1)))
+      [0, 1] structural z3-4.4.0 emna-0.1)))
 (assert-proof
   (lemma-65 (forall ((x Nat) (y Nat)) (= (plus y x) (plus x y)))
     ([lemma-48, lemma-49, lemma-60]
