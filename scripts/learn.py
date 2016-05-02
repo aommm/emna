@@ -32,7 +32,7 @@ def train(features, classes):
 
 def main():
   print 'getting features from database'
-  features, v = get_features()
+  features, v, features_dict = get_features()
   classes = get_classes()
   print 'training'
   clf = train(features, classes)

@@ -2,8 +2,6 @@
 -------------------------------------------------------------------------------
 -- Table definitions
 
--- TODO: add body or something?
-
 DROP TABLE hs_lemma_using;
 DROP TABLE hs_lemma_feature;
 DROP TABLE hs_lemma;

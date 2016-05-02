@@ -106,7 +106,8 @@ def get_features():
   rows = cur.fetchall()
   # Create dict
   features = dict()
-  for [lemma, feature] in rows:
+  # TODO TODO TODO: what to do about 'scheme' here?
+  for [lemma, feature, scheme] in rows:
     if not lemma in features:
       features[lemma] = dict()
     features[lemma][feature] = 1 # TODO check if already exists, should keep count?
