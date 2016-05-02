@@ -225,10 +225,12 @@ tryProve args prover fm thy =
      IO.hFlush IO.stdout
 
      ind_order <- getIndOrder args fm thy --[[2],[1],[0],[]]
-     let ind_order_pretty = map getLemmaNames ind_order
+     let isOk order = all (\var -> var < length prenex) order
+     let ind_order' = filter isOk ind_order
+     let ind_order_pretty = map getLemmaNames ind_order'
      putStrLn $ "induction order from script:"++show ind_order_pretty
 
-     let tree = freshPass (obligations args fm ind_order (prover_pre prover)) thy
+     let tree = freshPass (obligations args fm ind_order' (prover_pre prover)) thy
 
      ptree :: Tree (Promise [Obligation Result]) <- T.traverse (promise args prover) tree
 
