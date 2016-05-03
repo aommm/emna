@@ -66,10 +66,13 @@ printTree sep (FNode id fs) = do putStrLn $ sep ++ id; mapM_ (printTree (sep ++ 
 
 -- Extract subtrees with certain depth. Returns all possible trees as a list
 extractSubTrees :: Int -> FNode String -> [FNode String]
+extractSubTrees 0 _ = []
+extractSubTrees depth f@(FNode "==" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the equality symbol
+extractSubTrees depth f@(FNode "Equals" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the equality symbol
 extractSubTrees depth f@(FNode id fs) = [thisSubTree] ++ otherSubTrees
     where
         thisSubTree = extractSubTree depth f --(FNode id (concat $ map (extractSubTrees (depth-1)) fs))
-        otherSubTrees = (concat $ map (extractSubTrees depth) fs)
+        otherSubTrees = (concat $ map (extractSubTrees (depth-1)) fs)
 
 -- Extract one subtree
 extractSubTree :: Int -> FNode String -> FNode String

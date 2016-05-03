@@ -1,5 +1,4 @@
-from sklearn.cluster import KMeans
-
+from sklearn.cluster import KMeans, Birch, MeanShift
 
 from db import get_features, get_lemmas, get_classes
 from itertools import groupby
@@ -12,7 +11,9 @@ n_clusters = None
 
 def run():
   #init=numpy.array([[1,0,0], [0,1,0], [0,0,1]])
-  clf = KMeans(n_clusters=n_clusters)
+  clf = KMeans(n_clusters=n_clusters, tol=1e-32, max_iter=1000)
+  #clf = Birch(n_clusters = n_clusters)
+
   features,v,featuresDict = get_features()
 
   #print v.get_feature_names()
@@ -41,7 +42,7 @@ def run():
     for x in group:
       #print x
       #print x[1][0]
-      #print x[1][2]
+      print x[1][2]
       n = n + 1
       if x[1][0] in featuresDict:
         feats = featuresDict[x[1][0]].keys()
@@ -52,12 +53,13 @@ def run():
             groupFeats[f] = groupFeats[f] + 1
         #print '\n'
 
-    print "Cluster summary: "
+    print "\nCluster summary: "
     print "%i number of lemmas" % (n)
 
-    for k in groupFeats.keys():
-      if groupFeats[k] > 0:
-        print k + (" %i" % groupFeats[k]) + (", %i percent" % int((float(groupFeats[k])/n)*100))
+    #if n > 5:
+    #  for k in groupFeats.keys():
+    #    if groupFeats[k] > n/3:
+    #      print k + (" %i" % groupFeats[k]) + (", %i percent" % int((float(groupFeats[k])/n)*100))
 
 
     # print [x for x in group]
