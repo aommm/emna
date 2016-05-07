@@ -66,10 +66,10 @@ def main():
 
   all_schemes = "fa fs la ls ala afa afs als"
   scheme_combos = ["","fa"], ["","fs"], ["","la"], ["", "ls"], ["","ala"], ["","afa"], ["","afs"], ["","als"]
-  mls = ["bnb","svc"]
+  mls = ["bnb"]
   weight_combos = [1], [1], [1], [1]
   weight_permutations = list(itertools.product(*weight_combos))
-  depth_range = range(2,3)
+  depth_range = range(2,4)
   arg_combinations = list(itertools.product(*scheme_combos))
   n = len(weight_permutations)*len(mls)*len(depth_range)*len(arg_combinations)
   results = []

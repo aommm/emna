@@ -3,6 +3,8 @@ import psycopg2
 import sys
 import os
 from sklearn.feature_extraction import DictVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import CountVectorizer
 import numpy
 
 db_name = os.getenv('HS_DB_NAME', 'hipspec')
@@ -38,7 +40,17 @@ def get_features_from_rows(schemes,rows,wp):
   features_list = [features[lemma] for lemma in features]
   v = DictVectorizer()
   features_arr = v.fit_transform(features_list)
-  return features_arr, v
+
+  vectorizer = CountVectorizer(binary=True)
+
+  blabla = vectorizer.fit_transform(features_arr)
+
+  print blabla
+
+  v2 = TfidfTransformer()
+  features_arr2 = v2.fit_transform(features_arr)
+
+  return features_arr2, v
 
 def get_weight(scheme,wp):
   if scheme in ["ls","fs"]:
@@ -87,12 +99,51 @@ def get_features():
   for [lemma, feature, scheme] in rows:
     if not lemma in features:
       features[lemma] = dict()
-    features[lemma][feature] = 1 # TODO check if already exists, should keep count?
+    if feature in features[lemma]:
+      features[lemma][feature] = features[lemma][feature] + 1
+    else:
+      features[lemma][feature] = 1 # TODO check if already exists, should keep count?
+  
   # Convert to numerical thingy
   features_list = [features[lemma] for lemma in features]
   v = DictVectorizer()
   features_arr = v.fit_transform(features_list)
-  return features_arr, v, features
+  
+  v2 = TfidfTransformer()
+  features_arr2 = v2.fit_transform(features_arr)
+
+  print features_arr
+  print "------- sunesunesune --------"
+  print features_arr2
+  
+  return features_arr2, v, features
+
+def remove_popular(featuresDict, nLemmas):
+
+    # Removing super-popular features
+  featCount = dict()
+
+  for f in featuresDict:
+    for feat in featuresDict[f]:
+      if feat not in featCount:
+        featCount[feat] = 1
+      else:
+        featCount[feat] = featCount[feat] + 1
+
+  # print "Currently %i features, before removing popular... " % (len(featCount.keys()))
+
+  keysToRemove = []
+
+  for f in featCount:
+    if featCount[f] >= nLemmas/2:
+      keysToRemove.append(f)
+
+  for k in keysToRemove:
+    for lemma in featuresDict:
+      if k in featuresDict[lemma]:
+        featuresDict[lemma].pop(k, None)
+
+  return featuresDict
 
 # Get all lemmas (same order as get_features())
 def get_lemmas():

@@ -1,6 +1,6 @@
 from sklearn.cluster import KMeans, Birch, MeanShift
 
-from db import get_features, get_lemmas, get_classes
+from db import get_features, get_lemmas, get_classes, remove_popular
 from itertools import groupby
 from operator import itemgetter
 import sys
@@ -11,10 +11,16 @@ n_clusters = None
 
 def run():
   #init=numpy.array([[1,0,0], [0,1,0], [0,0,1]])
-  clf = KMeans(n_clusters=n_clusters, tol=1e-32, max_iter=1000)
+  clf = KMeans(n_clusters=n_clusters)
   #clf = Birch(n_clusters = n_clusters)
 
   features,v,featuresDict = get_features()
+
+  y = get_lemmas()
+
+  #featuresDict = remove_popular(featuresDict, len(y))
+
+  # print "Now we have %i features instead " % (len(featCount.keys()))
 
   #print v.get_feature_names()
   #print features
@@ -26,7 +32,6 @@ def run():
   # print len(x)
   # print features.shape
   # print features[111]
-  y = get_lemmas()
   print len(x), len(y)
   xy = zip(x,y)
 
@@ -44,13 +49,10 @@ def run():
       #print x[1][0]
       print x[1][2]
       n = n + 1
-      if x[1][0] in featuresDict:
-        feats = featuresDict[x[1][0]].keys()
-        for f in feats:
-          if f not in groupFeats:
-            groupFeats[f] = 1
-          else:
-            groupFeats[f] = groupFeats[f] + 1
+
+      #if #x[1][0] in featCount:
+        #feats = featuresDict[x[1][0]].keys()
+        
         #print '\n'
 
     print "\nCluster summary: "

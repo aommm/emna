@@ -53,7 +53,7 @@ main = do
 
                     finals <- runSchemesLibrary ls fs schemes (digitToInt (head depth))
                     let finalFeatures = removeDuplicates finals
-                    -- printList finalFeatures
+                    printList finalFeatures
 
                     insertFeatures conn finalFeatures
                     putStrLn "finished"
