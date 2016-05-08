@@ -3,9 +3,12 @@ import psycopg2
 import sys
 import os
 from sklearn.feature_extraction import DictVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy
+from functools import partial
+import nltk
 
 db_name = os.getenv('HS_DB_NAME', 'hipspec')
 db_host = os.getenv('HS_DB_HOST', 'localhost')
@@ -26,14 +29,14 @@ except:
   sys.exit(0)
 
 # Create feature matrix
-def get_features_from_rows(schemes,rows,wp):
+def get_features_from_rows(schemes,rows):
   features = dict()
   for [lemma, feature, scheme] in rows:
     if scheme in schemes:
       if not lemma in features:
         features[lemma] = dict()
       # print feature
-      features[lemma][feature] = get_weight(scheme,wp) # TODO check if already exists, should keep count?
+      features[lemma][feature] = 1 # TODO check if already exists, should keep count?
 
   # Convert to numerical thingy
   #print features
@@ -41,28 +44,21 @@ def get_features_from_rows(schemes,rows,wp):
   v = DictVectorizer()
   features_arr = v.fit_transform(features_list)
 
-  vectorizer = CountVectorizer(binary=True)
+  # Mergeing features into one long string per lemma, separated by #
+  concFeats = dict()
+  for lemma in features:
+    concFeats[lemma] = []
+    for f in features[lemma]:
+      concFeats[lemma].append(f)
 
-  blabla = vectorizer.fit_transform(features_arr)
+    concFeats[lemma] = "#".join(concFeats[lemma])
 
-  print blabla
+  concFeatsList = [concFeats[lemma] for lemma in concFeats]
 
-  v2 = TfidfTransformer()
-  features_arr2 = v2.fit_transform(features_arr)
+  vectorizer = TfidfVectorizer(max_df=0.75,analyzer=partial(nltk.regexp_tokenize, pattern='[^#\s][^\#]*[^#\s]*'))
+  countMatrix = vectorizer.fit_transform(concFeatsList)
 
-  return features_arr2, v
-
-def get_weight(scheme,wp):
-  if scheme in ["ls","fs"]:
-    return wp[0]
-  elif scheme in ["la","fa"]:
-    return wp[1]
-  elif scheme in ["als","afs"]:
-    return wp[2]
-  elif scheme in ["ala","afa"]:
-    return wp[3]
-  else:
-    return 0
+  return countMatrix, vectorizer
 
 def load_features():
   cur = conn.cursor()
@@ -99,24 +95,23 @@ def get_features():
   for [lemma, feature, scheme] in rows:
     if not lemma in features:
       features[lemma] = dict()
-    if feature in features[lemma]:
-      features[lemma][feature] = features[lemma][feature] + 1
-    else:
-      features[lemma][feature] = 1 # TODO check if already exists, should keep count?
+    features[lemma][feature] = 1
   
-  # Convert to numerical thingy
-  features_list = [features[lemma] for lemma in features]
-  v = DictVectorizer()
-  features_arr = v.fit_transform(features_list)
-  
-  v2 = TfidfTransformer()
-  features_arr2 = v2.fit_transform(features_arr)
+  # Mergeing features into one long string per lemma, separated by #
+  concFeats = dict()
+  for lemma in features:
+    concFeats[lemma] = []
+    for f in features[lemma]:
+      concFeats[lemma].append(f)
 
-  print features_arr
-  print "------- sunesunesune --------"
-  print features_arr2
-  
-  return features_arr2, v, features
+    concFeats[lemma] = "#".join(concFeats[lemma])
+
+  concFeatsList = [concFeats[lemma] for lemma in concFeats]
+
+  vectorizer = TfidfVectorizer(max_df=0.5,analyzer=partial(nltk.regexp_tokenize, pattern='[^#\s][^\#]*[^#\s]*'))
+  countMatrix = vectorizer.fit_transform(concFeatsList)
+
+  return countMatrix, vectorizer, features
 
 def remove_popular(featuresDict, nLemmas):
 

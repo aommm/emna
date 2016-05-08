@@ -41,7 +41,7 @@ insertLemmas conn [] _ = return ()
 insertLemmas conn (f:xs) thy = do
     let indVariables = getInductionVariables $ fm_info f
     let finalIndVars = if (length indVariables > 0) then [0] else []
-    execute conn "insert into hs_lemma (name, indvars, body) values (?, ?, ?) " [(fromJust $ getFmName f), ("{" ++ (intercalate "," (map show indVariables)) ++ "}"), showFormula f thy ]
+    execute conn "insert into hs_lemma (name, indvars, body) values (?, ?, ?) " [(fromJust $ getFmName f), ("{" ++ (intercalate "," (map show finalIndVars)) ++ "}"), showFormula f thy ]
     insertLemmas conn xs thy
 
 -- Inserts a list of features
@@ -54,7 +54,7 @@ insertFeatures conn ((lemma, features):xs) = do
     insertFeatures conn xs
 
 removeDuplicates :: [(String, [Feat])] -> [(String, [Feat])]
-removeDuplicates ((lemma, feats):xs) = (lemma, nub feats):(removeDuplicates xs)
+removeDuplicates ((lemma, feats):xs) = (lemma, feats):(removeDuplicates xs)
 removeDuplicates [] = []
 
 getInductionVariables :: Name a => Info a -> [Int]
@@ -101,7 +101,7 @@ combine' xs1 x = (map (mergeStrings x) xs1) ++ [x] ++ xs1
 
 -- return "rev, list"
 mergeStrings :: String -> String -> String
-mergeStrings x1 x2 = x2 ++ ", " ++ x1
+mergeStrings x1 x2 = x2 ++ "," ++ x1
 
 
 emptyLemmaList :: [String] -> [(String, [Feat])]
@@ -132,7 +132,7 @@ mergeFeatures sslf ((n, feats):ls) fs = (n, extendedFeats):(mergeFeatures sslf l
     where
         extendedFeats = (filter (\y -> (not sslf && not (isSymbolicLemmaFeat y)) || sslf) feats) ++ (nub addedFeats)
         addedFeats = concat $ map (\(n', f) -> f) funcsOfLemma
-        funcsOfLemma = filter (\(n', _) -> any (\(_, scheme) -> scheme == "ls") feats) fs -- finding the function features which has its key anywhere in the features of the lemma
+        funcsOfLemma = filter (\(functionName, _) -> any (\(feature, scheme) -> scheme == "ls" && feature == functionName) feats) fs -- finding the function features which has its key anywhere in the features of the lemma
 mergeFeatures _ [] _ = []
 
 isSymbolicLemmaFeat :: Feat -> Bool
