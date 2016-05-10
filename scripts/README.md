@@ -4,7 +4,9 @@ batch.py
 ```
 python batch.py /path/to/directory /path/to/library.lib
 ```
-Runs `emna` on all problems in a directory. Useful for building a .lib file, or for evaluating how emna performs. Outputs useful information for each problem into `./batch.log`.
+Runs `emna` on all problems in a directory. Useful for building a .lib file, or for evaluating how emna performs. If the .lib file does not exist, it is created.
+
+Outputs useful information for each problem into `./batch.log`.
 
 
 
@@ -26,16 +28,16 @@ Extracts features from the given library into the PostgreSQL database. Will wipe
 
 Looks for the environment variables `HS_DB_NAME`, `HS_DB_HOST`, `HS_DB_USERNAME` and `HS_DB_PASSWORD`.
 
-#### learn.py
+#### create_classifier.py
 ```
-python learn.py [/path/to/data]
+python create_classifier.py [/path/to/data]
 ```
 Creates `classifier.pkl` from the data currently in the PostgreSQL database. 
 
-#### classify.py
+#### use_classifier.py
 _Used only internally by HipSpec, there should be no need to call this directly._
 ```
-python classify.py stringifiedFeatures [/path/to/data]
+python use_classifier.py stringifiedFeatures [/path/to/data]
 ```
 Reads `classifier.pkl` and classifies `stringifiedFeatures` by it, returning the most probable classes on stdout.
 
@@ -43,9 +45,24 @@ Reads `classifier.pkl` and classifies `stringifiedFeatures` by it, returning the
 Evaluating feature extraction schemes
 -------------------------------------
 TODO
-#### validation.py
+#### supervised.py
+```
+python supervised.py
+```
+Runs cross-validation of supervised learning. Evaluates many different configurations and prints a table of results to screen.
+
+The script varies feature extraction schemes, depths and ML engines. To change which combinations it tries, you should edit the script.
 
 #### unsupervised.py
+```
+python unsupervised.py number_of_clusters path/to/lib.tiplib depth [feature extraction schemes]
+```
+Runs an unsupervised clustering algorithm, given some feature extractions schemes and depth, and prints the resulting clusters to screen.
+
+Example invocation:
+```
+python scripts/unsupervised.py 8 ./data/lib.tiplib 4 la ls
+```
 
 Other files
 -----------
