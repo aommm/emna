@@ -13,7 +13,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.feature_extraction import DictVectorizer
 from sklearn import cross_validation
 
-from learn import get_features, get_classes, load_features
+from db import get_features, get_classes, load_features, get_features_from_rows
 
 def create_weights(features):
   print features
