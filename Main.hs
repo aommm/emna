@@ -297,7 +297,7 @@ getIndOrder args f thy = do
   --[(_name,_indvars,features,_body)] <- formulasToFeatures [f] thy 
   let (Library fs _ _) = thyToLib thy
   features <- runSchemesConjecture f fs ["ls","la","fs","fa","ala","als","afs","afa"] 3
-  let process = (proc "python" ["./scripts/classify.py", show features, dataDir args]) { cwd = Just (workingDir args) }
+  let process = (proc "python" ["./scripts/use_classifier.py", show features, dataDir args]) { cwd = Just (workingDir args) }
   out <- readCreateProcess process ""
   return $ case readMaybe out of
     Nothing -> []
