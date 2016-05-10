@@ -43,7 +43,7 @@ main = do
             case parseLibrary libraryString of
                 Left msg      -> error $ "Parsing library failed:"++show msg
                 Right lib@(Library fs _ ls) -> do
-                    (Library fs' _ ls') <- filterNonInductiveLemmas lib
+                    -- (Library fs' _ ls') <- filterNonInductiveLemmas lib
                     -- Prepping the database
                     putStrLn connString
                     conn <- connectPostgreSQL (pack connString)
@@ -53,7 +53,7 @@ main = do
 
                     finals <- runSchemesLibrary ls fs schemes (digitToInt (head depth))
                     let finalFeatures = removeDuplicates finals
-                    printList finalFeatures
+                    -- printList finalFeatures
 
                     insertFeatures conn finalFeatures
                     putStrLn "finished"

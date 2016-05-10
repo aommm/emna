@@ -49,7 +49,7 @@ getFunctionSymbols fs depth
             tree = buildTree (func_body f)
             trees = extractSubTrees depth tree
             features = map (\y -> (y, "fs")) $ nub $ concat $ map extractFeatures trees
-    
+
 -- Builds a tree for an expression, recursively :)
 buildTree :: (Show a, Name a) => Expr a -> FNode String
 buildTree (Quant _ _ _ e') = buildTree e'
@@ -61,7 +61,7 @@ buildTree (Builtin Not :@: exps) = FNode "not" $ map buildTree exps
 
 buildTree (Lcl (Local name (TyCon feature _))) = FNode (varStr feature) []
 buildTree (Lcl (Local name (TyVar feature))) = FNode "anyType" []
-buildTree l@(Lcl (Local name (ts :=>: t))) = FNode ((concat $ map typeToString ts) ++  (" :=>: " ++ typeToString t)) []
+buildTree l@(Lcl (Local name (ts :=>: t))) = FNode ((concat $ map typeToString ts) ++  (":=>:" ++ typeToString t)) []
 
 buildTree (Gbl (Global name typ args) :@: exps) = FNode (varStr name) $ map buildTree exps
 buildTree (Match e cases) = FNode ("match " ++ (exprToString e)) $ map buildTree $ map case_rhs cases
@@ -74,7 +74,7 @@ exprToString :: (Show a, Name a) => Expr a -> String
 exprToString (Lcl (Local name _)) = varStr name
 exprToString (Gbl (Global name typ args) :@: exps) = varStr name
 exprToString (Builtin At :@: _) = "@"
-exprToString b = "unknown: " ++ show b
+exprToString b = "unknown:" ++ show b
 
 -- Gets string from type
 typeToString :: (Show a, Name a) => Type a -> String

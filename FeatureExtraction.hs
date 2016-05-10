@@ -55,7 +55,7 @@ insertFeatures conn ((lemma, features):xs) = do
     insertFeatures conn xs
 
 removeDuplicates :: [(String, [Feat])] -> [(String, [Feat])]
-removeDuplicates ((lemma, feats):xs) = (lemma, nub feats):(removeDuplicates xs)
+removeDuplicates ((lemma, feats):xs) = (lemma, feats):(removeDuplicates xs)
 removeDuplicates [] = []
 
 getInductionVariables :: Name a => Info a -> [Int]
@@ -67,6 +67,9 @@ printTree sep (FNode id fs) = do putStrLn $ sep ++ id; mapM_ (printTree (sep ++ 
 
 -- Extract subtrees with certain depth. Returns all possible trees as a list
 extractSubTrees :: Int -> FNode String -> [FNode String]
+extractSubTrees 0 _ = []
+--extractSubTrees depth f@(FNode "==" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the equality symbol
+--extractSubTrees depth f@(FNode "Equals" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the equality symbol
 extractSubTrees depth f@(FNode id fs) = [thisSubTree] ++ otherSubTrees
     where
         thisSubTree = extractSubTree depth f --(FNode id (concat $ map (extractSubTrees (depth-1)) fs))
@@ -99,7 +102,7 @@ combine' xs1 x = (map (mergeStrings x) xs1) ++ [x] ++ xs1
 
 -- return "rev, list"
 mergeStrings :: String -> String -> String
-mergeStrings x1 x2 = x2 ++ ", " ++ x1
+mergeStrings x1 x2 = x2 ++ "," ++ x1
 
 
 emptyLemmaList :: [String] -> [(String, [Feat])]
@@ -130,7 +133,7 @@ mergeFeatures sslf ((n, feats):ls) fs = (n, extendedFeats):(mergeFeatures sslf l
     where
         extendedFeats = (filter (\y -> (not sslf && not (isSymbolicLemmaFeat y)) || sslf) feats) ++ (nub addedFeats)
         addedFeats = concat $ map (\(n', f) -> f) funcsOfLemma
-        funcsOfLemma = filter (\(n', _) -> any (\(_, scheme) -> scheme == "ls") feats) fs -- finding the function features which has its key anywhere in the features of the lemma
+        funcsOfLemma = filter (\(functionName, _) -> any (\(feature, scheme) -> scheme == "ls" && feature == functionName) feats) fs -- finding the function features which has its key anywhere in the features of the lemma
 mergeFeatures _ [] _ = []
 
 isSymbolicLemmaFeat :: Feat -> Bool
