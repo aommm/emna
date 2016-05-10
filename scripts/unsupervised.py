@@ -8,6 +8,8 @@ import sh
 import numpy
 
 n_clusters = None
+commutative_lemmas = ['lemma-100', 'lemma-105', 'lemma-110', 'lemma-189', 'lemma-196', 'lemma-337', 'lemma-347', 'lemma-357', 'lemma-39', 'lemma-427', 'lemma-55', 'lemma-65', 'lemma-95']
+associative_lemmas = ['lemma-101', 'lemma-108', 'lemma-24', 'lemma-429', 'lemma-68', 'lemma-91', 'lemma-98']
 
 def run():
   #init=numpy.array([[1,0,0], [0,1,0], [0,0,1]])
@@ -46,8 +48,8 @@ def run():
 
     for x in group:
       #print x
-      #print x[1][0]
-      print x[1][2]
+      print x[1][0]
+      #print x[1][2]
       n = n + 1
 
       #if #x[1][0] in featCount:

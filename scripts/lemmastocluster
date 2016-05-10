@@ -1,0 +1,33 @@
+Commutative features:
+
+   lemma   |   feature    | scheme 
+-----------+--------------+--------
+ lemma-100 | _commutative | als
+ lemma-105 | _commutative | als
+ lemma-110 | _commutative | als
+ lemma-189 | _commutative | als
+ lemma-196 | _commutative | als
+ lemma-337 | _commutative | als
+ lemma-347 | _commutative | als
+ lemma-357 | _commutative | als
+ lemma-39  | _commutative | als
+ lemma-427 | _commutative | als
+ lemma-55  | _commutative | als
+ lemma-65  | _commutative | als
+ lemma-95  | _commutative | als
+(13 rows)
+
+['lemma-100', 'lemma-105', 'lemma-110', 'lemma-189', 'lemma-196', 'lemma-337', 'lemma-347', 'lemma-357', 'lemma-39', 'lemma-427', 'lemma-55', 'lemma-65', 'lemma-95']
+
+   lemma   |   feature    | scheme 
+-----------+--------------+--------
+ lemma-101 | _associative | als
+ lemma-108 | _associative | als
+ lemma-24  | _associative | als
+ lemma-429 | _associative | als
+ lemma-68  | _associative | als
+ lemma-91  | _associative | als
+ lemma-98  | _associative | als
+(7 rows)
+
+['lemma-101', 'lemma-108', 'lemma-24', 'lemma-429', 'lemma-68', 'lemma-91', 'lemma-98']
