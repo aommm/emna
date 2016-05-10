@@ -28,16 +28,16 @@ Extracts features from the given library into the PostgreSQL database. Will wipe
 
 Looks for the environment variables `HS_DB_NAME`, `HS_DB_HOST`, `HS_DB_USERNAME` and `HS_DB_PASSWORD`.
 
-#### learn.py
+#### create_classifier.py
 ```
-python learn.py [/path/to/data]
+python create_classifier.py [/path/to/data]
 ```
 Creates `classifier.pkl` from the data currently in the PostgreSQL database. 
 
-#### classify.py
+#### use_classifier.py
 _Used only internally by HipSpec, there should be no need to call this directly._
 ```
-python classify.py stringifiedFeatures [/path/to/data]
+python use_classifier.py stringifiedFeatures [/path/to/data]
 ```
 Reads `classifier.pkl` and classifies `stringifiedFeatures` by it, returning the most probable classes on stdout.
 
