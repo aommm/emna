@@ -82,16 +82,12 @@ def run_extract_features(args):
 def main():
   global n_clusters
   def fail():
-    print('Usage: python unsupervised.py [number_of_clusters] [feature extraction schemes]')
+    print('Usage: python unsupervised.py number_of_clusters path/to/lib.tiplib depth [feature extraction schemes]')
+    print('E.g.: python scripts/unsupervised.py 8 ./data/lib.tiplib 4 la ls')
     sys.exit(0)
 
-  if len(sys.argv) == 1: # no args
-    n_clusters = 8
-    run()
-
-  elif len(sys.argv) == 2: # only n_clusters
-    n_clusters = int(sys.argv[1])
-    run()
+  if len(sys.argv) < 4: # no args
+    fail()
 
   else:
     n_clusters = int(sys.argv[1])
