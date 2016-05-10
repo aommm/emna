@@ -8,7 +8,7 @@ from db import get_features, get_lemmas, get_classes
 
 # Handle arguments
 def fail():
-  print('Usage: python learn.py [/path/to/data]')
+  print('Usage: python create_classifier.py [/path/to/data]')
   sys.exit(0)
 
 data_path = None

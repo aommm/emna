@@ -9,7 +9,7 @@ from sklearn.externals import joblib
 
 # Handle arguments
 def fail():
-  print('Usage: python classify.py formulaOrFeaturesStringifiedInAnAsOfYetUnspecifiedManner [/path/to/data]')
+  print('Usage: python use_classifier.py formulaOrFeaturesStringifiedInAnAsOfYetUnspecifiedManner [/path/to/data]')
   sys.exit(0)
 
 data_path = None
