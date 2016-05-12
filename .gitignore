@@ -1,5 +1,5 @@
 
-data/
+librarify
 scripts/extractFeatures
 *.pyc
 

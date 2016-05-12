@@ -29,7 +29,7 @@ except:
   sys.exit(0)
 
 # Create feature matrix
-def get_features_from_rows(schemes,rows):
+def get_features_from_rows(schemes,rows,maxdf):
   features = dict()
   for [lemma, feature, scheme] in rows:
     if scheme in schemes:
@@ -55,7 +55,7 @@ def get_features_from_rows(schemes,rows):
 
   concFeatsList = [concFeats[lemma] for lemma in concFeats]
 
-  vectorizer = TfidfVectorizer(max_df=0.75,analyzer=partial(nltk.regexp_tokenize, pattern='[^#\s][^\#]*[^#\s]*'))
+  vectorizer = TfidfVectorizer(max_df=maxdf,analyzer=partial(nltk.regexp_tokenize, pattern='[^#\s][^\#]*[^#\s]*'))
   countMatrix = vectorizer.fit_transform(concFeatsList)
 
   return countMatrix, vectorizer
@@ -87,7 +87,7 @@ def get_classes():
   return classes_arr    
 
 # Create feature matrix
-def get_features():
+def get_features(maxdf):
   # Get from db
   rows = load_features()
   # Create dict
@@ -108,7 +108,7 @@ def get_features():
 
   concFeatsList = [concFeats[lemma] for lemma in concFeats]
 
-  vectorizer = TfidfVectorizer(max_df=0.5,analyzer=partial(nltk.regexp_tokenize, pattern='[^#\s][^\#]*[^#\s]*'))
+  vectorizer = TfidfVectorizer(max_df=maxdf,analyzer=partial(nltk.regexp_tokenize, pattern='[^#\s][^\#]*[^#\s]*'))
   countMatrix = vectorizer.fit_transform(concFeatsList)
 
   return countMatrix, vectorizer, features

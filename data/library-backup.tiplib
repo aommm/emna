@@ -1,0 +1,476 @@
+(declare-datatypes (a)
+  ((list (nil) (cons (head a) (tail (list a))))))
+(declare-datatypes () ((Nat (Z) (S (p Nat)))))
+(declare-datatypes ()
+  ((Bin (One) (ZeroAnd (ZeroAnd_0 Bin)) (OneAnd (OneAnd_0 Bin)))))
+(define-fun-rec
+  s ((x Bin)) Bin
+    (match x
+      (case One (ZeroAnd One))
+      (case (ZeroAnd xs) (OneAnd xs))
+      (case (OneAnd ys) (ZeroAnd (s ys)))))
+(define-fun-rec
+  (par (a)
+    (qrev
+       ((x (list a)) (y (list a))) (list a)
+       (match x
+         (case nil y)
+         (case (cons z xs) (qrev xs (cons z y)))))))
+(define-fun-rec
+  plus
+    ((x Nat) (y Nat)) Nat
+    (match x
+      (case Z y)
+      (case (S z) (S (plus z y)))))
+(define-fun-rec
+  times
+    ((x Bin) (y Bin)) Bin
+    (match x
+      (case One y)
+      (case (ZeroAnd xs) (ZeroAnd (times xs y)))
+      (case (OneAnd ys) (plus (ZeroAnd (times ys y)) y))))
+(define-fun one () Nat (S Z))
+(define-fun-rec
+  mult2
+    ((x Nat) (y Nat) (z Nat)) Nat
+    (match x
+      (case Z z)
+      (case (S x2) (mult2 x2 y (plus y z)))))
+(define-fun-rec
+  mult
+    ((x Nat) (y Nat)) Nat
+    (match x
+      (case Z Z)
+      (case (S z) (plus y (mult z y)))))
+(define-fun-rec
+  qexp
+    ((x Nat) (y Nat) (z Nat)) Nat
+    (match y
+      (case Z z)
+      (case (S n) (qexp x n (mult x z)))))
+(define-fun-rec
+  qfac
+    ((x Nat) (y Nat)) Nat
+    (match x
+      (case Z y)
+      (case (S z) (qfac z (mult x y)))))
+(define-fun-rec
+  (par (a)
+    (length
+       ((x (list a))) Nat
+       (match x
+         (case nil Z)
+         (case (cons y xs) (S (length xs)))))))
+(define-fun-rec
+  le
+    ((x Nat) (y Nat)) Bool
+    (match x
+      (case Z true)
+      (case (S z)
+        (match y
+          (case Z false)
+          (case (S x2) (le z x2))))))
+(define-fun-rec
+  sorted
+    ((x (list Nat))) Bool
+    (match x
+      (case nil true)
+      (case (cons y z)
+        (match z
+          (case nil true)
+          (case (cons y2 xs) (and (le y y2) (sorted z)))))))
+(define-fun-rec
+  insert2
+    ((x Nat) (y (list Nat))) (list Nat)
+    (match y
+      (case nil (cons x (as nil (list Nat))))
+      (case (cons z xs)
+        (ite (le x z) (cons x y) (cons z (insert2 x xs))))))
+(define-fun-rec
+  isort
+    ((x (list Nat))) (list Nat)
+    (match x
+      (case nil (as nil (list Nat)))
+      (case (cons y xs) (insert2 y (isort xs)))))
+(define-fun-rec
+  half
+    ((x Nat)) Nat
+    (match x
+      (case Z Z)
+      (case (S y)
+        (match y
+          (case Z Z)
+          (case (S z) (S (half z)))))))
+(define-fun-rec
+  fac
+    ((x Nat)) Nat
+    (match x
+      (case Z (S Z))
+      (case (S y) (mult x (fac y)))))
+(define-fun-rec
+  exp
+    ((x Nat) (y Nat)) Nat
+    (match y
+      (case Z (S Z))
+      (case (S n) (mult x (exp x n)))))
+(define-fun-rec
+  even
+    ((x Nat)) Bool
+    (match x
+      (case Z true)
+      (case (S y)
+        (match y
+          (case Z false)
+          (case (S z) (even z))))))
+(define-fun-rec
+  equal
+    ((x Nat) (y Nat)) Bool
+    (match x
+      (case Z
+        (match y
+          (case Z true)
+          (case (S z) false)))
+      (case (S x2)
+        (match y
+          (case Z false)
+          (case (S y2) (equal x2 y2))))))
+(define-fun unequal ((x Nat) (y Nat)) Bool (not (equal x y)))
+(define-fun-rec
+  elem
+    ((x Nat) (y (list Nat))) Bool
+    (match y
+      (case nil false)
+      (case (cons z xs) (or (equal x z) (elem x xs)))))
+(define-fun-rec
+  intersect2
+    ((x (list Nat)) (y (list Nat))) (list Nat)
+    (match x
+      (case nil (as nil (list Nat)))
+      (case (cons z xs)
+        (ite (elem z y) (cons z (intersect2 xs y)) (intersect2 xs y)))))
+(define-fun-rec
+  subset2
+    ((x (list Nat)) (y (list Nat))) Bool
+    (match x
+      (case nil true)
+      (case (cons z xs) (and (elem z y) (subset2 xs y)))))
+(define-fun-rec
+  union2
+    ((x (list Nat)) (y (list Nat))) (list Nat)
+    (match x
+      (case nil y)
+      (case (cons z xs)
+        (ite (elem z y) (union2 xs y) (cons z (union2 xs y))))))
+(define-fun-rec
+  (par (a)
+    (drop
+       ((x Nat) (y (list a))) (list a)
+       (match x
+         (case Z y)
+         (case (S z)
+           (match y
+             (case nil (as nil (list a)))
+             (case (cons x2 x3) (drop z x3))))))))
+(define-fun-rec
+  double
+    ((x Nat)) Nat
+    (match x
+      (case Z Z)
+      (case (S y) (S (S (double y))))))
+(define-fun-rec
+  count
+    ((x Nat) (y (list Nat))) Nat
+    (match y
+      (case nil Z)
+      (case (cons z xs)
+        (ite (equal x z) (S (count x xs)) (count x xs)))))
+(define-fun-rec
+  (par (a)
+    (append
+       ((x (list a)) (y (list a))) (list a)
+       (match x
+         (case nil y)
+         (case (cons z xs) (cons z (append xs y)))))))
+(define-fun-rec
+  (par (a)
+    (rev
+       ((x (list a))) (list a)
+       (match x
+         (case nil (as nil (list a)))
+         (case (cons y xs) (append (rev xs) (cons y (as nil (list a)))))))))
+(define-fun-rec
+  (par (a)
+    (qrevflat
+       ((x (list (list a))) (y (list a))) (list a)
+       (match x
+         (case nil y)
+         (case (cons xs xss) (qrevflat xss (append (rev xs) y)))))))
+(define-fun-rec
+  (par (a)
+    (revflat
+       ((x (list (list a)))) (list a)
+       (match x
+         (case nil (as nil (list a)))
+         (case (cons xs xss) (append (revflat xss) (rev xs)))))))
+(define-fun-rec
+  (par (a)
+    (rotate
+       ((x Nat) (y (list a))) (list a)
+       (match x
+         (case Z y)
+         (case (S z)
+           (match y
+             (case nil (as nil (list a)))
+             (case (cons x2 x3)
+               (rotate z (append x3 (cons x2 (as nil (list a))))))))))))
+(assert-proof
+  (lemma-0 (forall ((x Nat)) (= (double x) (plus x x)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-1
+    (forall ((x (list a)) (y (list a)))
+      (= (length (append x y)) (length (append y x))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-10
+    (forall ((x (list a)) (y (list a)))
+      (= (rev (append (rev x) (rev y))) (append y x)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-11
+    (forall ((x (list a)) (y (list a)))
+      (= (qrev x y) (append (rev x) y)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-12 (forall ((x Nat)) (= (half (plus x x)) x))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-13 (forall ((x (list Nat))) (sorted (isort x)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-14 (forall ((x Nat)) (= (plus x (S x)) (S (plus x x))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-15 (forall ((x Nat)) (even (plus x x)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-16
+    (forall ((x (list a)) (y (list a)))
+      (= (rev (rev (append x y))) (append (rev (rev x)) (rev (rev y)))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-17
+    (forall ((x (list a)) (y (list a)))
+      (= (rev (append (rev x) y)) (append (rev y) x)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-18
+    (forall ((x (list a)) (y (list a)))
+      (= (append (rev (rev x)) y) (rev (rev (append x y)))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-19 (forall ((x (list a))) (even (length (append x x))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-2
+    (forall ((x (list a)) (y (list a)))
+      (= (length (append x y)) (plus (length y) (length x))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-20
+    (forall ((x (list a)) (y (list a)))
+      (= (rotate (length x) (append x y)) (append y x)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-21
+    (forall ((x (list a)) (y (list a)))
+      (= (even (length (append x y))) (even (length (append y x)))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-22
+    (forall ((x (list a)) (y (list a)))
+      (= (half (length (append x y))) (half (length (append y x)))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-23
+    (forall ((x Nat) (y Nat)) (= (even (plus x y)) (even (plus y x))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-24
+    (forall ((x (list a)) (y (list a)))
+      (= (even (length (append x y)))
+        (even (plus (length y) (length x)))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-25
+    (forall ((x Nat) (y Nat)) (= (half (plus x y)) (half (plus y x))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-26
+    (forall ((x (list a))) (= (rev x) (qrev x (as nil (list a)))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-27
+    (forall ((x (list (list a))))
+      (= (revflat x) (qrevflat x (as nil (list a)))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-28
+    (forall ((x (list a))) (= (rev (qrev x (as nil (list a)))) x))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-29
+    (forall ((x (list a)))
+      (= (rev (append (rev x) (as nil (list a)))) x))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-3
+    (forall ((x (list a)))
+      (= (length (append x x)) (double (length x))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-30
+    (forall ((x (list a)))
+      (= (qrev (qrev x (as nil (list a))) (as nil (list a))) x))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-31 (forall ((x (list a))) (= (rotate (length x) x) x))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-32 (forall ((x Nat)) (= (fac x) (qfac x one)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-33 (forall ((x Nat) (y Nat)) (= (mult x y) (mult2 x y Z)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-34 (forall ((x Nat) (y Nat)) (= (exp x y) (qexp x y one)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-35
+    (forall ((x Nat) (y (list Nat)) (z (list Nat)))
+      (=> (elem x y) (elem x (append y z))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-36
+    (forall ((x Nat) (y (list Nat)) (z (list Nat)))
+      (=> (elem x z) (elem x (append y z))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-37
+    (forall ((x Nat) (y (list Nat)) (z (list Nat)))
+      (=> (elem x y) (=> (elem x z) (elem x (append y z)))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-38
+    (forall ((x Nat) (y Nat) (z (list Nat)))
+      (=> (elem x (drop y z)) (elem x z)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-39
+    (forall ((x (list Nat)) (y (list Nat)))
+      (=> (subset2 x y) (= (union2 x y) y)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-4 (forall ((x (list a))) (= (length (rev x)) (length x)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-40
+    (forall ((x (list Nat)) (y (list Nat)))
+      (=> (subset2 x y) (= (intersect2 x y) x)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-41
+    (forall ((x Nat) (y (list Nat)) (z (list Nat)))
+      (=> (elem x y) (elem x (union2 y z))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-42
+    (forall ((x Nat) (y (list Nat)) (z (list Nat)))
+      (=> (elem x y) (elem x (union2 z y))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-43
+    (forall ((x Nat) (y (list Nat)) (z (list Nat)))
+      (=> (elem x y) (=> (elem x z) (elem x (intersect2 y z)))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-44 (forall ((x Nat) (y (list Nat))) (elem x (insert2 x y)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-45
+    (forall ((x Nat) (y Nat) (z (list Nat)))
+      (=> (= x y) (elem x (insert2 y z))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-46
+    (forall ((x Nat) (y Nat) (z (list Nat)))
+      (=> (unequal x y) (= (elem x (insert2 y z)) (elem x z))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-47
+    (forall ((x (list Nat))) (= (length (isort x)) (length x)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-48
+    (forall ((x Nat) (y (list Nat)))
+      (=> (elem x (isort y)) (elem x y)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-49
+    (forall ((x Nat) (y (list Nat)))
+      (= (count x (isort y)) (count x y)))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-5
+    (forall ((x (list a)) (y (list a)))
+      (= (length (rev (append x y))) (plus (length x) (length y))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (lemma-50
+    (forall ((x Bin) (y Bin) (z Bin))
+      (= (times x (plus y z)) (plus (times x y) (times x z))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-6
+    (forall ((x (list a)) (y (list a)))
+      (= (length (qrev x y)) (plus (length x) (length y))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-7
+    (forall ((x Nat) (y Nat) (z (list a)))
+      (= (drop x (drop y z)) (drop y (drop x z))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-8
+    (forall ((x Nat) (y Nat) (z (list a)) (w Nat))
+      (= (drop w (drop x (drop y z))) (drop y (drop x (drop w z)))))
+    ([] [] structural herp derp)))
+(assert-proof
+  (par (a)
+    lemma-9 (forall ((x (list a))) (= (rev (rev x)) x))
+    ([] [] structural herp derp)))
+(check-sat)
