@@ -48,7 +48,7 @@ getFunctionSymbols fs depth
             name = varStr $ func_name f
             tree = buildTree (func_body f)
             trees = extractSubTrees depth tree
-            features = map (\y -> (y, "fs")) $ nub $ concat $ map extractFeatures trees
+            features = map (\y -> ("_f " ++ y, "fs")) $ concat $ map extractFeatures trees
 
 -- Builds a tree for an expression, recursively :)
 buildTree :: (Show a, Name a) => Expr a -> FNode String

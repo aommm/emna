@@ -70,6 +70,7 @@ extractSubTrees :: Int -> FNode String -> [FNode String]
 extractSubTrees 0 _ = []
 extractSubTrees depth f@(FNode "==" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the equality symbol
 extractSubTrees depth f@(FNode "Equals" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the equality symbol
+extractSubTrees depth f@(FNode "match" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the match symbol
 extractSubTrees depth f@(FNode id fs) = [thisSubTree] ++ otherSubTrees
     where
         thisSubTree = extractSubTree depth f --(FNode id (concat $ map (extractSubTrees (depth-1)) fs))
@@ -125,13 +126,13 @@ preMerge :: [(String, [Feat])] -> [(String, [Feat])] -> [(String, [Feat])]
 preMerge xs ys = preMerge' (sort xs) (sort ys) -- We can assume the lists are equally long here
 
 preMerge' :: [(String, [Feat])] -> [(String, [Feat])] -> [(String, [Feat])]
-preMerge' xs ys = map (\((n, f1),(_, f2)) -> (n, nub $ f1 ++ f2)) $ zip xs ys
+preMerge' xs ys = map (\((n, f1),(_, f2)) -> (n, f1 ++ f2)) $ zip xs ys
 
 -- Not sure about the complexity of this one hehe :-)
 mergeFeatures :: Bool -> [(String, [Feat])] -> [(String, [Feat])] -> [(String, [Feat])]
 mergeFeatures sslf ((n, feats):ls) fs = (n, extendedFeats):(mergeFeatures sslf ls fs)
     where
-        extendedFeats = (filter (\y -> (not sslf && not (isSymbolicLemmaFeat y)) || sslf) feats) ++ (nub addedFeats)
+        extendedFeats = (filter (\y -> (not sslf && not (isSymbolicLemmaFeat y)) || sslf) feats) ++ (addedFeats)
         addedFeats = concat $ map (\(n', f) -> f) funcsOfLemma
         funcsOfLemma = filter (\(functionName, _) -> any (\(feature, scheme) -> scheme == "ls" && feature == functionName) feats) fs -- finding the function features which has its key anywhere in the features of the lemma
 mergeFeatures _ [] _ = []

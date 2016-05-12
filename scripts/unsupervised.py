@@ -65,12 +65,12 @@ def run():
     print "\nCluster summary: "
     print "%i number of lemmas\n" % (n)
 
-    if n > 5:
-      for k in groupFeats.keys():
-        if groupFeats[k] >= n*0.75:
-          print k + (" %i" % groupFeats[k]) + (", %i percent" % int((float(groupFeats[k])/n)*100))
+    #if n > 5:
+    #  for k in groupFeats.keys():
+    #    if groupFeats[k] >= n*0.75:
+    #      print k + (" %i" % groupFeats[k]) + (", %i percent" % int((float(groupFeats[k])/n)*100))
 
-    print "\n"
+    #print "\n"
 
     # print [x for x in group]
     # listOfThings = " and ".join([thing[1] for thing in group])

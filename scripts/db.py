@@ -95,14 +95,19 @@ def get_features(maxdf):
   for [lemma, feature, scheme] in rows:
     if not lemma in features:
       features[lemma] = dict()
-    features[lemma][feature] = 1
+    if feature not in features[lemma]:
+      features[lemma][feature] = 1
+    else:
+      features[lemma][feature] = features[lemma][feature] + 1
   
   # Mergeing features into one long string per lemma, separated by #
   concFeats = dict()
   for lemma in features:
     concFeats[lemma] = []
     for f in features[lemma]:
-      concFeats[lemma].append(f)
+      for r in range(0,features[lemma][f]):
+        concFeats[lemma].append(f)
+
 
     concFeats[lemma] = "#".join(concFeats[lemma])
 
@@ -110,6 +115,9 @@ def get_features(maxdf):
 
   vectorizer = TfidfVectorizer(max_df=maxdf,analyzer=partial(nltk.regexp_tokenize, pattern='[^#\s][^\#]*[^#\s]*'))
   countMatrix = vectorizer.fit_transform(concFeatsList)
+
+  for i,name in enumerate(vectorizer.get_feature_names()):
+    print "%s, %f" % (name, vectorizer.idf_[i])
 
   return countMatrix, vectorizer, features
 
