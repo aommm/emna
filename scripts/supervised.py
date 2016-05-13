@@ -24,7 +24,7 @@ def compute_score(schemes,classes,rows,ml):
   elif ml == "svc":
     clf = svm.SVC(kernel="linear")
 
-  features, v = get_features_from_rows(schemes,rows)
+  features, v = get_features_from_rows(schemes,rows,1.0)
   result = cross_validation.cross_val_score(clf, features, classes, cv=5)
   return result
 
@@ -65,7 +65,7 @@ def main():
   all_schemes = "fa fs la ls ala afa afs als"
   scheme_combos = ["","fa"], ["","fs"], ["","la"], ["", "ls"], ["","ala"], ["","afa"], ["","afs"], ["","als"]
   mls = ["svc","bnb"]
-  depth_range = range(1,4)
+  depth_range = range(3,4)
   arg_combinations = list(itertools.product(*scheme_combos))
   n = len(mls)*len(depth_range)*len(arg_combinations)
   results = []

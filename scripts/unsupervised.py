@@ -31,6 +31,8 @@ def run():
   # clf.fit(features)
   x = clf.fit_predict(features)
 
+  print clf.labels_
+
   # featureDict = v.inverse_transform(features)
   # print len(x)
   # print features.shape
