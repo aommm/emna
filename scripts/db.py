@@ -110,6 +110,46 @@ def get_features(maxdf):
 
   return countMatrix, vectorizer, features
 
+# Create feature matrix
+def get_function_features():
+  cur = conn.cursor()
+  cur.execute("""SELECT * from hs_function_feature ORDER BY function""")
+  rows = cur.fetchall()
+  # Get from db
+  # rows = load_features()
+  keys = []
+  # Create dict
+  features = dict()
+  for [function, feature, scheme] in rows:
+    if not function in features:
+      features[function] = dict()
+    features[function][feature] = 1
+    if not function in keys:
+      keys.append(function)
+  
+  # Mergeing features into one long string per function, separated by #
+  concFeats = dict()
+  for function in features:
+    concFeats[function] = []
+    for f in features[function]:
+      concFeats[function].append(f)
+
+
+    concFeats[function] = "#".join(concFeats[function])
+
+  concFeatsList = [concFeats[function] for function in concFeats]
+
+  print concFeatsList
+
+  vectorizer = TfidfVectorizer(analyzer=partial(nltk.regexp_tokenize, pattern='[^#\s][^\#]*[^#\s]*'))
+  countMatrix = vectorizer.fit_transform(concFeatsList)
+
+#  for i,name in enumerate(vectorizer.get_feature_names()):
+#    print "%s, %f" % (name, vectorizer.idf_[i])
+
+  return countMatrix, vectorizer, features, keys
+
+
 def remove_popular(featuresDict, nLemmas):
 
     # Removing super-popular features

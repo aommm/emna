@@ -54,8 +54,17 @@ insertFeatures conn ((lemma, features):xs) = do
     executeMany conn "insert into hs_lemma_feature (lemma, feature, scheme) values (?,?,?)" values
     insertFeatures conn xs
 
+-- Inserts a list of function features
+insertFunctionFeatures :: Connection -> [(String, [Feat])] -> IO ()
+insertFunctionFeatures conn [] = return ()
+insertFunctionFeatures conn ((lemma, features):xs) = do
+    let (flist, slist) = unzip features
+    let values = zip3 (take (length features) (repeat lemma)) flist slist
+    executeMany conn "insert into hs_function_feature (function, feature, scheme) values (?,?,?)" values
+    insertFunctionFeatures conn xs
+
 removeDuplicates :: [(String, [Feat])] -> [(String, [Feat])]
-removeDuplicates ((lemma, feats):xs) = (lemma, feats):(removeDuplicates xs)
+removeDuplicates ((lemma, feats):xs) = (lemma, nub feats):(removeDuplicates xs)
 removeDuplicates [] = []
 
 getInductionVariables :: Name a => Info a -> [Int]

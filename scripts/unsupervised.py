@@ -50,9 +50,9 @@ def run():
     n = 0
 
     for x in group:
-      #print x
+      print x
       #print "\n"
-      print "%s, %s" % (x[1][0], x[1][2])
+      #print "%s, %s" % (x[1][0], x[1][2])
       n = n + 1
 
       feats = featuresDict[x[1][0]].keys()

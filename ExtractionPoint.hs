@@ -42,12 +42,24 @@ runSchemesLibrary fms funcs schemes depth = do
     let lemmaFeats = map snd $ filter (\(k,_) -> elem k schemes || k == "ls") $ filter (\(_,v) -> length v > 0) [("ls",ls),("la",la),("als",als),("ala",ala)]
     let functionFeats = map snd $ filter (\(k,_) -> elem k schemes) $ filter (\(_,v) -> length v > 0) [("afs",afs),("afa",afa),("fs",fs),("fa",fa)]
 
+    putStrLn $ "heheh = " ++ (show functionFeats)
+
     let lemmaNames = M.keys fms
 
     let firstHalf = (if length lemmaFeats == 0 then (emptyLemmaList lemmaNames) else (generateHalf lemmaFeats))
     let secondHalf = generateHalf functionFeats
 
     return $ mergeFeatures ("ls" `elem` schemes) firstHalf secondHalf
+
+runFunctionSchemesLibrary :: (Show a, Name a) => Map String (Formula a) -> Map a (Function a) -> [String] -> Int -> IO ([(String, [Feat])])
+runFunctionSchemesLibrary fms funcs schemes depth = do
+
+    let fs = (if (elem "fs" schemes) then (getFunctionSymbols funcs depth) else [])
+    let fa = (if (elem "fa" schemes) then (getAbstractFunctions funcs depth) else [])
+
+    let functionFeats = map snd $ filter (\(k,_) -> elem k schemes) $ filter (\(_,v) -> length v > 0) [("fs",fs),("fa",fa)]
+
+    return $ generateHalf functionFeats
 
 runSchemesConjecture :: (Show a, Name a) => Formula a -> Map a (Function a) -> [String] -> Int -> IO ([Feat])
 runSchemesConjecture f funcs schemes depth = do 

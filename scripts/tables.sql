@@ -5,6 +5,7 @@
 DROP TABLE hs_lemma_using;
 DROP TABLE hs_lemma_feature;
 DROP TABLE hs_lemma;
+DROP TABLE hs_function_feature;
 
 CREATE TABLE hs_lemma (
   name TEXT NOT NULL PRIMARY KEY,
@@ -26,9 +27,16 @@ CREATE TABLE hs_lemma_feature (
   scheme TEXT NOT NULL
 );
 
+CREATE TABLE hs_function_feature (
+  function TEXT NOT NULL,
+  feature TEXT NOT NULL,
+  scheme TEXT NOT NULL
+);
+
 GRANT ALL PRIVILEGES ON hs_lemma TO hipspecuser;
 GRANT ALL PRIVILEGES ON hs_lemma_using TO hipspecuser;
 GRANT ALL PRIVILEGES ON hs_lemma_feature TO hipspecuser;
+GRANT ALL PRIVILEGES ON hs_function_feature TO hipspecuser;
 
 -------------------------------------------------------------------------------
 -- Dummy data
