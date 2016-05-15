@@ -1,0 +1,192 @@
+
+Moas superkluster (8 lemman:
+prop 26:	rev xs = qrev xs [ ]
+prop 27:	revflat xs = qrevflat xs [ ]
+prop 28: 	rev(qrev xs [ ]) = xs
+prop 29:	rev(rev xs ++ [ ]) = xs
+prop 30: 	qrev(qrev xs [ ]) = xs
+prop 32: 	fac x = qfac x 1
+prop 33:	mult(x,y) = qmult(x,y,0)
+prop 34:	exp(x,y) = qexp(x,y,1)
+
+python ./scripts/unsupervised.py 4 ./data/library.tiplib 2 fa fs
+
+ger ett kluster:
+
+lemma-0, double n = (n+n)
+lemma-1, length (xs++ys) = length (ys++xs)
+lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+lemma-25, half (n+m) = half (m+n)
+	lemma-26, rev xs = qrev xs []
+	lemma-27, revflat xs = qrevflat xs []
+	lemma-28, rev (qrev xs []) = xs
+	lemma-29, rev (rev xs++[]) = xs
+lemma-3, length (xs++xs) = double (length xs)
+	lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+	lemma-32, fac n = qfac n b
+lemma-45, (n = m) => (n`elem`insert2 m xs)
+lemma-49, count n (isort xs) = count n xs
+lemma-6, length (qrev xs ys) = (length xs+length ys)
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
+
+Här har vi alltså 6 av dessa lemman, av 18 totalt.
+
+Tanke:
+- Alla funktioner har ju match, vi kanske ändå kan ta bort just match-grejen.
+
+
+Nu testar vi med lemma-features.
+
+python ./scripts/unsupervised.py 4 ./data/library.tiplib 2 la ls
+
+lemma-0, double n = (n+n)
+lemma-17, rev (rev xs++ys) = (rev ys++xs)
+lemma-18, (rev (rev xs)++ys) = rev (rev (xs++ys))
+lemma-19, even (length (xs++xs))
+lemma-25, half (n+m) = half (m+n)
+	lemma-26, rev xs = qrev xs []
+	lemma-27, revflat xs = qrevflat xs []
+	lemma-29, rev (rev xs++[]) = xs
+lemma-3, length (xs++xs) = double (length xs)
+	lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+	lemma-32, fac n = qfac n b
+lemma-49, count n (isort xs) = count n xs
+
+5 bra lemman, men färre dåliga (totalt sett bättre resultat skulle jag säga.) 13 st totalt alltså. Lemma 0, 3, 31 och 49 är de som varit med på båda sidorna.
+
+
+Vi testar funktionerna igen med lite mer djup:
+python ./scripts/unsupervised.py 4 ./data/library.tiplib 3 fa fs
+
+Nu får vi klustret:
+
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+lemma-25, half (n+m) = half (m+n)
+	lemma-26, rev xs = qrev xs []
+	lemma-27, revflat xs = qrevflat xs []
+	lemma-28, rev (qrev xs []) = xs
+	lemma-29, rev (rev xs++[]) = xs
+lemma-3, length (xs++xs) = double (length xs)
+	lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+	lemma-32, fac n = qfac n b
+lemma-49, count n (isort xs) = count n xs
+
+6 bra lemman, 6 dåliga 12 totalt. Ännu en förbättring. 3, 31 och 49 hänger sig kvar. Kanske i brist på bättre vänner?
+
+
+
+python ./scripts/unsupervised.py 4 ./data/library.tiplib 3 la ls
+
+	lemma-26, rev xs = qrev xs []
+	lemma-27, revflat xs = qrevflat xs []
+	lemma-29, rev (rev xs++[]) = xs
+	lemma-30, qrev (qrev xs []) [] = xs
+lemma-49, count n (isort xs) = count n xs
+
+Cluster summary: 
+5 number of lemmas
+
+4 bra lemman av 5. 49e hänger fortfarande med haha.
+
+
+NU TESTAR JAG ATT TA BORT MATCH. Själva funktionskroppen är kvar men ingen feature för just matchning.
+
+
+python ./scripts/unsupervised.py 4 ./data/library.tiplib 2 fa fs
+
+Gamla med samma kommando:
+
+lemma-0, double n = (n+n)
+lemma-1, length (xs++ys) = length (ys++xs)
+lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+lemma-25, half (n+m) = half (m+n)
+	lemma-26, rev xs = qrev xs []
+	lemma-27, revflat xs = qrevflat xs []
+	lemma-28, rev (qrev xs []) = xs
+	lemma-29, rev (rev xs++[]) = xs
+lemma-3, length (xs++xs) = double (length xs)
+	lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+	lemma-32, fac n = qfac n b
+lemma-45, (n = m) => (n`elem`insert2 m xs)
+lemma-49, count n (isort xs) = count n xs
+lemma-6, length (qrev xs ys) = (length xs+length ys)
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
+
+
+Nya: 
+
+lemma-0, double n = (n+n)
+lemma-1, length (xs++ys) = length (ys++xs)
+lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+lemma-25, half (n+m) = half (m+n)
+	lemma-26, rev xs = qrev xs []
+	lemma-27, revflat xs = qrevflat xs []
+	lemma-28, rev (qrev xs []) = xs
+	lemma-29, rev (rev xs++[]) = xs
+lemma-3, length (xs++xs) = double (length xs)
+	lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+	lemma-32, fac n = qfac n b
+lemma-45, (n = m) => (n`elem`insert2 m xs)
+lemma-49, count n (isort xs) = count n xs
+lemma-6, length (qrev xs ys) = (length xs+length ys)
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
+
+Exakt samma för detta djup. Vi testar djup 3.
+
+
+Gamla:
+
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+lemma-25, half (n+m) = half (m+n)
+	lemma-26, rev xs = qrev xs []
+	lemma-27, revflat xs = qrevflat xs []
+	lemma-28, rev (qrev xs []) = xs
+	lemma-29, rev (rev xs++[]) = xs
+lemma-3, length (xs++xs) = double (length xs)
+	lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+	lemma-32, fac n = qfac n b
+lemma-49, count n (isort xs) = count n xs
+
+
+Nya:
+
+lemma-0, double n = (n+n)
+lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+lemma-25, half (n+m) = half (m+n)
+	lemma-26, rev xs = qrev xs []
+	lemma-27, revflat xs = qrevflat xs []
+	lemma-28, rev (qrev xs []) = xs
+	lemma-29, rev (rev xs++[]) = xs
+lemma-3, length (xs++xs) = double (length xs)
+	lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+	lemma-32, fac n = qfac n b
+lemma-39, subset2 xs ys => (union2 xs ys = ys)
+lemma-45, (n = m) => (n`elem`insert2 m xs)
+lemma-49, count n (isort xs) = count n xs
+lemma-6, length (qrev xs ys) = (length xs+length ys)
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
+
+Sämre än förra.
+
+Diskussion: Vi fick många färre features, vilket...
+
+
+Är KMeans ens deterministisk?
+

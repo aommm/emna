@@ -50,7 +50,7 @@ getAbstractFunctions fs depth
             name = varStr $ func_name f
             tree = buildTree (func_body f)
             trees = extractSubTrees depth tree
-            features = map (\h -> ("f " ++ h, "fa")) $ concat $ map extractFeatures trees
+            features = map (\h -> ("_f " ++ h, "fa")) $ concat $ map extractFeatures trees
 
 -- Builds a tree for an expression, recursively :)
 buildTree :: (Show a, Name a) => Expr a -> FNode String

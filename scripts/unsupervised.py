@@ -40,6 +40,8 @@ def run():
   print len(x), len(y)
   xy = zip(x,y)
 
+  print clf.cluster_centers_
+
   getClass = itemgetter(0);
   xy = sorted(xy, key=getClass)
   for key, group in groupby(xy, getClass):
