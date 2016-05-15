@@ -33,13 +33,13 @@ analyseSymbolic ((lemmaName, features):xs) = (lemmaName, f'):rest
         nFeats = length features -- number of features
         nDistFeats = length $ nub features -- number of distinct features
         ratio = intdiv nDistFeats nFeats -- 
-        mostPopular = most (freq features) -- most popular feature of the lemma
-        -- f' = ["_length " ++ (show nFeats), "_lengthDistinct " ++ (show nDistFeats), "_distinctRatio " ++ (printf "%.1f" $ ratio), "_popular " ++ mostPopular]
-        f' = []
+        (_,mostPopular) = most (freq features) -- most popular feature of the lemma
+        f' = ["_length " ++ (show nFeats), "_lengthDistinct " ++ (show nDistFeats), "_distinctRatio " ++ (printf "%.1f" $ ratio), "_popular " ++ mostPopular]
+        -- f' = []
 
 analyseSymbolicLemmaFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map String (Formula a) -> [(String, [Feat])]
 analyseSymbolicLemmaFeatures [] _ = []
-analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "als")) $ something $ features' ++ ["_mainFunction " ++ mainF] ++ (getBooleanFeatures [commutative, associative])):rest
+analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "als")) $ something $ features' ++ (getBooleanFeatures [commutative, associative])):rest
     where
         rest = analyseSymbolicLemmaFeatures xs ls
         fs = analyseSymbolic [(lemmaName, features)]
@@ -55,7 +55,7 @@ analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s
 
 analyseSymbolicFunctionFeatures :: [(String, [Feat])] -> [(String, [Feat])]
 analyseSymbolicFunctionFeatures [] = []
-analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, map (\s -> (s, "afs")) $ something $ features' ++ (getBooleanFeatures [rec])):rest
+analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, map (\s -> ("f " ++ s, "afs")) $ something $ features' ++ (getBooleanFeatures [rec])):rest
     where
         rest = analyseSymbolicFunctionFeatures xs
         fs = analyseSymbolic [(fName, features)]
