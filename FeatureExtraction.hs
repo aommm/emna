@@ -79,7 +79,9 @@ extractSubTrees :: Int -> FNode String -> [FNode String]
 extractSubTrees 0 _ = []
 --extractSubTrees depth f@(FNode "==" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the equality symbol
 --extractSubTrees depth f@(FNode "Equals" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the equality symbol
-extractSubTrees depth f@(FNode "match" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the match symbol
+--extractSubTrees depth f@(FNode "=>" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the equality symbol
+--extractSubTrees depth f@(FNode "Implies" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the equality symbol
+--extractSubTrees depth f@(FNode "match" fs) = (concat $ map (extractSubTrees depth) fs) -- Skipping the match symbol
 extractSubTrees depth f@(FNode id fs) = [thisSubTree] ++ otherSubTrees
     where
         thisSubTree = extractSubTree depth f --(FNode id (concat $ map (extractSubTrees (depth-1)) fs))
