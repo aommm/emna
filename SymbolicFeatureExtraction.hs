@@ -66,7 +66,7 @@ buildTree l@(Lcl (Local name (ts :=>: t))) = FNode ((concat $ map typeToString t
 buildTree (Gbl (Global name typ args) :@: exps) = FNode (varStr name) $ map buildTree exps
 
 -- We aim to filter away matches that is the end of a recursive function, focusing on the recursive part of the body
-buildTree (Match e cases) = FNode ("match") $ map buildTree $ map case_rhs cases
+buildTree (Match e cases) = FNode ("match " ++ (exprToString e)) $ map buildTree $ map case_rhs cases
 buildTree (Lam locals e) = FNode "lambda" [buildTree e]
 buildTree e = trace (show e) $ FNode "unknown" []
 

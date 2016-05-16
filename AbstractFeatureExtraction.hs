@@ -65,7 +65,7 @@ buildTree (Lcl (Local name (TyCon feature _))) = FNode "Var" []
 buildTree (Lcl (Local name (TyVar feature))) = FNode "Var" []
 buildTree l@(Lcl (Local name (ts :=>: t))) = FNode "FuncType" []
 
-buildTree (Match e cases) = FNode ("match") $ map buildTree $ map case_rhs cases'
+buildTree (Match e cases) = FNode ("match " ++ (exprToString e)) $ map buildTree $ map case_rhs cases'
     where
         cases' = filter caseFilter cases
 

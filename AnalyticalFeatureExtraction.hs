@@ -47,7 +47,7 @@ analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s
         exactSame = exactSameSymbols (fm_body $ fromJust $ M.lookup lemmaName ls)
         commutative = ("commutative", (if exactSame then (isCommutative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
         associative = ("associative", (if exactSame then (isAssociative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
-        mainF = mainFunction (fm_body $ fromJust $ M.lookup lemmaName ls)
+        -- mainF = mainFunction (fm_body $ fromJust $ M.lookup lemmaName ls)
   
 analyseSymbolicFunctionFeatures :: [(String, [Feat])] -> [(String, [Feat])]
 analyseSymbolicFunctionFeatures [] = []
