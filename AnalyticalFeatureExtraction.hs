@@ -55,7 +55,7 @@ analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s
 
 analyseSymbolicFunctionFeatures :: [(String, [Feat])] -> [(String, [Feat])]
 analyseSymbolicFunctionFeatures [] = []
-analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, map (\s -> ("f " ++ s, "afs")) $ something $ features' ++ (getBooleanFeatures [rec])):rest
+analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, map (\s -> ("f " ++ s, "afs")) $ something $ features'):rest
     where
         rest = analyseSymbolicFunctionFeatures xs
         fs = analyseSymbolic [(fName, features)]

@@ -64,7 +64,7 @@ def main():
 
   all_schemes = "fa fs la ls ala afa afs als"
   scheme_combos = ["","fa"], ["","fs"], ["","la"], ["", "ls"], ["","ala"], ["","afa"], ["","afs"], ["","als"]
-  mls = ["svc","bnb"]
+  mls = ["svc"]
   depth_range = range(3,4)
   arg_combinations = list(itertools.product(*scheme_combos))
   n = len(mls)*len(depth_range)*len(arg_combinations)
