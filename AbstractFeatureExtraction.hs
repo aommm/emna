@@ -50,7 +50,7 @@ getAbstractFunctions fs depth
             name = varStr $ func_name f
             tree = buildTree (func_body f)
             trees = extractSubTrees depth tree
-            features = map (\h -> ("_f " ++ h, "fa")) $ concat $ map extractFeatures trees
+            features = map (\h -> (h, "fa")) $ concat $ map extractFeatures trees
 
 -- Builds a tree for an expression, recursively :)
 buildTree :: (Show a, Name a) => Expr a -> FNode String
@@ -68,11 +68,13 @@ buildTree l@(Lcl (Local name (ts :=>: t))) = FNode "FuncType" []
 buildTree (Match e cases) = FNode ("match") $ map buildTree $ map case_rhs cases'
     where
         cases' = filter caseFilter cases
+
 buildTree (Gbl (Global name typ args) :@: exps) 
     | varStr name == "nil" = FNode "Const" []
     | varStr name == "one" = FNode "Const" []
     | varStr name == "Z" = FNode "Const" []
     | otherwise = FNode "Func" $ map buildTree exps
+
 buildTree (Lam locals e) = FNode "Lambda" [buildTree e]
 
 buildTree e = trace (show e) $ FNode "unknown" []

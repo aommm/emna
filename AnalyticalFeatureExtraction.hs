@@ -34,7 +34,7 @@ analyseSymbolic ((lemmaName, features):xs) = (lemmaName, f'):rest
         nDistFeats = length $ nub features -- number of distinct features
         ratio = intdiv nDistFeats nFeats -- 
         (_,mostPopular) = most (freq features) -- most popular feature of the lemma
-        f' = ["_length " ++ (show nFeats), "_lengthDistinct " ++ (show nDistFeats), "_distinctRatio " ++ (printf "%.1f" $ ratio), "_popular " ++ mostPopular]
+        f' = ["length " ++ (show nFeats), "lengthDistinct " ++ (show nDistFeats), "distinctRatio " ++ (printf "%.1f" $ ratio), "popular " ++ mostPopular]
         -- f' = []
 
 analyseSymbolicLemmaFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map String (Formula a) -> [(String, [Feat])]
@@ -46,8 +46,8 @@ analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s
         (_, features') = head fs
         same = sameSymbols (fm_body $ fromJust $ M.lookup lemmaName ls)
         exactSame = exactSameSymbols (fm_body $ fromJust $ M.lookup lemmaName ls)
-        commutative = ("_commutative", (if exactSame then (isCommutative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
-        associative = ("_associative", (if exactSame then (isAssociative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
+        commutative = ("commutative", (if exactSame then (isCommutative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
+        associative = ("associative", (if exactSame then (isAssociative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
         mainF = mainFunction (fm_body $ fromJust $ M.lookup lemmaName ls)
         -- rightMainFunction = ("_leftMainFunction", mainFunction (fm_body $ fromJust $ M.lookup lemmaName ls))
         -- hasList = ("_hasList", hasList (fm_body $ fromJust $ M.lookup lemmaName ls))
@@ -55,12 +55,12 @@ analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s
 
 analyseSymbolicFunctionFeatures :: [(String, [Feat])] -> [(String, [Feat])]
 analyseSymbolicFunctionFeatures [] = []
-analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, map (\s -> ("f " ++ s, "afs")) $ something $ features'):rest
+analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, map (\s -> (s, "afs")) $ something $ features'):rest
     where
         rest = analyseSymbolicFunctionFeatures xs
         fs = analyseSymbolic [(fName, features)]
         (_, features') = head fs
-        -- rec = ("_recursive", isRecursive fName features) -- is the function recursive? Just looking for the function name among the features
+        -- rec = ("recursive", isRecursive fName features) -- is the function recursive? Just looking for the function name among the features
 
 something :: [String] -> [String]
 something [] = ["nothing"]

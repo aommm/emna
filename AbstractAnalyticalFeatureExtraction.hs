@@ -34,20 +34,20 @@ analyseAbstract ((lemmaName, features):xs) = (lemmaName, f'):rest
         nDistFeats = length $ nub features -- number of distinct features
         ratio = intdiv nDistFeats nFeats
         (_,mostPopular) = most (freq features) -- most popular feature of the lemma
-        f' = ["_abstractlength " ++ (show nFeats), "_abstractLengthDistinct " ++ (show nDistFeats), "_abstractDistinctRatio " ++ (printf "%.1f" $ ratio), "_abstractPopular " ++ mostPopular]
+        f' = ["abstractlength " ++ (show nFeats), "abstractLengthDistinct " ++ (show nDistFeats), "abstractDistinctRatio " ++ (printf "%.1f" $ ratio), "abstractPopular " ++ mostPopular]
 
 analyseAbstractLemmaFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map String (Formula a) -> [(String, [Feat])]
 analyseAbstractLemmaFeatures [] _ = []
-analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "ala")) $ f' ++ ["_innerFunctionDepth " ++ show iFDepth] ++ (getBooleanFeatures [iF])):rest
+analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "ala")) $ f' ++ ["innerFunctionDepth " ++ show iFDepth] ++ (getBooleanFeatures [iF])):rest
     where
         rest = analyseAbstractLemmaFeatures xs ls
         [(name, f')] = analyseAbstract [(lemmaName, features)]
         iFDepth = innerFunctionDepth (fm_body $ fromJust $ M.lookup lemmaName ls)
-        iF = ("_innerFunctionApplication", iFDepth >= 2)
+        iF = ("innerFunctionApplication", iFDepth >= 2)
     
 analyseAbstractFunctionFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map a (Function a) -> [(String, [Feat])]
 analyseAbstractFunctionFeatures [] _ = []
-analyseAbstractFunctionFeatures ((funcName, features):xs) fs = (funcName, map (\s -> ("f " ++ s, "afa")) $ f' ++ ["_nArgs " ++ (show nArgs)]):rest
+analyseAbstractFunctionFeatures ((funcName, features):xs) fs = (funcName, map (\s -> (s, "afa")) $ f' ++ ["nArgs " ++ (show nArgs)]):rest
     where
         rest = analyseAbstractFunctionFeatures xs fs
         (_,function) = fromJust $ find (\(f,_) -> (varStr f) == funcName) (M.toList fs)

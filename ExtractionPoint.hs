@@ -42,8 +42,6 @@ runSchemesLibrary fms funcs schemes depth = do
     let lemmaFeats = map snd $ filter (\(k,_) -> elem k schemes || k == "ls") $ filter (\(_,v) -> length v > 0) [("ls",ls),("la",la),("als",als),("ala",ala)]
     let functionFeats = map snd $ filter (\(k,_) -> elem k schemes) $ filter (\(_,v) -> length v > 0) [("afs",afs),("afa",afa),("fs",fs),("fa",fa)]
 
-    putStrLn $ "heheh = " ++ (show functionFeats)
-
     let lemmaNames = M.keys fms
 
     let firstHalf = (if length lemmaFeats == 0 then (emptyLemmaList lemmaNames) else (generateHalf lemmaFeats))

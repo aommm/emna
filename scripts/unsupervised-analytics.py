@@ -7,10 +7,6 @@ import sys
 import sh
 import numpy
 
-commutative_lemmas = ['lemma-100', 'lemma-105', 'lemma-110', 'lemma-189', 'lemma-196', 'lemma-337', 'lemma-347', 'lemma-357', 'lemma-39', 'lemma-427', 'lemma-55', 'lemma-65', 'lemma-95']
-associative_lemmas = ['lemma-101', 'lemma-108', 'lemma-24', 'lemma-429', 'lemma-68', 'lemma-91', 'lemma-98']
-tail_recursive_lemmas = ['lemma-381','lemma-371','lemma-380']
-
 def run(rows, schemes, maxdf, n_clusters, y):
   #init=numpy.array([[1,0,0], [0,1,0], [0,0,1]])
   clf = KMeans(n_clusters=n_clusters)

@@ -45,7 +45,7 @@ main = do
                 Right lib@(Library fs _ ls) -> do
                     -- (Library fs' _ ls') <- filterNonInductiveLemmas lib
                     -- Prepping the database
-                    putStrLn connString
+                    -- putStrLn connString
                     conn <- connectPostgreSQL (pack connString)
                     clearDB conn
                     let thy = libToThy lib

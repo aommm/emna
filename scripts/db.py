@@ -34,8 +34,8 @@ def get_features_from_rows(schemes,rows,maxdf,binary, tfidf):
   for [lemma, feature, scheme] in rows:
     if not lemma in features:
       features[lemma] = dict()
-    features[lemma][feature] = 1
-  
+    features[lemma][scheme + " " + feature] = 1
+
   if tfidf:
     # Mergeing features into one long string per lemma, separated by #
     concFeats = dict()
@@ -95,15 +95,16 @@ def get_features(maxdf):
   for [lemma, feature, scheme] in rows:
     if not lemma in features:
       features[lemma] = dict()
-    features[lemma][feature] = 1
+    features[lemma][scheme + " " + feature] = 1
   
+  print features
+
   # Mergeing features into one long string per lemma, separated by #
   concFeats = dict()
   for lemma in features:
     concFeats[lemma] = []
     for f in features[lemma]:
       concFeats[lemma].append(f)
-
 
     concFeats[lemma] = "#".join(concFeats[lemma])
 

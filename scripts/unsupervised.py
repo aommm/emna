@@ -8,9 +8,8 @@ import sh
 import numpy
 
 n_clusters = None
-#commutative_lemmas = ['lemma-100', 'lemma-105', 'lemma-110', 'lemma-189', 'lemma-196', 'lemma-337', 'lemma-347', 'lemma-357', 'lemma-39', 'lemma-427', 'lemma-55', 'lemma-65', 'lemma-95']
-#associative_lemmas = ['lemma-101', 'lemma-108', 'lemma-24', 'lemma-429', 'lemma-68', 'lemma-91', 'lemma-98']
-#tail_recursive_lemmas = ['lemma-381','lemma-371','lemma-380']
+commutative = ['lemma-1','lemma-21','lemma-22','lemma-23','lemma-25']
+generalisation = ['lemma-26','lemma-27','lemma-28','lemma-29','lemma-30','lemma-31','lemma-32','lemma-33','lemma-34']
 
 def run():
   #init=numpy.array([[1,0,0], [0,1,0], [0,0,1]])
