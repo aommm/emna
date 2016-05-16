@@ -29,36 +29,39 @@ except:
   sys.exit(0)
 
 # Create feature matrix
-def get_features_from_rows(schemes,rows,maxdf,binary, tfidf):
+def get_features_from_rows(schemes,rows):
   features = dict()
   for [lemma, feature, scheme] in rows:
     if not lemma in features:
       features[lemma] = dict()
     features[lemma][scheme + " " + feature] = 1
 
-  if tfidf:
-    # Mergeing features into one long string per lemma, separated by #
-    concFeats = dict()
-    for lemma in features:
-      concFeats[lemma] = []
-      for f in features[lemma]:
-        concFeats[lemma].append(f)
+  v = DictVectorizer()
+  firstMatrix = v.fit_transform([features[lemma] for lemma in features])
 
+  transformer = TfidfTransformer()
+  countMatrix = transformer.fit_transform(firstMatrix)
 
-      concFeats[lemma] = "#".join(concFeats[lemma])
+  return countMatrix, v, features
 
-    concFeatsList = [concFeats[lemma] for lemma in concFeats]
+# Create feature matrix
+def get_features():
+  # Get from db
+  rows = load_features()
+  # Create dict
+  features = dict()
+  for [lemma, feature, scheme] in rows:
+    if not lemma in features:
+      features[lemma] = dict()
+    features[lemma][scheme + " " + feature] = 1
 
-    vectorizer = TfidfVectorizer(binary=binary,max_df=maxdf,analyzer=partial(nltk.regexp_tokenize, pattern='[^#\s][^\#]*[^#\s]*'))
-    countMatrix = vectorizer.fit_transform(concFeatsList)
+  v = DictVectorizer()
+  firstMatrix = v.fit_transform([features[lemma] for lemma in features])
 
-    return countMatrix, vectorizer
-  else:
-    features_arr = [features[lemma] for lemma in features]
-    v = DictVectorizer()
-    matrix = v.fit_transform(features_arr)
+  transformer = TfidfTransformer()
+  countMatrix = transformer.fit_transform(firstMatrix)
 
-    return matrix, v
+  return countMatrix, v, features
 
 def load_features():
   cur = conn.cursor()
@@ -85,38 +88,6 @@ def get_classes():
   # Convert to numerical thingy
   classes_arr = numpy.array(list(classes_list))
   return classes_arr    
-
-# Create feature matrix
-def get_features(maxdf):
-  # Get from db
-  rows = load_features()
-  # Create dict
-  features = dict()
-  for [lemma, feature, scheme] in rows:
-    if not lemma in features:
-      features[lemma] = dict()
-    features[lemma][scheme + " " + feature] = 1
-  
-  print features
-
-  # Mergeing features into one long string per lemma, separated by #
-  concFeats = dict()
-  for lemma in features:
-    concFeats[lemma] = []
-    for f in features[lemma]:
-      concFeats[lemma].append(f)
-
-    concFeats[lemma] = "#".join(concFeats[lemma])
-
-  concFeatsList = [concFeats[lemma] for lemma in concFeats]
-
-  vectorizer = TfidfVectorizer(analyzer=partial(nltk.regexp_tokenize, pattern='[^#\s][^\#]*[^#\s]*'))
-  countMatrix = vectorizer.fit_transform(concFeatsList)
-
-#  for i,name in enumerate(vectorizer.get_feature_names()):
-#    print "%s, %f" % (name, vectorizer.idf_[i])
-
-  return countMatrix, vectorizer, features
 
 # Create feature matrix
 def get_function_features():

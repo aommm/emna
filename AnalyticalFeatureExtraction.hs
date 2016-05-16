@@ -35,11 +35,10 @@ analyseSymbolic ((lemmaName, features):xs) = (lemmaName, f'):rest
         ratio = intdiv nDistFeats nFeats -- 
         (_,mostPopular) = most (freq features) -- most popular feature of the lemma
         f' = ["length " ++ (show nFeats), "lengthDistinct " ++ (show nDistFeats), "distinctRatio " ++ (printf "%.1f" $ ratio), "popular " ++ mostPopular]
-        -- f' = []
 
 analyseSymbolicLemmaFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map String (Formula a) -> [(String, [Feat])]
 analyseSymbolicLemmaFeatures [] _ = []
-analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "als")) $ something $ features' ++ (getBooleanFeatures [commutative, associative])):rest
+analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "als")) $ features' ++ (getBooleanFeatures [commutative, associative])):rest
     where
         rest = analyseSymbolicLemmaFeatures xs ls
         fs = analyseSymbolic [(lemmaName, features)]
@@ -49,34 +48,14 @@ analyseSymbolicLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s
         commutative = ("commutative", (if exactSame then (isCommutative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
         associative = ("associative", (if exactSame then (isAssociative (fm_body $ fromJust $ M.lookup lemmaName ls)) else False))
         mainF = mainFunction (fm_body $ fromJust $ M.lookup lemmaName ls)
-        -- rightMainFunction = ("_leftMainFunction", mainFunction (fm_body $ fromJust $ M.lookup lemmaName ls))
-        -- hasList = ("_hasList", hasList (fm_body $ fromJust $ M.lookup lemmaName ls))
-    -- let distributive = (if (same && not exactSame) then (isDistributive (fm_body $ fromJust $ M.lookup lemmaName ls)) else False)
-
+  
 analyseSymbolicFunctionFeatures :: [(String, [Feat])] -> [(String, [Feat])]
 analyseSymbolicFunctionFeatures [] = []
-analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, map (\s -> (s, "afs")) $ something $ features'):rest
+analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, map (\s -> (s, "afs")) $ features'):rest
     where
         rest = analyseSymbolicFunctionFeatures xs
         fs = analyseSymbolic [(fName, features)]
         (_, features') = head fs
-        -- rec = ("recursive", isRecursive fName features) -- is the function recursive? Just looking for the function name among the features
-
-something :: [String] -> [String]
-something [] = ["nothing"]
-something (x:xs) = (x:xs)
-
-mainFunction :: (Show a, Name a) => Expr a -> String
-mainFunction (Quant _ _ _ (Builtin Equal :@: [e1, e2]))
-    | lhsMain == rhsMain || (not (lhsMain == "var") && rhsMain == "var") = lhsMain
-    | lhsMain == rhsMain || (lhsMain == "var" && not (rhsMain == "var")) = rhsMain
-    | otherwise = "none"
-    where
-        lhsMain = mainFunction e1
-        rhsMain = mainFunction e2
-mainFunction (Gbl (Global name1 _ _) :@: _) = varStr name1
-mainFunction _ = "var"
-
 getBooleanFeatures :: [(String, Bool)] -> [String]
 getBooleanFeatures ls = map (\(y,b) -> y) $ filter (\(y,b) -> b) ls
 
@@ -119,20 +98,6 @@ isAssociative' (Gbl (Global name1 _ _) :@: [fab,c]) (Gbl (Global name2 _ _) :@: 
         (Gbl (Global namefab _ _) :@: [a', b]) = fab
         (Gbl (Global namefbc _ _) :@: [b',c']) = fbc
 isAssociative' _ _ = False
-
-isDistributive :: (Show a, Name a) => Expr a -> Bool
-isDistributive (Quant _ _ _ (Builtin Equal :@: [e1, e2])) = isDistributive' e1 e2
-isDistributive _ = False
-
-isDistributive' :: (Show a, Name a) => Expr a -> Expr a -> Bool
-isDistributive' g1@(Gbl (Global _ _ _) :@: [f1]) g2@(Gbl (Global _ _ _) :@: args)
-    | isFunction f1 && (all isFunction args) = (all (areTheSame g1) args) && areTheSame f1 g2 && sameBottomArguments
-    | otherwise = False
-    where
-        sameBottomArguments = all (\(x,y) -> areTheSame x y) $ zip (sort f1args) (sort argsOfG)
-        f1'@(Gbl (Global _ _ _) :@: f1args) = f1
-        argsOfG = map (\(Gbl (Global _ _ _) :@: [arg]) -> arg) args
-isDistributive' _ _ = False
 
 isFunctionWithArgs :: (Show a, Name a) => Expr a -> Int -> Bool
 isFunctionWithArgs (Gbl (Global _ _ _) :@: args) len = (length args == len)
