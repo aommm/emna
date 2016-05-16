@@ -29,29 +29,36 @@ except:
   sys.exit(0)
 
 # Create feature matrix
-def get_features_from_rows(schemes,rows,maxdf):
+def get_features_from_rows(schemes,rows,maxdf,binary, tfidf):
   features = dict()
   for [lemma, feature, scheme] in rows:
     if not lemma in features:
       features[lemma] = dict()
     features[lemma][feature] = 1
   
-  # Mergeing features into one long string per lemma, separated by #
-  concFeats = dict()
-  for lemma in features:
-    concFeats[lemma] = []
-    for f in features[lemma]:
-      concFeats[lemma].append(f)
+  if tfidf:
+    # Mergeing features into one long string per lemma, separated by #
+    concFeats = dict()
+    for lemma in features:
+      concFeats[lemma] = []
+      for f in features[lemma]:
+        concFeats[lemma].append(f)
 
 
-    concFeats[lemma] = "#".join(concFeats[lemma])
+      concFeats[lemma] = "#".join(concFeats[lemma])
 
-  concFeatsList = [concFeats[lemma] for lemma in concFeats]
+    concFeatsList = [concFeats[lemma] for lemma in concFeats]
 
-  vectorizer = TfidfVectorizer(max_df=maxdf,analyzer=partial(nltk.regexp_tokenize, pattern='[^#\s][^\#]*[^#\s]*'))
-  countMatrix = vectorizer.fit_transform(concFeatsList)
+    vectorizer = TfidfVectorizer(binary=binary,max_df=maxdf,analyzer=partial(nltk.regexp_tokenize, pattern='[^#\s][^\#]*[^#\s]*'))
+    countMatrix = vectorizer.fit_transform(concFeatsList)
 
-  return countMatrix, vectorizer
+    return countMatrix, vectorizer
+  else:
+    features_arr = [features[lemma] for lemma in features]
+    v = DictVectorizer()
+    matrix = v.fit_transform(features_arr)
+
+    return matrix, v
 
 def load_features():
   cur = conn.cursor()

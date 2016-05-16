@@ -60,7 +60,7 @@ analyseSymbolicFunctionFeatures ((fName, features):xs) = (fName, map (\s -> ("f 
         rest = analyseSymbolicFunctionFeatures xs
         fs = analyseSymbolic [(fName, features)]
         (_, features') = head fs
-        rec = ("_recursive", isRecursive fName features) -- is the function recursive? Just looking for the function name among the features
+        -- rec = ("_recursive", isRecursive fName features) -- is the function recursive? Just looking for the function name among the features
 
 something :: [String] -> [String]
 something [] = ["nothing"]

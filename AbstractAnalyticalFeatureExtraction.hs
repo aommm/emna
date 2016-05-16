@@ -38,7 +38,7 @@ analyseAbstract ((lemmaName, features):xs) = (lemmaName, f'):rest
 
 analyseAbstractLemmaFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map String (Formula a) -> [(String, [Feat])]
 analyseAbstractLemmaFeatures [] _ = []
-analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "ala")) $ f' ++ ["_innerFunctionDepth " ++ iFDepth] ++ (getBooleanFeatures [iF])):rest
+analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "ala")) $ f' ++ ["_innerFunctionDepth " ++ show iFDepth] ++ (getBooleanFeatures [iF])):rest
     where
         rest = analyseAbstractLemmaFeatures xs ls
         [(name, f')] = analyseAbstract [(lemmaName, features)]
