@@ -33,7 +33,7 @@ analyseSymbolic ((lemmaName, features):xs) = (lemmaName, f'):rest
         nFeats = length features -- number of features
         nDistFeats = length $ nub features -- number of distinct features
         ratio = intdiv nDistFeats nFeats -- 
-        (_,mostPopular) = most (freq features) -- most popular feature of the lemma
+        (mostPopular,_) = trace (lemmaName ++ " " ++ show features) $ most (freq features) -- most popular feature of the lemma
         f' = ["length " ++ (show nFeats), "lengthDistinct " ++ (show nDistFeats), "distinctRatio " ++ (printf "%.1f" $ ratio), "popular " ++ mostPopular]
 
 analyseSymbolicLemmaFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map String (Formula a) -> [(String, [Feat])]

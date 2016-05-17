@@ -33,6 +33,8 @@ getLemmaSymbols ls depth
             (k:ks) = M.keys ls
             name = k
             tree = buildTree (fm_body f)
+            -- putStrLn $ "-------------" ++ name ++ "--------------------"
+            --printTree tree
             trees = extractSubTrees depth tree
             features = map (\y -> (y, "ls")) $ concat $ map extractFeatures trees
 

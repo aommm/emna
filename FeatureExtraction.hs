@@ -29,6 +29,7 @@ type Feat = (String, String) -- Feature string and what scheme
 
 clearDB :: Connection -> IO ()
 clearDB conn = do
+    execute_ conn "delete from hs_function_feature"
     execute_ conn "delete from hs_lemma_feature"
     execute_ conn "delete from hs_lemma_using"
     execute_ conn "delete from hs_lemma" 

@@ -65,9 +65,19 @@ innerFunctionDepth (Quant _ _ _ (Builtin Equal :@: [e1, e2])) = maximum [lhs, rh
     where
         lhs = innerFunctionDepth e1
         rhs = innerFunctionDepth e2
-innerFunctionDepth (Gbl (Global name typ args) :@: []) = 1
+innerFunctionDepth gbl@(Gbl (Global name typ args) :@: []) 
+    | isConstant gbl = 0 
+    | otherwise = trace (show gbl) $ 1
 innerFunctionDepth (Gbl (Global name typ args) :@: exps) = 1 + (maximum $ map innerFunctionDepth exps)
 innerFunctionDepth _ = 0
+
+isConstant :: (Show a, Name a) => Expr a -> Bool
+isConstant (Gbl (Global name typ args) :@: []) 
+    | varStr name == "nil" = True
+    | varStr name == "one" = True
+    | varStr name == "Z" = True
+    | otherwise = False
+isConstant _ = False
 
 most :: [(Int, Feat)] -> Feat
 most list = f
