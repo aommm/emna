@@ -33,7 +33,7 @@ analyseAbstract ((lemmaName, features):xs) = (lemmaName, f'):rest
         nFeats = length features -- number of features
         nDistFeats = length $ nub features -- number of distinct features
         ratio = intdiv nDistFeats nFeats
-        (_,mostPopular) = most (freq features) -- most popular feature of the lemma
+        (mostPopular,_) = most (freq features) -- most popular feature of the lemma
         f' = ["abstractlength " ++ (show nFeats), "abstractLengthDistinct " ++ (show nDistFeats), "abstractDistinctRatio " ++ (printf "%.1f" $ ratio), "abstractPopular " ++ mostPopular]
 
 analyseAbstractLemmaFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map String (Formula a) -> [(String, [Feat])]
