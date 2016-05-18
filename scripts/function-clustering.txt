@@ -1,0 +1,459 @@
+#####################################################################
+
+652 features are used...
+------------------------------------
+Cluster 0
+count
+equal
+even
+exp
+mult
+rotate
+
+Cluster summary: 
+6 number of lemmas
+
+------------------------------------
+Cluster 1
+append
+double
+drop
+elem
+fac
+half
+insert2
+intersect2
+isort
+le
+length
+mult2
+one
+plus
+qexp
+qfac
+qrev
+qrevflat
+rev
+revflat
+sorted
+subset2
+unequal
+union2
+
+Cluster summary: 
+24 number of lemmas
+
+
+#####################################################################
+
+652 features are used...
+------------------------------------
+Cluster 0
+append
+double
+drop
+elem
+fac
+half
+insert2
+intersect2
+isort
+le
+length
+mult2
+one
+plus
+qexp
+qfac
+qrev
+qrevflat
+rev
+revflat
+sorted
+subset2
+unequal
+union2
+
+Cluster summary: 
+24 number of lemmas
+
+------------------------------------
+Cluster 1
+count
+equal
+even
+exp
+mult
+rotate
+
+Cluster summary: 
+6 number of lemmas
+
+
+#####################################################################
+
+652 features are used...
+------------------------------------
+Cluster 0
+append
+double
+drop
+elem
+fac
+half
+insert2
+intersect2
+isort
+le
+length
+mult2
+one
+plus
+qexp
+qfac
+rev
+sorted
+subset2
+unequal
+union2
+
+Cluster summary: 
+21 number of lemmas
+
+------------------------------------
+Cluster 1
+count
+equal
+even
+exp
+mult
+qrev
+qrevflat
+revflat
+rotate
+
+Cluster summary: 
+9 number of lemmas
+
+
+#####################################################################
+
+652 features are used...
+------------------------------------
+Cluster 0
+append
+count
+double
+drop
+elem
+fac
+half
+insert2
+intersect2
+isort
+le
+length
+mult2
+one
+plus
+qexp
+qfac
+qrev
+qrevflat
+rev
+revflat
+sorted
+subset2
+unequal
+union2
+
+Cluster summary: 
+25 number of lemmas
+
+------------------------------------
+Cluster 1
+equal
+even
+exp
+mult
+rotate
+
+Cluster summary: 
+5 number of lemmas
+
+
+#####################################################################
+
+652 features are used...
+------------------------------------
+Cluster 0
+append
+double
+drop
+elem
+fac
+half
+insert2
+intersect2
+isort
+le
+length
+mult2
+one
+plus
+qexp
+qfac
+qrev
+qrevflat
+rev
+revflat
+sorted
+subset2
+unequal
+union2
+
+Cluster summary: 
+24 number of lemmas
+
+------------------------------------
+Cluster 1
+count
+equal
+even
+exp
+mult
+rotate
+
+Cluster summary: 
+6 number of lemmas
+
+
+#####################################################################
+
+652 features are used...
+------------------------------------
+Cluster 0
+append
+double
+drop
+elem
+fac
+half
+insert2
+intersect2
+isort
+le
+length
+mult2
+one
+plus
+qexp
+qfac
+qrev
+qrevflat
+rev
+revflat
+sorted
+subset2
+unequal
+union2
+
+Cluster summary: 
+24 number of lemmas
+
+------------------------------------
+Cluster 1
+count
+equal
+even
+exp
+mult
+rotate
+
+Cluster summary: 
+6 number of lemmas
+
+
+#####################################################################
+
+652 features are used...
+------------------------------------
+Cluster 0
+count
+equal
+even
+exp
+mult
+rotate
+
+Cluster summary: 
+6 number of lemmas
+
+------------------------------------
+Cluster 1
+append
+double
+drop
+elem
+fac
+half
+insert2
+intersect2
+isort
+le
+length
+mult2
+one
+plus
+qexp
+qfac
+qrev
+qrevflat
+rev
+revflat
+sorted
+subset2
+unequal
+union2
+
+Cluster summary: 
+24 number of lemmas
+
+
+#####################################################################
+
+652 features are used...
+------------------------------------
+Cluster 0
+append
+double
+drop
+elem
+fac
+half
+insert2
+intersect2
+isort
+le
+length
+mult2
+one
+plus
+qexp
+qfac
+qrev
+qrevflat
+rev
+revflat
+sorted
+subset2
+unequal
+union2
+
+Cluster summary: 
+24 number of lemmas
+
+------------------------------------
+Cluster 1
+count
+equal
+even
+exp
+mult
+rotate
+
+Cluster summary: 
+6 number of lemmas
+
+
+#####################################################################
+
+652 features are used...
+------------------------------------
+Cluster 0
+append
+double
+drop
+elem
+fac
+half
+insert2
+isort
+le
+length
+mult2
+one
+plus
+qexp
+qfac
+rev
+sorted
+subset2
+unequal
+union2
+
+Cluster summary: 
+20 number of lemmas
+
+------------------------------------
+Cluster 1
+count
+equal
+even
+exp
+intersect2
+mult
+qrev
+qrevflat
+revflat
+rotate
+
+Cluster summary: 
+10 number of lemmas
+
+
+#####################################################################
+
+652 features are used...
+------------------------------------
+Cluster 0
+count
+equal
+even
+exp
+mult
+mult2
+qrevflat
+revflat
+rotate
+
+Cluster summary: 
+9 number of lemmas
+
+------------------------------------
+Cluster 1
+append
+double
+drop
+elem
+fac
+half
+insert2
+intersect2
+isort
+le
+length
+one
+plus
+qexp
+qfac
+qrev
+rev
+sorted
+subset2
+unequal
+union2
+
+Cluster summary: 
+21 number of lemmas
+

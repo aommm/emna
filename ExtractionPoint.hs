@@ -52,10 +52,12 @@ runSchemesLibrary fms funcs schemes depth = do
 runFunctionSchemesLibrary :: (Show a, Name a) => Map String (Formula a) -> Map a (Function a) -> [String] -> Int -> IO ([(String, [Feat])])
 runFunctionSchemesLibrary fms funcs schemes depth = do
 
-    let fs = (if (elem "fs" schemes) then (getFunctionSymbols funcs depth) else [])
-    let fa = (if (elem "fa" schemes) then (getAbstractFunctions funcs depth) else [])
+    let fs = (if (elem "fs" schemes || elem "afs" schemes) then (getFunctionSymbols funcs depth) else [])
+    let fa = (if (elem "fa" schemes || elem "afa" schemes) then (getAbstractFunctions funcs depth) else [])
+    let afs = (if (elem "afs" schemes) then (analyseSymbolicFunctionFeatures fs) else [])
+    let afa = (if (elem "afa" schemes) then (analyseAbstractFunctionFeatures fa funcs) else [])
 
-    let functionFeats = map snd $ filter (\(k,_) -> elem k schemes) $ filter (\(_,v) -> length v > 0) [("fs",fs),("fa",fa)]
+    let functionFeats = map snd $ filter (\(k,_) -> elem k schemes) $ filter (\(_,v) -> length v > 0) [("fs",fs),("fa",fa),("afs",afs),("afa",afa)]
 
     return $ generateHalf functionFeats
 

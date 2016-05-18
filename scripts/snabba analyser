@@ -1,0 +1,101 @@
+
+
+##### Lemma-klustring med lemma-features #######
+
+Lägst 10
+Högst 13 (90% av fallen)
+
+9 av 10 gånger var klustret exakt:
+
+lemma-1, length (xs++ys) = length (ys++xs)
+lemma-22, half (length (xs++ys)) = half (length (ys++xs))
+lemma-23, even (n+m) = even (m+n)
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+	lemma-26, rev xs = qrev xs []
+	lemma-27, revflat xs = qrevflat xs []
+	lemma-28, rev (qrev xs []) = xs
+lemma-3, length (xs++xs) = double (length xs)
+	lemma-30, qrev (qrev xs []) [] = xs
+	lemma-31, rotate (length xs) xs = xs
+	lemma-32, fac n = qfac n b
+	lemma-33, (n*m) = mult2 n m Z
+lemma-36, (n`elem`ys) => (n`elem`(xs++ys))
+
+Så lemma 26-28, 30-33 är konsekvent med. I 10e klustret var de flesta av dessa också med.
+
+Dessa ville dock inte vara med:
+lemma-29, rev (rev xs++[]) = xs
+lemma-34, exp n m = qexp n m b
+
+Lemma 26-34 behöver generalisering (according to Learning from TIP), så vi lyckas få 7 av 9 konsekvent i detta kluster.
+Experimenterande med högre eller lägre djup (1, 2 och 4) gav ingen märkbar skillnad.
+Testande av enbart la och ls själva gav inte heller nämnbar skillnad.
+
+
+
+##### Lemma-klustring med funktions-features #######
+
+9 av 10 ggr var klustret exakt:
+
+lemma-11, qrev xs ys = (rev xs++ys)
+lemma-13, sorted (isort xs)
+lemma-14, (n+S n) = S (n+n)
+lemma-19, even (length (xs++xs))
+lemma-2, length (xs++ys) = (length ys+length xs)
+lemma-34, exp n m = qexp n m b
+lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
+lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
+lemma-44, n`elem`insert2 n xs
+lemma-45, (n = m) => (n`elem`insert2 m xs)
+lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
+
+Inget utmärkande för detta kluster.
+Att köra enbart fs eller fa ger samma kluster. Av detta kanske vi kan dra slutsatsen att dessa ger liknande effekter vid klustring.
+
+
+
+
+##### Lemma-klustring med analytiska features #######
+
+Testade alla fyra samtidigt, och fick i 10 av 10 fall det stabila klustret från lemma-features.
+
+lemma-1, length (xs++ys) = length (ys++xs)
+lemma-22, half (length (xs++ys)) = half (length (ys++xs))
+lemma-23, even (n+m) = even (m+n)
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+lemma-26, rev xs = qrev xs []
+lemma-27, revflat xs = qrevflat xs []
+lemma-28, rev (qrev xs []) = xs
+lemma-3, length (xs++xs) = double (length xs)
+lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+lemma-32, fac n = qfac n b
+lemma-33, (n*m) = mult2 n m Z
+lemma-36, (n`elem`ys) => (n`elem`(xs++ys))
+
+Självständigt sett så gav afs nästan detta hela tiden, med små variationer.
+als var ganska varierande, med 9-19 st i lilla klustret. I huvudsak samma lemman, dominerat av svansrekursiva.
+ala är hyffsat stabil, några fler ofta än afs men ibland exakt samma kluster.
+afa var rätt stabil runt 15, liten förlängning av vårt "standardkluster".
+
+
+
+###### Funktions-klustring med funktions-features #######
+
+6 av 10 kluster såg ut såhär:
+count
+equal
+even
+exp
+mult
+rotate
+
+Dessa var med i samtliga kluster, men hade ibland fler.
+
+
+
+
+###### Supervised learning #######
+
+67% som bäst med 0-or-other. Vi får resonera kring att det helt enkelt är för lite data för att detta ska bli bra.
+

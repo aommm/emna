@@ -7,6 +7,8 @@ import sys
 import sh
 import numpy
 
+import warnings
+
 n_clusters = None
 
 def run():
@@ -39,8 +41,8 @@ def run_extract_features(args):
   # Populate SQL db with features for this scheme
   extractFeatures = sh.Command("./scripts/extractFeatures")
   out = extractFeatures(*args)
-  print out
-  print "invoked extractFeatures with args",args
+  # print out
+  #print "invoked extractFeatures with args",args
 
 
 def main():
