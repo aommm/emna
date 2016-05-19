@@ -97,5 +97,23 @@ Dessa var med i samtliga kluster, men hade ibland fler.
 
 ###### Supervised learning #######
 
-67% som bäst med 0-or-other. Vi får resonera kring att det helt enkelt är för lite data för att detta ska bli bra.
+Välja induktionsvariabel:
+
+749.	0.6879 (+/- 0.06)		d = 3		['la', 'ls', 'afa', 'als']
+750.	0.6879 (+/- 0.06)		d = 3		['la', 'ls', 'ala', 'afa', 'als']
+751.	0.6879 (+/- 0.06)		d = 3		['la', 'ls', 'ala', 'afa', 'afs', 'als']
+752.	0.6879 (+/- 0.06)		d = 3		['fa', 'la', 'ls', 'afs']
+753.	0.6879 (+/- 0.06)		d = 3		['fa', 'la', 'ls', 'afs', 'als']
+754.	0.6879 (+/- 0.06)		d = 3		['fa', 'la', 'ls', 'afa']
+755.	0.6879 (+/- 0.06)		d = 3		['fa', 'la', 'ls', 'afa', 'als']
+756.	0.6879 (+/- 0.06)		d = 3		['fa', 'la', 'ls', 'afa', 'afs']
+757.	0.6879 (+/- 0.06)		d = 3		['fa', 'la', 'ls', 'afa', 'afs', 'als']
+758.	0.6879 (+/- 0.06)		d = 3		['fa', 'la', 'ls', 'ala', 'afa']
+759.	0.6879 (+/- 0.06)		d = 3		['fa', 'la', 'ls', 'ala', 'afa', 'afs']
+760.	0.6974 (+/- 0.05)		d = 3		['ls', 'afa', 'afs', 'als']
+761.	0.6974 (+/- 0.05)		d = 3		['ls', 'ala', 'afa', 'als']
+762.	0.6974 (+/- 0.05)		d = 3		['ls', 'ala', 'afa', 'afs']
+763.	0.6974 (+/- 0.05)		d = 3		['ls', 'ala', 'afa', 'afs', 'als']
+764.	0.6984 (+/- 0.07)		d = 1		['la']
+
 

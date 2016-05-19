@@ -22,6 +22,8 @@ def compute_score(schemes,classes,rows):
   clf = BernoulliNB()
   features, v, fs = get_features_from_rows(schemes,rows)
 
+  print len(v.get_feature_names())
+
   result = cross_validation.cross_val_score(clf, features, classes, cv=5)
   return result
 
@@ -58,7 +60,7 @@ def main():
 
   all_schemes = "fa fs la ls ala afa afs als"
   scheme_combos = ["","fa"], ["","fs"], ["","la"], ["", "ls"], ["","ala"], ["","afa"], ["","afs"], ["","als"]
-  depth_range = range(1,5)
+  depth_range = range(1,4)
   arg_combinations = list(itertools.product(*scheme_combos))
   n = len(depth_range)*len(arg_combinations)
   results = []
@@ -76,7 +78,7 @@ def main():
   #print ""
   print "Index\tAverage score\t\tFeature extraction arguments"
   for i,result in enumerate(results_sorted):
-    nice_str = "%i.\t%0.2f (+/- %0.2f)\t\td = %i\t\t" % (i, result['mean'], result['deviation'], result['depth'])
+    nice_str = "%i.\t%0.4f (+/- %0.2f)\t\td = %i\t\t" % (i, result['mean'], result['deviation'], result['depth'])
     print nice_str, result['args']
 
 if __name__ == '__main__':

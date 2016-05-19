@@ -32,9 +32,10 @@ except:
 def get_features_from_rows(schemes,rows):
   features = dict()
   for [lemma, feature, scheme] in rows:
-    if not lemma in features:
-      features[lemma] = dict()
-    features[lemma][scheme + " " + feature] = 1
+    if scheme in schemes:
+      if not lemma in features:
+        features[lemma] = dict()
+      features[lemma][scheme + " " + feature] = 1
 
   v = DictVectorizer()
   firstMatrix = v.fit_transform([features[lemma] for lemma in features])
