@@ -26,6 +26,15 @@ Extracts features from the given library into the PostgreSQL database. Will wipe
 
 Looks for the environment variables `HS_DB_NAME`, `HS_DB_HOST`, `HS_DB_USERNAME` and `HS_DB_PASSWORD`.
 
+A note on filtering and induction variables:
+- In extractFeatures, you can select whether or not to filter away lemmas with no induction variable. This is done by the function filterNonInductiveLemmas.
+- In FeatureExtraction.hs, in the function insertLemmas, you can choose if you will group all non-first-variable-only-lemmas as one group by using the statement which returns either [0] or [1].
+- Make sure to recompile after these changes before running any tests.
+
+#### extractFunctionFeatures.hs
+
+Works like extractFeatures.hs, but only with fs, fa, afa and afs extraction schemes.
+
 #### learn.py
 ```
 python learn.py [/path/to/data]
@@ -46,6 +55,8 @@ TODO
 #### validation.py
 
 #### unsupervised.py
+
+#### unsupervised-functions.py
 
 Other files
 -----------
