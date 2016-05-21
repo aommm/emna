@@ -1,0 +1,89 @@
+Translations from ACL2 to TIP language
+##########################################
+
+# Factorial
+(defun fact (n) (if (zp n) 1 (* n (fact (- n 1)))))
+(define-fun-rec
+  fact
+    ((x Nat)) Nat
+    (match x
+      (case Z one)
+      (case (S y) (mult x (fact (minus x one))))))
+
+(defun helper-fact (n a) (if (zp n) a (helper-fact (- n 1) (* a n))))
+(define-fun-rec
+  helper-fact
+  ((x Nat) (z Nat)) Nat
+  (match x
+    (case Z z)
+    (case (S y) (helper-fact (minus x one) (mult z x)))))
+
+(defun fact-tail (n) (helper-fact n 1))
+(define-fun
+  fact-tail
+  ((x Nat)) Nat (helper-fact x one))
+
+(defthm fact-fact-tail (implies (natp n) (equal (fact-tail n) (fact n))))
+(assert-proof
+  (fact-fact-tail
+    (forall ((x Nat)) (= (fact-tail x) (fact x)))
+  ([] [] structural herp derp)))
+
+# Power
+(defun power (n) (if (zp n) 1 (* 2 (power (- n 1)))))
+(define-fun-rec
+  power
+    ((x Nat)) Nat
+    (match x
+      (case Z one)
+      (case (S y) (mult (S one) (power (minus x one))))))
+
+(defun helper-power (n a) (if (zp n) a (helper-power (- n 1) (+ a a))))
+(define-fun-rec
+  helper-power
+  ((x Nat) (z Nat)) Nat
+  (match x
+    (case Z z)
+    (case (S y) (helper-power (minus x one) (plus z z)))))
+
+(defun power-tail (n) (helper-power n 1))
+(define-fun
+  power-tail
+  ((x Nat)) Nat (helper-power x one))
+
+(defthm power-power-tail (implies (natp n) (equal (power-tail n) (power n))))
+(assert-proof
+  (par (a)
+    power-power-tail
+    (forall ((x Nat)) (= (power-tail x) (power x)))
+  ([] [] structural herp derp)))
+
+# Fibonacci
+(defun fib (n) (if (zp n) 0 (if (equal n 1) 1 (+ (fib (- n 1)) (fib (- n 2))))))
+(define-fun-rec
+  fib
+    ((x Nat)) Nat
+    (match x
+      (case Z Z)
+      (case (S y) (ite (equal x one) one (plus (fib (minus x one)) (fib (minus x (S one))))))))
+
+(defun helper-fib (n j k) (if (zp n) j (if (equal n 1) k (helper-fib (- n 1) k (+ j k))))) 
+
+(define-fun-rec
+  helper-fib
+  ((x Nat) (z Nat) (y Nat)) Nat
+  (match x
+    (case Z z)
+    (case (S y) (ite (equal x one) y (helper-fib (minus x one) y (plus z z))))))
+
+(defun fib-tail (n) (helper-fib n 0 1))
+(define-fun
+  fib-tail
+  ((x Nat)) Nat (helper-fib x Z one))
+
+(defthm fib-fib-tail (implies (natp n) (equal (fib-tail n) (fib n))))
+(assert-proof
+  (par (a)
+    fib-fib-tail
+    (forall ((x Nat)) (= (fib-tail x) (fib x)))
+  ([] [] structural herp derp)))
