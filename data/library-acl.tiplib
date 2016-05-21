@@ -484,13 +484,11 @@
     (forall ((x Nat)) (= (fact-tail x) (fact x)))
   ([] [] structural herp derp)))
 (assert-proof
-  (par (a)
-    power-power-tail
+  (power-power-tail
     (forall ((x Nat)) (= (power-tail x) (power x)))
   ([] [] structural herp derp)))
 (assert-proof
-  (par (a)
-    fib-fib-tail
+  (fib-fib-tail
     (forall ((x Nat)) (= (fib-tail x) (fib x)))
   ([] [] structural herp derp)))
 (assert-proof

@@ -15,6 +15,8 @@ def run():
 
   print "%i features are used..." % len(v.get_feature_names())
 
+  print features
+
   x = clf.fit_predict(features)
   xy = zip(x,y)
   
