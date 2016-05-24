@@ -34,11 +34,13 @@ analyseAbstract ((lemmaName, features):xs) = (lemmaName, f'):rest
         nDistFeats = length $ nub features -- number of distinct features
         ratio = intdiv nDistFeats nFeats
         (mostPopular,_) = most (freq features) -- most popular feature of the lemma
-        f' = ["abstractlength " ++ (show nFeats), "abstractLengthDistinct " ++ (show nDistFeats), "abstractDistinctRatio " ++ (printf "%.1f" $ ratio), "abstractPopular " ++ mostPopular]
+--         f' = ["abstractlength " ++ (show nFeats), "abstractLengthDistinct " ++ (show nDistFeats), "abstractDistinctRatio " ++ (printf "%.1f" $ ratio), "abstractPopular " ++ mostPopular]
+        f' = ["abstractPopular " ++ mostPopular]
 
 analyseAbstractLemmaFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map String (Formula a) -> [(String, [Feat])]
 analyseAbstractLemmaFeatures [] _ = []
-analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "ala")) $ f' ++ ["innerFunctionDepth " ++ show iFDepth] ++ (getBooleanFeatures [iF])):rest
+-- analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "ala")) $ f' ++ ["innerFunctionDepth " ++ show iFDepth] ++ (getBooleanFeatures [iF])):rest
+analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s -> (s, "ala")) $ f'):rest
     where
         rest = analyseAbstractLemmaFeatures xs ls
         [(name, f')] = analyseAbstract [(lemmaName, features)]
