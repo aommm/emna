@@ -41,8 +41,8 @@ insertLemmas :: Name a => Connection -> [Formula a] -> Theory a -> IO ()
 insertLemmas conn [] _ = return ()
 insertLemmas conn (f:xs) thy = do
     let indVariables = getInductionVariables $ fm_info f
-    --let finalIndVars = if (indVariables == [0]) then [0] else [1]
-    let finalIndVars = indVariables
+    let finalIndVars = if (indVariables == [0]) then [0] else [1]
+    --let finalIndVars = indVariables
     execute conn "insert into hs_lemma (name, indvars, body) values (?, ?, ?) " [(fromJust $ getFmName f), ("{" ++ (intercalate "," (map show finalIndVars)) ++ "}"), showFormula f thy ]
     insertLemmas conn xs thy
 

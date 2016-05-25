@@ -76,11 +76,16 @@ isTailRecursive' funcName (Match ex cases)
 isTailRecursive' funcName _ = False
 
 callsItself :: (Show a, Name a) => String -> Expr a -> Bool
-callsItself funcName (Gbl (Global name _ _) :@: _)
-    | varStr name == funcName = True
+callsItself funcName (Gbl (Global name _ _) :@: exps)
+    | (varStr name == funcName) && (atLeastOneFunctionApplication exps) = True
     | otherwise = False
---callsItself funcName m@(Match ex cases) = isTailRecursive' funcName m
+callsItself funcName m@(Match ex cases) = isTailRecursive' funcName m
 callsItself funcName expr = False
+
+atLeastOneFunctionApplication :: (Show a, Name a) => [Expr a] -> Bool
+atLeastOneFunctionApplication ((Gbl (Global name _ _) :@: _):exps) = True
+atLeastOneFunctionApplication (_:exps) = atLeastOneFunctionApplication exps
+atLeastOneFunctionApplication [] = False
 
 getBooleanFeatures :: [(String, Bool)] -> [String]
 getBooleanFeatures ls = map (\(y,b) -> y) $ filter (\(y,b) -> b) ls
