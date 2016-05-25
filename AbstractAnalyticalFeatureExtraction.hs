@@ -49,13 +49,39 @@ analyseAbstractLemmaFeatures ((lemmaName, features):xs) ls = (lemmaName, map (\s
     
 analyseAbstractFunctionFeatures :: (Show a, Name a) => [(String, [Feat])] -> Map a (Function a) -> [(String, [Feat])]
 analyseAbstractFunctionFeatures [] _ = []
-analyseAbstractFunctionFeatures ((funcName, features):xs) fs = (funcName, map (\s -> (s, "afa")) $ f' ++ ["nArgs " ++ (show nArgs)]):rest
+analyseAbstractFunctionFeatures ((funcName, features):xs) fs = (funcName, map (\s -> (s, "afa")) $ f' ++ ["nArgs " ++ (show nArgs)] ++ (getBooleanFeatures [tailRecursive])):rest
     where
         rest = analyseAbstractFunctionFeatures xs fs
         (_,function) = fromJust $ find (\(f,_) -> (varStr f) == funcName) (M.toList fs)
         [(name, f')] = analyseAbstract [(funcName, features)]
         nArgs = numberOfArgs function
+        tailRecursive = ("tailRecursive", isTailRecursive funcName (lookupFunctionFromString funcName (M.toList fs)))
+
+lookupFunctionFromString :: (Show a, Name a) => String -> [(a, Function a)] -> Maybe (Function a)
+lookupFunctionFromString funcName ((id, func):fs) 
+    | varStr id == funcName = Just func
+    | otherwise = lookupFunctionFromString funcName fs
+lookupFunctionFromString _ [] = Nothing
     
+isTailRecursive :: (Show a, Name a) => String -> Maybe (Function a) -> Bool
+isTailRecursive _ Nothing = False
+isTailRecursive funcName (Just func) = isTailRecursive' funcName $ func_body func
+
+isTailRecursive' :: (Show a, Name a) => String -> Expr a -> Bool
+isTailRecursive' funcName (Match ex cases)
+    | length cases == 2 = (callsItself funcName c1) || (callsItself funcName c2)
+    | otherwise = False
+    where
+        [c1, c2] = map case_rhs cases
+isTailRecursive' funcName _ = False
+
+callsItself :: (Show a, Name a) => String -> Expr a -> Bool
+callsItself funcName (Gbl (Global name _ _) :@: _)
+    | varStr name == funcName = True
+    | otherwise = False
+--callsItself funcName m@(Match ex cases) = isTailRecursive' funcName m
+callsItself funcName expr = False
+
 getBooleanFeatures :: [(String, Bool)] -> [String]
 getBooleanFeatures ls = map (\(y,b) -> y) $ filter (\(y,b) -> b) ls
 
