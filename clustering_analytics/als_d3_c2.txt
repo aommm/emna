@@ -530,6 +530,21 @@ connString:dbname='hipspec' host='localhost'
 25 features are used...
 ------------------------------------
 Cluster 0
+lemma-10, rev (rev xs++rev ys) = (ys++xs)
+lemma-11, qrev xs ys = (rev xs++ys)
+lemma-25, half (n+m) = half (m+n)
+lemma-34, exp n m = qexp n m b
+lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
+lemma-4, length (rev xs) = length xs
+lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
+lemma-6, length (qrev xs ys) = (length xs+length ys)
+lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
+
+Cluster summary: 
+9 number of lemmas
+
+------------------------------------
+Cluster 1
 lemma-0, double n = (n+n)
 lemma-1, length (xs++ys) = length (ys++xs)
 lemma-12, half (n+n) = n
@@ -574,21 +589,6 @@ lemma-9, rev (rev xs) = xs
 
 Cluster summary: 
 41 number of lemmas
-
-------------------------------------
-Cluster 1
-lemma-10, rev (rev xs++rev ys) = (ys++xs)
-lemma-11, qrev xs ys = (rev xs++ys)
-lemma-25, half (n+m) = half (m+n)
-lemma-34, exp n m = qexp n m b
-lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
-lemma-4, length (rev xs) = length xs
-lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
-lemma-6, length (qrev xs ys) = (length xs+length ys)
-lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
-
-Cluster summary: 
-9 number of lemmas
 
 ####################################################################
 

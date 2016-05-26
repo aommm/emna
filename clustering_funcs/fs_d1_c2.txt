@@ -2,98 +2,6 @@ connString:dbname='hipspec' host='localhost'
 42 features are used...
 ------------------------------------
 Cluster 0
-count
-drop
-equal
-even
-exp
-insert2
-intersect2
-mult
-mult2
-one
-plus
-qexp
-qfac
-qrevflat
-rev
-rotate
-sorted
-unequal
-union2
-
-Cluster summary: 
-19 number of lemmas
-
-------------------------------------
-Cluster 1
-append
-double
-elem
-fac
-half
-isort
-le
-length
-qrev
-revflat
-subset2
-
-Cluster summary: 
-11 number of lemmas
-
-####################################################################
-
-connString:dbname='hipspec' host='localhost'
-42 features are used...
-------------------------------------
-Cluster 0
-count
-drop
-equal
-even
-exp
-insert2
-intersect2
-mult
-mult2
-one
-plus
-qexp
-qfac
-qrevflat
-rev
-rotate
-sorted
-unequal
-union2
-
-Cluster summary: 
-19 number of lemmas
-
-------------------------------------
-Cluster 1
-append
-double
-elem
-fac
-half
-isort
-le
-length
-qrev
-revflat
-subset2
-
-Cluster summary: 
-11 number of lemmas
-
-####################################################################
-
-connString:dbname='hipspec' host='localhost'
-42 features are used...
-------------------------------------
-Cluster 0
 append
 double
 elem
@@ -324,6 +232,23 @@ connString:dbname='hipspec' host='localhost'
 42 features are used...
 ------------------------------------
 Cluster 0
+append
+double
+elem
+fac
+half
+isort
+le
+length
+qrev
+revflat
+subset2
+
+Cluster summary: 
+11 number of lemmas
+
+------------------------------------
+Cluster 1
 count
 drop
 equal
@@ -347,8 +272,12 @@ union2
 Cluster summary: 
 19 number of lemmas
 
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+42 features are used...
 ------------------------------------
-Cluster 1
+Cluster 0
 append
 double
 elem
@@ -358,11 +287,36 @@ isort
 le
 length
 qrev
+qrevflat
 revflat
 subset2
 
 Cluster summary: 
-11 number of lemmas
+12 number of lemmas
+
+------------------------------------
+Cluster 1
+count
+drop
+equal
+even
+exp
+insert2
+intersect2
+mult
+mult2
+one
+plus
+qexp
+qfac
+rev
+rotate
+sorted
+unequal
+union2
+
+Cluster summary: 
+18 number of lemmas
 
 ####################################################################
 
@@ -416,6 +370,23 @@ connString:dbname='hipspec' host='localhost'
 42 features are used...
 ------------------------------------
 Cluster 0
+append
+double
+elem
+fac
+half
+isort
+le
+length
+qrev
+revflat
+subset2
+
+Cluster summary: 
+11 number of lemmas
+
+------------------------------------
+Cluster 1
 count
 drop
 equal
@@ -439,8 +410,12 @@ union2
 Cluster summary: 
 19 number of lemmas
 
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+42 features are used...
 ------------------------------------
-Cluster 1
+Cluster 0
 append
 double
 elem
@@ -455,4 +430,29 @@ subset2
 
 Cluster summary: 
 11 number of lemmas
+
+------------------------------------
+Cluster 1
+count
+drop
+equal
+even
+exp
+insert2
+intersect2
+mult
+mult2
+one
+plus
+qexp
+qfac
+qrevflat
+rev
+rotate
+sorted
+unequal
+union2
+
+Cluster summary: 
+19 number of lemmas
 

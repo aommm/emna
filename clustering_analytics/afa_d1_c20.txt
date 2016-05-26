@@ -2,17 +2,6 @@ connString:dbname='hipspec' host='localhost'
 9 features are used...
 ------------------------------------
 Cluster 0
-lemma-0, double n = (n+n)
-lemma-2, length (xs++ys) = (length ys+length xs)
-lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
-lemma-4, length (rev xs) = length xs
-lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
-
-Cluster summary: 
-5 number of lemmas
-
-------------------------------------
-Cluster 1
 lemma-11, qrev xs ys = (rev xs++ys)
 lemma-13, sorted (isort xs)
 lemma-14, (n+S n) = S (n+n)
@@ -29,7 +18,7 @@ Cluster summary:
 11 number of lemmas
 
 ------------------------------------
-Cluster 2
+Cluster 1
 lemma-1, length (xs++ys) = length (ys++xs)
 lemma-22, half (length (xs++ys)) = half (length (ys++xs))
 lemma-23, even (n+m) = even (m+n)
@@ -48,184 +37,42 @@ Cluster summary:
 
 ------------------------------------
 Cluster 3
-lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
-lemma-26, rev xs = qrev xs []
-lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
+lemma-0, double n = (n+n)
+lemma-2, length (xs++ys) = (length ys+length xs)
+lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
+lemma-4, length (rev xs) = length xs
+lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 4
+lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 5
+lemma-17, rev (rev xs++ys) = (rev ys++xs)
+lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
+lemma-48, (n`elem`isort xs) => (n`elem`xs)
 
 Cluster summary: 
 3 number of lemmas
 
 ------------------------------------
-Cluster 4
+Cluster 6
+lemma-47, length (isort xs) = length xs
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 7
 lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 5
-lemma-47, length (isort xs) = length xs
-lemma-7, drop n (drop m xs) = drop m (drop n xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 6
-lemma-29, rev (rev xs++[]) = xs
-lemma-44, n`elem`insert2 n xs
-lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 7
-lemma-17, rev (rev xs++ys) = (rev ys++xs)
-lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
-lemma-48, (n`elem`isort xs) => (n`elem`xs)
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 8
-lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 10
-lemma-21, even (length (xs++ys)) = even (length (ys++xs))
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 11
-lemma-15, even (n+n)
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 12
-lemma-10, rev (rev xs++rev ys) = (ys++xs)
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 13
-lemma-25, half (n+m) = half (m+n)
-lemma-40, subset2 xs ys => (intersect2 xs ys = xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 14
-lemma-18, (rev (rev xs)++ys) = rev (rev (xs++ys))
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 15
-lemma-12, half (n+n) = n
-lemma-39, subset2 xs ys => (union2 xs ys = ys)
-lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
-
-Cluster summary: 
-3 number of lemmas
-
-####################################################################
-
-connString:dbname='hipspec' host='localhost'
-9 features are used...
-------------------------------------
-Cluster 0
-lemma-17, rev (rev xs++ys) = (rev ys++xs)
-lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
-lemma-48, (n`elem`isort xs) => (n`elem`xs)
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 1
-lemma-12, half (n+n) = n
-lemma-39, subset2 xs ys => (union2 xs ys = ys)
-lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 2
-lemma-21, even (length (xs++ys)) = even (length (ys++xs))
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 3
-lemma-11, qrev xs ys = (rev xs++ys)
-lemma-13, sorted (isort xs)
-lemma-14, (n+S n) = S (n+n)
-lemma-19, even (length (xs++xs))
-lemma-34, exp n m = qexp n m b
-lemma-38, (n`elem`drop m xs) => (n`elem`xs)
-lemma-45, (n = m) => (n`elem`insert2 m xs)
-lemma-49, count n (isort xs) = count n xs
-lemma-5, length (rev (xs++ys)) = (length xs+length ys)
-lemma-6, length (qrev xs ys) = (length xs+length ys)
-lemma-9, rev (rev xs) = xs
-
-Cluster summary: 
-11 number of lemmas
-
-------------------------------------
-Cluster 4
-lemma-47, length (isort xs) = length xs
-lemma-7, drop n (drop m xs) = drop m (drop n xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 5
-lemma-0, double n = (n+n)
-lemma-2, length (xs++ys) = (length ys+length xs)
-lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
-lemma-4, length (rev xs) = length xs
-lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
-
-Cluster summary: 
-5 number of lemmas
-
-------------------------------------
-Cluster 6
-lemma-1, length (xs++ys) = length (ys++xs)
-lemma-22, half (length (xs++ys)) = half (length (ys++xs))
-lemma-23, even (n+m) = even (m+n)
-lemma-24, even (length (xs++ys)) = even (length ys+length xs)
-lemma-27, revflat xs = qrevflat xs []
-lemma-28, rev (qrev xs []) = xs
-lemma-3, length (xs++xs) = double (length xs)
-lemma-30, qrev (qrev xs []) [] = xs
-lemma-31, rotate (length xs) xs = xs
-lemma-32, fac n = qfac n b
-lemma-33, (n*m) = mult2 n m Z
-lemma-36, (n`elem`ys) => (n`elem`(xs++ys))
-
-Cluster summary: 
-12 number of lemmas
-
-------------------------------------
-Cluster 7
-lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
 
 Cluster summary: 
 1 number of lemmas
@@ -241,165 +88,30 @@ Cluster summary:
 
 ------------------------------------
 Cluster 9
-lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
-lemma-26, rev xs = qrev xs []
-lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
+lemma-12, half (n+n) = n
+lemma-39, subset2 xs ys => (union2 xs ys = ys)
+lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
 
 Cluster summary: 
 3 number of lemmas
 
 ------------------------------------
 Cluster 10
-lemma-15, even (n+n)
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 11
-lemma-10, rev (rev xs++rev ys) = (ys++xs)
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 12
-lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 13
-lemma-25, half (n+m) = half (m+n)
-lemma-40, subset2 xs ys => (intersect2 xs ys = xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 14
-lemma-18, (rev (rev xs)++ys) = rev (rev (xs++ys))
-
-Cluster summary: 
-1 number of lemmas
-
-####################################################################
-
-connString:dbname='hipspec' host='localhost'
-9 features are used...
-------------------------------------
-Cluster 0
-lemma-15, even (n+n)
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 1
-lemma-1, length (xs++ys) = length (ys++xs)
-lemma-22, half (length (xs++ys)) = half (length (ys++xs))
-lemma-23, even (n+m) = even (m+n)
-lemma-24, even (length (xs++ys)) = even (length ys+length xs)
-lemma-27, revflat xs = qrevflat xs []
-lemma-28, rev (qrev xs []) = xs
-lemma-3, length (xs++xs) = double (length xs)
-lemma-30, qrev (qrev xs []) [] = xs
-lemma-31, rotate (length xs) xs = xs
-lemma-32, fac n = qfac n b
-lemma-33, (n*m) = mult2 n m Z
-lemma-36, (n`elem`ys) => (n`elem`(xs++ys))
-
-Cluster summary: 
-12 number of lemmas
-
-------------------------------------
-Cluster 2
-lemma-10, rev (rev xs++rev ys) = (ys++xs)
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 3
-lemma-11, qrev xs ys = (rev xs++ys)
-lemma-13, sorted (isort xs)
-lemma-14, (n+S n) = S (n+n)
-lemma-19, even (length (xs++xs))
-lemma-34, exp n m = qexp n m b
-lemma-38, (n`elem`drop m xs) => (n`elem`xs)
-lemma-45, (n = m) => (n`elem`insert2 m xs)
-lemma-49, count n (isort xs) = count n xs
-lemma-5, length (rev (xs++ys)) = (length xs+length ys)
-lemma-6, length (qrev xs ys) = (length xs+length ys)
-lemma-9, rev (rev xs) = xs
-
-Cluster summary: 
-11 number of lemmas
-
-------------------------------------
-Cluster 5
-lemma-0, double n = (n+n)
-lemma-2, length (xs++ys) = (length ys+length xs)
-lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
-lemma-4, length (rev xs) = length xs
-lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
-
-Cluster summary: 
-5 number of lemmas
-
-------------------------------------
-Cluster 6
 lemma-21, even (length (xs++ys)) = even (length (ys++xs))
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
-Cluster 7
-lemma-29, rev (rev xs++[]) = xs
-lemma-44, n`elem`insert2 n xs
-lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 8
-lemma-47, length (isort xs) = length xs
-lemma-7, drop n (drop m xs) = drop m (drop n xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 9
-lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
+Cluster 11
+lemma-15, even (n+n)
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
-Cluster 10
-lemma-17, rev (rev xs++ys) = (rev ys++xs)
-lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
-lemma-48, (n`elem`isort xs) => (n`elem`xs)
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 11
-lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
-lemma-26, rev xs = qrev xs []
-lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
 Cluster 12
-lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
+lemma-10, rev (rev xs++rev ys) = (ys++xs)
 
 Cluster summary: 
 1 number of lemmas
@@ -421,9 +133,9 @@ Cluster summary:
 
 ------------------------------------
 Cluster 16
-lemma-12, half (n+n) = n
-lemma-39, subset2 xs ys => (union2 xs ys = ys)
-lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
+lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
+lemma-26, rev xs = qrev xs []
+lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
 
 Cluster summary: 
 3 number of lemmas
@@ -434,36 +146,38 @@ connString:dbname='hipspec' host='localhost'
 9 features are used...
 ------------------------------------
 Cluster 0
-lemma-12, half (n+n) = n
-lemma-39, subset2 xs ys => (union2 xs ys = ys)
-lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
+lemma-47, length (isort xs) = length xs
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 1
+lemma-17, rev (rev xs++ys) = (rev ys++xs)
+lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
+lemma-48, (n`elem`isort xs) => (n`elem`xs)
 
 Cluster summary: 
 3 number of lemmas
 
 ------------------------------------
-Cluster 1
-lemma-11, qrev xs ys = (rev xs++ys)
-lemma-13, sorted (isort xs)
-lemma-14, (n+S n) = S (n+n)
-lemma-19, even (length (xs++xs))
-lemma-34, exp n m = qexp n m b
-lemma-38, (n`elem`drop m xs) => (n`elem`xs)
-lemma-45, (n = m) => (n`elem`insert2 m xs)
-lemma-49, count n (isort xs) = count n xs
-lemma-5, length (rev (xs++ys)) = (length xs+length ys)
-lemma-6, length (qrev xs ys) = (length xs+length ys)
-lemma-9, rev (rev xs) = xs
-
-Cluster summary: 
-11 number of lemmas
-
-------------------------------------
 Cluster 2
-lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
+lemma-1, length (xs++ys) = length (ys++xs)
+lemma-22, half (length (xs++ys)) = half (length (ys++xs))
+lemma-23, even (n+m) = even (m+n)
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+lemma-27, revflat xs = qrevflat xs []
+lemma-28, rev (qrev xs []) = xs
+lemma-3, length (xs++xs) = double (length xs)
+lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+lemma-32, fac n = qfac n b
+lemma-33, (n*m) = mult2 n m Z
+lemma-36, (n`elem`ys) => (n`elem`(xs++ys))
 
 Cluster summary: 
-1 number of lemmas
+12 number of lemmas
 
 ------------------------------------
 Cluster 3
@@ -487,115 +201,6 @@ Cluster summary:
 
 ------------------------------------
 Cluster 5
-lemma-17, rev (rev xs++ys) = (rev ys++xs)
-lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
-lemma-48, (n`elem`isort xs) => (n`elem`xs)
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 6
-lemma-21, even (length (xs++ys)) = even (length (ys++xs))
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 7
-lemma-47, length (isort xs) = length xs
-lemma-7, drop n (drop m xs) = drop m (drop n xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 8
-lemma-29, rev (rev xs++[]) = xs
-lemma-44, n`elem`insert2 n xs
-lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 9
-lemma-15, even (n+n)
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 10
-lemma-1, length (xs++ys) = length (ys++xs)
-lemma-22, half (length (xs++ys)) = half (length (ys++xs))
-lemma-23, even (n+m) = even (m+n)
-lemma-24, even (length (xs++ys)) = even (length ys+length xs)
-lemma-27, revflat xs = qrevflat xs []
-lemma-28, rev (qrev xs []) = xs
-lemma-3, length (xs++xs) = double (length xs)
-lemma-30, qrev (qrev xs []) [] = xs
-lemma-31, rotate (length xs) xs = xs
-lemma-32, fac n = qfac n b
-lemma-33, (n*m) = mult2 n m Z
-lemma-36, (n`elem`ys) => (n`elem`(xs++ys))
-
-Cluster summary: 
-12 number of lemmas
-
-------------------------------------
-Cluster 11
-lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 12
-lemma-10, rev (rev xs++rev ys) = (ys++xs)
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 13
-lemma-25, half (n+m) = half (m+n)
-lemma-40, subset2 xs ys => (intersect2 xs ys = xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 14
-lemma-18, (rev (rev xs)++ys) = rev (rev (xs++ys))
-
-Cluster summary: 
-1 number of lemmas
-
-####################################################################
-
-connString:dbname='hipspec' host='localhost'
-9 features are used...
-------------------------------------
-Cluster 0
-lemma-1, length (xs++ys) = length (ys++xs)
-lemma-22, half (length (xs++ys)) = half (length (ys++xs))
-lemma-23, even (n+m) = even (m+n)
-lemma-24, even (length (xs++ys)) = even (length ys+length xs)
-lemma-27, revflat xs = qrevflat xs []
-lemma-28, rev (qrev xs []) = xs
-lemma-3, length (xs++xs) = double (length xs)
-lemma-30, qrev (qrev xs []) [] = xs
-lemma-31, rotate (length xs) xs = xs
-lemma-32, fac n = qfac n b
-lemma-33, (n*m) = mult2 n m Z
-lemma-36, (n`elem`ys) => (n`elem`(xs++ys))
-
-Cluster summary: 
-12 number of lemmas
-
-------------------------------------
-Cluster 1
 lemma-11, qrev xs ys = (rev xs++ys)
 lemma-13, sorted (isort xs)
 lemma-14, (n+S n) = S (n+n)
@@ -612,23 +217,14 @@ Cluster summary:
 11 number of lemmas
 
 ------------------------------------
-Cluster 3
-lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
-lemma-26, rev xs = qrev xs []
-lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 4
-lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
+Cluster 6
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
-Cluster 5
+Cluster 7
 lemma-29, rev (rev xs++[]) = xs
 lemma-44, n`elem`insert2 n xs
 lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
@@ -637,39 +233,22 @@ Cluster summary:
 3 number of lemmas
 
 ------------------------------------
-Cluster 6
+Cluster 9
 lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
-Cluster 7
-lemma-47, length (isort xs) = length xs
-lemma-7, drop n (drop m xs) = drop m (drop n xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 8
-lemma-17, rev (rev xs++ys) = (rev ys++xs)
-lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
-lemma-48, (n`elem`isort xs) => (n`elem`xs)
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
 Cluster 10
-lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+lemma-15, even (n+n)
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
 Cluster 11
-lemma-15, even (n+n)
+lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
 
 Cluster summary: 
 1 number of lemmas
@@ -698,6 +277,148 @@ Cluster summary:
 
 ------------------------------------
 Cluster 15
+lemma-12, half (n+n) = n
+lemma-39, subset2 xs ys => (union2 xs ys = ys)
+lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
+
+Cluster summary: 
+3 number of lemmas
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+9 features are used...
+------------------------------------
+Cluster 0
+lemma-11, qrev xs ys = (rev xs++ys)
+lemma-13, sorted (isort xs)
+lemma-14, (n+S n) = S (n+n)
+lemma-19, even (length (xs++xs))
+lemma-34, exp n m = qexp n m b
+lemma-38, (n`elem`drop m xs) => (n`elem`xs)
+lemma-45, (n = m) => (n`elem`insert2 m xs)
+lemma-49, count n (isort xs) = count n xs
+lemma-5, length (rev (xs++ys)) = (length xs+length ys)
+lemma-6, length (qrev xs ys) = (length xs+length ys)
+lemma-9, rev (rev xs) = xs
+
+Cluster summary: 
+11 number of lemmas
+
+------------------------------------
+Cluster 1
+lemma-47, length (isort xs) = length xs
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 2
+lemma-1, length (xs++ys) = length (ys++xs)
+lemma-22, half (length (xs++ys)) = half (length (ys++xs))
+lemma-23, even (n+m) = even (m+n)
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+lemma-27, revflat xs = qrevflat xs []
+lemma-28, rev (qrev xs []) = xs
+lemma-3, length (xs++xs) = double (length xs)
+lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+lemma-32, fac n = qfac n b
+lemma-33, (n*m) = mult2 n m Z
+lemma-36, (n`elem`ys) => (n`elem`(xs++ys))
+
+Cluster summary: 
+12 number of lemmas
+
+------------------------------------
+Cluster 4
+lemma-18, (rev (rev xs)++ys) = rev (rev (xs++ys))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 5
+lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 6
+lemma-17, rev (rev xs++ys) = (rev ys++xs)
+lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
+lemma-48, (n`elem`isort xs) => (n`elem`xs)
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 7
+lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 8
+lemma-12, half (n+n) = n
+lemma-39, subset2 xs ys => (union2 xs ys = ys)
+lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 9
+lemma-29, rev (rev xs++[]) = xs
+lemma-44, n`elem`insert2 n xs
+lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 10
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 11
+lemma-15, even (n+n)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 12
+lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
+lemma-26, rev xs = qrev xs []
+lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 13
+lemma-25, half (n+m) = half (m+n)
+lemma-40, subset2 xs ys => (intersect2 xs ys = xs)
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 14
+lemma-10, rev (rev xs++rev ys) = (ys++xs)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 19
 lemma-0, double n = (n+n)
 lemma-2, length (xs++ys) = (length ys+length xs)
 lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
@@ -706,6 +427,141 @@ lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
 
 Cluster summary: 
 5 number of lemmas
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+9 features are used...
+------------------------------------
+Cluster 0
+lemma-15, even (n+n)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 1
+lemma-1, length (xs++ys) = length (ys++xs)
+lemma-22, half (length (xs++ys)) = half (length (ys++xs))
+lemma-23, even (n+m) = even (m+n)
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+lemma-27, revflat xs = qrevflat xs []
+lemma-28, rev (qrev xs []) = xs
+lemma-3, length (xs++xs) = double (length xs)
+lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+lemma-32, fac n = qfac n b
+lemma-33, (n*m) = mult2 n m Z
+lemma-36, (n`elem`ys) => (n`elem`(xs++ys))
+
+Cluster summary: 
+12 number of lemmas
+
+------------------------------------
+Cluster 2
+lemma-11, qrev xs ys = (rev xs++ys)
+lemma-13, sorted (isort xs)
+lemma-14, (n+S n) = S (n+n)
+lemma-19, even (length (xs++xs))
+lemma-34, exp n m = qexp n m b
+lemma-38, (n`elem`drop m xs) => (n`elem`xs)
+lemma-45, (n = m) => (n`elem`insert2 m xs)
+lemma-49, count n (isort xs) = count n xs
+lemma-5, length (rev (xs++ys)) = (length xs+length ys)
+lemma-6, length (qrev xs ys) = (length xs+length ys)
+lemma-9, rev (rev xs) = xs
+
+Cluster summary: 
+11 number of lemmas
+
+------------------------------------
+Cluster 3
+lemma-0, double n = (n+n)
+lemma-2, length (xs++ys) = (length ys+length xs)
+lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
+lemma-4, length (rev xs) = length xs
+lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 4
+lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
+lemma-26, rev xs = qrev xs []
+lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 5
+lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 6
+lemma-17, rev (rev xs++ys) = (rev ys++xs)
+lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
+lemma-48, (n`elem`isort xs) => (n`elem`xs)
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 7
+lemma-47, length (isort xs) = length xs
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 8
+lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 10
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 11
+lemma-29, rev (rev xs++[]) = xs
+lemma-44, n`elem`insert2 n xs
+lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 12
+lemma-10, rev (rev xs++rev ys) = (ys++xs)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 13
+lemma-25, half (n+m) = half (m+n)
+lemma-40, subset2 xs ys => (intersect2 xs ys = xs)
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 14
+lemma-18, (rev (rev xs)++ys) = rev (rev (xs++ys))
+
+Cluster summary: 
+1 number of lemmas
 
 ------------------------------------
 Cluster 16
@@ -757,46 +613,6 @@ Cluster summary:
 
 ------------------------------------
 Cluster 3
-lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
-lemma-26, rev xs = qrev xs []
-lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 4
-lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 5
-lemma-29, rev (rev xs++[]) = xs
-lemma-44, n`elem`insert2 n xs
-lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 6
-lemma-47, length (isort xs) = length xs
-lemma-7, drop n (drop m xs) = drop m (drop n xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 7
-lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 8
 lemma-17, rev (rev xs++ys) = (rev ys++xs)
 lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
 lemma-48, (n`elem`isort xs) => (n`elem`xs)
@@ -805,7 +621,68 @@ Cluster summary:
 3 number of lemmas
 
 ------------------------------------
+Cluster 4
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 5
+lemma-18, (rev (rev xs)++ys) = rev (rev (xs++ys))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 6
+lemma-29, rev (rev xs++[]) = xs
+lemma-44, n`elem`insert2 n xs
+lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 7
+lemma-47, length (isort xs) = length xs
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 8
+lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
+lemma-26, rev xs = qrev xs []
+lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
 Cluster 9
+lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 10
+lemma-15, even (n+n)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 11
+lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 12
 lemma-12, half (n+n) = n
 lemma-39, subset2 xs ys => (union2 xs ys = ys)
 lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
@@ -814,40 +691,19 @@ Cluster summary:
 3 number of lemmas
 
 ------------------------------------
-Cluster 10
-lemma-21, even (length (xs++ys)) = even (length (ys++xs))
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 11
-lemma-15, even (n+n)
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 12
+Cluster 13
 lemma-10, rev (rev xs++rev ys) = (ys++xs)
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
-Cluster 13
+Cluster 14
 lemma-25, half (n+m) = half (m+n)
 lemma-40, subset2 xs ys => (intersect2 xs ys = xs)
 
 Cluster summary: 
 2 number of lemmas
-
-------------------------------------
-Cluster 14
-lemma-18, (rev (rev xs)++ys) = rev (rev (xs++ys))
-
-Cluster summary: 
-1 number of lemmas
 
 ------------------------------------
 Cluster 19
@@ -866,92 +722,13 @@ connString:dbname='hipspec' host='localhost'
 9 features are used...
 ------------------------------------
 Cluster 0
-lemma-12, half (n+n) = n
-lemma-39, subset2 xs ys => (union2 xs ys = ys)
-lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 1
-lemma-11, qrev xs ys = (rev xs++ys)
-lemma-13, sorted (isort xs)
-lemma-14, (n+S n) = S (n+n)
-lemma-19, even (length (xs++xs))
-lemma-34, exp n m = qexp n m b
-lemma-38, (n`elem`drop m xs) => (n`elem`xs)
-lemma-45, (n = m) => (n`elem`insert2 m xs)
-lemma-49, count n (isort xs) = count n xs
-lemma-5, length (rev (xs++ys)) = (length xs+length ys)
-lemma-6, length (qrev xs ys) = (length xs+length ys)
-lemma-9, rev (rev xs) = xs
-
-Cluster summary: 
-11 number of lemmas
-
-------------------------------------
-Cluster 2
-lemma-21, even (length (xs++ys)) = even (length (ys++xs))
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 3
-lemma-0, double n = (n+n)
-lemma-2, length (xs++ys) = (length ys+length xs)
-lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
-lemma-4, length (rev xs) = length xs
-lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
-
-Cluster summary: 
-5 number of lemmas
-
-------------------------------------
-Cluster 4
-lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
-lemma-26, rev xs = qrev xs []
-lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 5
-lemma-17, rev (rev xs++ys) = (rev ys++xs)
-lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
-lemma-48, (n`elem`isort xs) => (n`elem`xs)
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 6
 lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
-Cluster 7
-lemma-47, length (isort xs) = length xs
-lemma-7, drop n (drop m xs) = drop m (drop n xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 8
-lemma-29, rev (rev xs++[]) = xs
-lemma-44, n`elem`insert2 n xs
-lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 9
+Cluster 1
 lemma-1, length (xs++ys) = length (ys++xs)
 lemma-22, half (length (xs++ys)) = half (length (ys++xs))
 lemma-23, even (n+m) = even (m+n)
@@ -969,15 +746,94 @@ Cluster summary:
 12 number of lemmas
 
 ------------------------------------
+Cluster 2
+lemma-11, qrev xs ys = (rev xs++ys)
+lemma-13, sorted (isort xs)
+lemma-14, (n+S n) = S (n+n)
+lemma-19, even (length (xs++xs))
+lemma-34, exp n m = qexp n m b
+lemma-38, (n`elem`drop m xs) => (n`elem`xs)
+lemma-45, (n = m) => (n`elem`insert2 m xs)
+lemma-49, count n (isort xs) = count n xs
+lemma-5, length (rev (xs++ys)) = (length xs+length ys)
+lemma-6, length (qrev xs ys) = (length xs+length ys)
+lemma-9, rev (rev xs) = xs
+
+Cluster summary: 
+11 number of lemmas
+
+------------------------------------
+Cluster 3
+lemma-12, half (n+n) = n
+lemma-39, subset2 xs ys => (union2 xs ys = ys)
+lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 4
+lemma-0, double n = (n+n)
+lemma-2, length (xs++ys) = (length ys+length xs)
+lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
+lemma-4, length (rev xs) = length xs
+lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 5
+lemma-29, rev (rev xs++[]) = xs
+lemma-44, n`elem`insert2 n xs
+lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 6
+lemma-47, length (isort xs) = length xs
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 7
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 8
+lemma-17, rev (rev xs++ys) = (rev ys++xs)
+lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
+lemma-48, (n`elem`isort xs) => (n`elem`xs)
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 9
+lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
+lemma-26, rev xs = qrev xs []
+lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
 Cluster 10
-lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
+lemma-15, even (n+n)
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
 Cluster 11
-lemma-15, even (n+n)
+lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
 
 Cluster summary: 
 1 number of lemmas
@@ -1010,26 +866,24 @@ connString:dbname='hipspec' host='localhost'
 9 features are used...
 ------------------------------------
 Cluster 0
-lemma-0, double n = (n+n)
-lemma-2, length (xs++ys) = (length ys+length xs)
-lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
-lemma-4, length (rev xs) = length xs
-lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
+lemma-1, length (xs++ys) = length (ys++xs)
+lemma-22, half (length (xs++ys)) = half (length (ys++xs))
+lemma-23, even (n+m) = even (m+n)
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+lemma-27, revflat xs = qrevflat xs []
+lemma-28, rev (qrev xs []) = xs
+lemma-3, length (xs++xs) = double (length xs)
+lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+lemma-32, fac n = qfac n b
+lemma-33, (n*m) = mult2 n m Z
+lemma-36, (n`elem`ys) => (n`elem`(xs++ys))
 
 Cluster summary: 
-5 number of lemmas
+12 number of lemmas
 
 ------------------------------------
 Cluster 1
-lemma-12, half (n+n) = n
-lemma-39, subset2 xs ys => (union2 xs ys = ys)
-lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 2
 lemma-11, qrev xs ys = (rev xs++ys)
 lemma-13, sorted (isort xs)
 lemma-14, (n+S n) = S (n+n)
@@ -1056,30 +910,13 @@ Cluster summary:
 
 ------------------------------------
 Cluster 4
-lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
 Cluster 5
-lemma-29, rev (rev xs++[]) = xs
-lemma-44, n`elem`insert2 n xs
-lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 6
-lemma-47, length (isort xs) = length xs
-lemma-7, drop n (drop m xs) = drop m (drop n xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 7
 lemma-17, rev (rev xs++ys) = (rev ys++xs)
 lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
 lemma-48, (n`elem`isort xs) => (n`elem`xs)
@@ -1088,47 +925,46 @@ Cluster summary:
 3 number of lemmas
 
 ------------------------------------
-Cluster 8
-lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
+Cluster 6
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
 
 Cluster summary: 
 1 number of lemmas
+
+------------------------------------
+Cluster 7
+lemma-29, rev (rev xs++[]) = xs
+lemma-44, n`elem`insert2 n xs
+lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
+
+Cluster summary: 
+3 number of lemmas
 
 ------------------------------------
 Cluster 9
-lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
+lemma-47, length (isort xs) = length xs
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
 
 Cluster summary: 
-1 number of lemmas
+2 number of lemmas
 
 ------------------------------------
 Cluster 10
-lemma-1, length (xs++ys) = length (ys++xs)
-lemma-22, half (length (xs++ys)) = half (length (ys++xs))
-lemma-23, even (n+m) = even (m+n)
-lemma-24, even (length (xs++ys)) = even (length ys+length xs)
-lemma-27, revflat xs = qrevflat xs []
-lemma-28, rev (qrev xs []) = xs
-lemma-3, length (xs++xs) = double (length xs)
-lemma-30, qrev (qrev xs []) [] = xs
-lemma-31, rotate (length xs) xs = xs
-lemma-32, fac n = qfac n b
-lemma-33, (n*m) = mult2 n m Z
-lemma-36, (n`elem`ys) => (n`elem`(xs++ys))
-
-Cluster summary: 
-12 number of lemmas
-
-------------------------------------
-Cluster 11
 lemma-15, even (n+n)
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
-Cluster 12
+Cluster 11
 lemma-10, rev (rev xs++rev ys) = (ys++xs)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 12
+lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
 
 Cluster summary: 
 1 number of lemmas
@@ -1148,19 +984,50 @@ lemma-18, (rev (rev xs)++ys) = rev (rev (xs++ys))
 Cluster summary: 
 1 number of lemmas
 
+------------------------------------
+Cluster 15
+lemma-0, double n = (n+n)
+lemma-2, length (xs++ys) = (length ys+length xs)
+lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
+lemma-4, length (rev xs) = length xs
+lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 16
+lemma-12, half (n+n) = n
+lemma-39, subset2 xs ys => (union2 xs ys = ys)
+lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
+
+Cluster summary: 
+3 number of lemmas
+
 ####################################################################
 
 connString:dbname='hipspec' host='localhost'
 9 features are used...
 ------------------------------------
 Cluster 0
-lemma-15, even (n+n)
+lemma-29, rev (rev xs++[]) = xs
+lemma-44, n`elem`insert2 n xs
+lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
 
 Cluster summary: 
-1 number of lemmas
+3 number of lemmas
 
 ------------------------------------
 Cluster 1
+lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
+lemma-26, rev xs = qrev xs []
+lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 2
 lemma-1, length (xs++ys) = length (ys++xs)
 lemma-22, half (length (xs++ys)) = half (length (ys++xs))
 lemma-23, even (n+m) = even (m+n)
@@ -1178,7 +1045,18 @@ Cluster summary:
 12 number of lemmas
 
 ------------------------------------
-Cluster 2
+Cluster 3
+lemma-0, double n = (n+n)
+lemma-2, length (xs++ys) = (length ys+length xs)
+lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
+lemma-4, length (rev xs) = length xs
+lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 4
 lemma-11, qrev xs ys = (rev xs++ys)
 lemma-13, sorted (isort xs)
 lemma-14, (n+S n) = S (n+n)
@@ -1195,38 +1073,7 @@ Cluster summary:
 11 number of lemmas
 
 ------------------------------------
-Cluster 3
-lemma-10, rev (rev xs++rev ys) = (ys++xs)
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
 Cluster 5
-lemma-25, half (n+m) = half (m+n)
-lemma-40, subset2 xs ys => (intersect2 xs ys = xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 6
-lemma-21, even (length (xs++ys)) = even (length (ys++xs))
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 7
-lemma-29, rev (rev xs++[]) = xs
-lemma-44, n`elem`insert2 n xs
-lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 8
 lemma-47, length (isort xs) = length xs
 lemma-7, drop n (drop m xs) = drop m (drop n xs)
 
@@ -1234,7 +1081,7 @@ Cluster summary:
 2 number of lemmas
 
 ------------------------------------
-Cluster 9
+Cluster 6
 lemma-17, rev (rev xs++ys) = (rev ys++xs)
 lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
 lemma-48, (n`elem`isort xs) => (n`elem`xs)
@@ -1243,27 +1090,47 @@ Cluster summary:
 3 number of lemmas
 
 ------------------------------------
-Cluster 11
+Cluster 7
 lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
-Cluster 12
+Cluster 8
 lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
-Cluster 13
-lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
-lemma-26, rev xs = qrev xs []
-lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
+Cluster 9
+lemma-15, even (n+n)
 
 Cluster summary: 
-3 number of lemmas
+1 number of lemmas
+
+------------------------------------
+Cluster 10
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 12
+lemma-10, rev (rev xs++rev ys) = (ys++xs)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 13
+lemma-25, half (n+m) = half (m+n)
+lemma-40, subset2 xs ys => (intersect2 xs ys = xs)
+
+Cluster summary: 
+2 number of lemmas
 
 ------------------------------------
 Cluster 14
@@ -1281,23 +1148,38 @@ lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
 Cluster summary: 
 3 number of lemmas
 
-------------------------------------
-Cluster 19
-lemma-0, double n = (n+n)
-lemma-2, length (xs++ys) = (length ys+length xs)
-lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
-lemma-4, length (rev xs) = length xs
-lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
-
-Cluster summary: 
-5 number of lemmas
-
 ####################################################################
 
 connString:dbname='hipspec' host='localhost'
 9 features are used...
 ------------------------------------
 Cluster 0
+lemma-12, half (n+n) = n
+lemma-39, subset2 xs ys => (union2 xs ys = ys)
+lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 1
+lemma-17, rev (rev xs++ys) = (rev ys++xs)
+lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
+lemma-48, (n`elem`isort xs) => (n`elem`xs)
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 2
+lemma-25, half (n+m) = half (m+n)
+lemma-40, subset2 xs ys => (intersect2 xs ys = xs)
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 3
 lemma-11, qrev xs ys = (rev xs++ys)
 lemma-13, sorted (isort xs)
 lemma-14, (n+S n) = S (n+n)
@@ -1314,33 +1196,6 @@ Cluster summary:
 11 number of lemmas
 
 ------------------------------------
-Cluster 1
-lemma-12, half (n+n) = n
-lemma-39, subset2 xs ys => (union2 xs ys = ys)
-lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
-Cluster 2
-lemma-21, even (length (xs++ys)) = even (length (ys++xs))
-
-Cluster summary: 
-1 number of lemmas
-
-------------------------------------
-Cluster 3
-lemma-0, double n = (n+n)
-lemma-2, length (xs++ys) = (length ys+length xs)
-lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
-lemma-4, length (rev xs) = length xs
-lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
-
-Cluster summary: 
-5 number of lemmas
-
-------------------------------------
 Cluster 4
 lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
 lemma-26, rev xs = qrev xs []
@@ -1351,6 +1206,21 @@ Cluster summary:
 
 ------------------------------------
 Cluster 5
+lemma-47, length (isort xs) = length xs
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 6
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 7
 lemma-29, rev (rev xs++[]) = xs
 lemma-44, n`elem`insert2 n xs
 lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
@@ -1359,35 +1229,22 @@ Cluster summary:
 3 number of lemmas
 
 ------------------------------------
-Cluster 6
-lemma-47, length (isort xs) = length xs
-lemma-7, drop n (drop m xs) = drop m (drop n xs)
-
-Cluster summary: 
-2 number of lemmas
-
-------------------------------------
-Cluster 7
+Cluster 8
 lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
 
 Cluster summary: 
 1 number of lemmas
 
 ------------------------------------
-Cluster 8
-lemma-17, rev (rev xs++ys) = (rev ys++xs)
-lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
-lemma-48, (n`elem`isort xs) => (n`elem`xs)
-
-Cluster summary: 
-3 number of lemmas
-
-------------------------------------
 Cluster 9
-lemma-15, even (n+n)
+lemma-0, double n = (n+n)
+lemma-2, length (xs++ys) = (length ys+length xs)
+lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
+lemma-4, length (rev xs) = length xs
+lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
 
 Cluster summary: 
-1 number of lemmas
+5 number of lemmas
 
 ------------------------------------
 Cluster 10
@@ -1409,7 +1266,7 @@ Cluster summary:
 
 ------------------------------------
 Cluster 11
-lemma-10, rev (rev xs++rev ys) = (ys++xs)
+lemma-15, even (n+n)
 
 Cluster summary: 
 1 number of lemmas
@@ -1417,6 +1274,140 @@ Cluster summary:
 ------------------------------------
 Cluster 12
 lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 13
+lemma-10, rev (rev xs++rev ys) = (ys++xs)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 14
+lemma-18, (rev (rev xs)++ys) = rev (rev (xs++ys))
+
+Cluster summary: 
+1 number of lemmas
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+9 features are used...
+------------------------------------
+Cluster 0
+lemma-0, double n = (n+n)
+lemma-2, length (xs++ys) = (length ys+length xs)
+lemma-35, (n`elem`xs) => (n`elem`(xs++ys))
+lemma-4, length (rev xs) = length xs
+lemma-41, (n`elem`xs) => (n`elem`union2 xs ys)
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 1
+lemma-11, qrev xs ys = (rev xs++ys)
+lemma-13, sorted (isort xs)
+lemma-14, (n+S n) = S (n+n)
+lemma-19, even (length (xs++xs))
+lemma-34, exp n m = qexp n m b
+lemma-38, (n`elem`drop m xs) => (n`elem`xs)
+lemma-45, (n = m) => (n`elem`insert2 m xs)
+lemma-49, count n (isort xs) = count n xs
+lemma-5, length (rev (xs++ys)) = (length xs+length ys)
+lemma-6, length (qrev xs ys) = (length xs+length ys)
+lemma-9, rev (rev xs) = xs
+
+Cluster summary: 
+11 number of lemmas
+
+------------------------------------
+Cluster 2
+lemma-1, length (xs++ys) = length (ys++xs)
+lemma-22, half (length (xs++ys)) = half (length (ys++xs))
+lemma-23, even (n+m) = even (m+n)
+lemma-24, even (length (xs++ys)) = even (length ys+length xs)
+lemma-27, revflat xs = qrevflat xs []
+lemma-28, rev (qrev xs []) = xs
+lemma-3, length (xs++xs) = double (length xs)
+lemma-30, qrev (qrev xs []) [] = xs
+lemma-31, rotate (length xs) xs = xs
+lemma-32, fac n = qfac n b
+lemma-33, (n*m) = mult2 n m Z
+lemma-36, (n`elem`ys) => (n`elem`(xs++ys))
+
+Cluster summary: 
+12 number of lemmas
+
+------------------------------------
+Cluster 3
+lemma-16, rev (rev (xs++ys)) = (rev (rev xs)++rev (rev ys))
+lemma-26, rev xs = qrev xs []
+lemma-37, (n`elem`xs) => ((n`elem`ys) => (n`elem`(xs++ys)))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 4
+lemma-21, even (length (xs++ys)) = even (length (ys++xs))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 5
+lemma-17, rev (rev xs++ys) = (rev ys++xs)
+lemma-42, (n`elem`xs) => (n`elem`union2 ys xs)
+lemma-48, (n`elem`isort xs) => (n`elem`xs)
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 6
+lemma-47, length (isort xs) = length xs
+lemma-7, drop n (drop m xs) = drop m (drop n xs)
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 7
+lemma-46, unequal n m => ((n`elem`insert2 m xs) = (n`elem`xs))
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 8
+lemma-20, rotate (length xs) (xs++ys) = (ys++xs)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 9
+lemma-29, rev (rev xs++[]) = xs
+lemma-44, n`elem`insert2 n xs
+lemma-8, drop o (drop n (drop m xs)) = drop m (drop n (drop o xs))
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 11
+lemma-15, even (n+n)
+
+Cluster summary: 
+1 number of lemmas
+
+------------------------------------
+Cluster 12
+lemma-10, rev (rev xs++rev ys) = (ys++xs)
 
 Cluster summary: 
 1 number of lemmas
@@ -1435,4 +1426,13 @@ lemma-18, (rev (rev xs)++ys) = rev (rev (xs++ys))
 
 Cluster summary: 
 1 number of lemmas
+
+------------------------------------
+Cluster 15
+lemma-12, half (n+n) = n
+lemma-39, subset2 xs ys => (union2 xs ys = ys)
+lemma-43, (n`elem`xs) => ((n`elem`ys) => (n`elem`intersect2 xs ys))
+
+Cluster summary: 
+3 number of lemmas
 
