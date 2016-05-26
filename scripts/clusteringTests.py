@@ -11,15 +11,15 @@ def main():
 
   print "Processing %i combinations for clustering" % n
   
-  os.system("rm ./clustering_analytics/*")
+  os.system("rm ./clustering_funcs/*")
 
   for s in schemes:
     for d in depths:
       for c in clusters:
         for n in range(0,10):
-          os.system("python ./scripts/unsupervised.py %i ./data/library.tiplib %i %s >> ./clustering_analytics/%s_d%i_c%i.txt" % (c,d,s,s,d,c))
+          os.system("python ./scripts/unsupervised-functions.py %i ./data/library.tiplib %i %s >> ./clustering_funcs/%s_d%i_c%i.txt" % (c,d,s,s,d,c))
           if n < 9:
-            os.system("echo \"####################################################################\n\" >> ./clustering_analytics/%s_d%i_c%i.txt " % (s,d,c))
+            os.system("echo \"####################################################################\n\" >> ./clustering_funcs/%s_d%i_c%i.txt " % (s,d,c))
 
 if __name__ == '__main__':
   main()
