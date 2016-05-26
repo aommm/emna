@@ -4,7 +4,7 @@ def main():
   # Loop over all possible feature extraction schemes
   # TODO: any point with depth=0?
 
-  schemes = ["als","afs","ala","afa"]
+  schemes = ["fs","fa","afa","afa"]
   depths= [1,2,3]
   clusters = [2,8,20]
   n = len(depths)*len(clusters)*len(schemes)

@@ -1,0 +1,54 @@
+connString:dbname='hipspec' host='localhost'
+finished
+
+invoked extractFeatures with args ['./data/library.tiplib', '1', 'als']
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+finished
+
+invoked extractFeatures with args ['./data/library.tiplib', '1', 'als']
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+finished
+
+invoked extractFeatures with args ['./data/library.tiplib', '1', 'als']
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+finished
+
+invoked extractFeatures with args ['./data/library.tiplib', '1', 'als']
+####################################################################
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+finished
+
+invoked extractFeatures with args ['./data/library.tiplib', '1', 'als']
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+finished
+
+invoked extractFeatures with args ['./data/library.tiplib', '1', 'als']
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+finished
+
+invoked extractFeatures with args ['./data/library.tiplib', '1', 'als']
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+finished
+
+invoked extractFeatures with args ['./data/library.tiplib', '1', 'als']
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+finished
+
+invoked extractFeatures with args ['./data/library.tiplib', '1', 'als']
