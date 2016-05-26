@@ -1,0 +1,818 @@
+connString:dbname='hipspec' host='localhost'
+78 features are used...
+------------------------------------
+Cluster 0
+plus
+qrev
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 1
+insert2
+intersect2
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 2
+exp
+mult
+rotate
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 3
+double
+drop
+elem
+half
+le
+one
+qexp
+union2
+
+Cluster summary: 
+8 number of lemmas
+
+------------------------------------
+Cluster 4
+isort
+length
+qfac
+subset2
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 5
+count
+equal
+even
+qrevflat
+revflat
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 6
+mult2
+rev
+sorted
+unequal
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 7
+append
+fac
+
+Cluster summary: 
+2 number of lemmas
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+78 features are used...
+------------------------------------
+Cluster 0
+isort
+length
+qfac
+subset2
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 1
+count
+equal
+even
+mult2
+qrevflat
+revflat
+
+Cluster summary: 
+6 number of lemmas
+
+------------------------------------
+Cluster 2
+drop
+elem
+half
+le
+one
+qexp
+unequal
+union2
+
+Cluster summary: 
+8 number of lemmas
+
+------------------------------------
+Cluster 3
+exp
+mult
+rotate
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 4
+plus
+qrev
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 5
+append
+fac
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 6
+double
+rev
+sorted
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 7
+insert2
+intersect2
+
+Cluster summary: 
+2 number of lemmas
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+78 features are used...
+------------------------------------
+Cluster 0
+insert2
+intersect2
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 1
+exp
+mult
+rotate
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 2
+double
+drop
+elem
+half
+le
+one
+qexp
+union2
+
+Cluster summary: 
+8 number of lemmas
+
+------------------------------------
+Cluster 3
+count
+equal
+even
+qrevflat
+revflat
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 4
+isort
+length
+qfac
+subset2
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 5
+append
+fac
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 6
+mult2
+rev
+sorted
+unequal
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 7
+plus
+qrev
+
+Cluster summary: 
+2 number of lemmas
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+78 features are used...
+------------------------------------
+Cluster 0
+append
+fac
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 1
+double
+drop
+elem
+half
+le
+one
+qexp
+union2
+
+Cluster summary: 
+8 number of lemmas
+
+------------------------------------
+Cluster 2
+count
+equal
+even
+qrevflat
+revflat
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 3
+exp
+mult
+rotate
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 4
+isort
+length
+qfac
+subset2
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 5
+plus
+qrev
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 6
+mult2
+rev
+sorted
+unequal
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 7
+insert2
+intersect2
+
+Cluster summary: 
+2 number of lemmas
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+78 features are used...
+------------------------------------
+Cluster 0
+double
+drop
+elem
+half
+le
+one
+qexp
+union2
+
+Cluster summary: 
+8 number of lemmas
+
+------------------------------------
+Cluster 1
+isort
+length
+qfac
+subset2
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 2
+exp
+mult
+rotate
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 3
+count
+equal
+even
+mult2
+revflat
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 4
+append
+fac
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 5
+plus
+qrev
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 6
+qrevflat
+rev
+sorted
+unequal
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 7
+insert2
+intersect2
+
+Cluster summary: 
+2 number of lemmas
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+78 features are used...
+------------------------------------
+Cluster 0
+plus
+qrev
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 1
+double
+half
+one
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 2
+count
+equal
+even
+mult2
+revflat
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 3
+isort
+length
+qfac
+subset2
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 4
+exp
+mult
+rotate
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 5
+append
+fac
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 6
+qrevflat
+rev
+sorted
+unequal
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 7
+drop
+elem
+insert2
+intersect2
+le
+qexp
+union2
+
+Cluster summary: 
+7 number of lemmas
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+78 features are used...
+------------------------------------
+Cluster 0
+drop
+elem
+half
+le
+one
+qexp
+unequal
+union2
+
+Cluster summary: 
+8 number of lemmas
+
+------------------------------------
+Cluster 1
+count
+equal
+even
+mult2
+qrevflat
+revflat
+
+Cluster summary: 
+6 number of lemmas
+
+------------------------------------
+Cluster 2
+exp
+mult
+rotate
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 3
+isort
+length
+qfac
+subset2
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 4
+plus
+qrev
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 5
+append
+fac
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 6
+double
+rev
+sorted
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 7
+insert2
+intersect2
+
+Cluster summary: 
+2 number of lemmas
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+78 features are used...
+------------------------------------
+Cluster 0
+exp
+mult
+rotate
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 1
+double
+drop
+elem
+half
+le
+one
+qexp
+union2
+
+Cluster summary: 
+8 number of lemmas
+
+------------------------------------
+Cluster 2
+count
+equal
+even
+qrevflat
+revflat
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 3
+append
+fac
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 4
+isort
+length
+qfac
+subset2
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 5
+insert2
+intersect2
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 6
+plus
+qrev
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 7
+mult2
+rev
+sorted
+unequal
+
+Cluster summary: 
+4 number of lemmas
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+78 features are used...
+------------------------------------
+Cluster 0
+plus
+qrev
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 1
+insert2
+intersect2
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 2
+count
+equal
+even
+mult2
+revflat
+
+Cluster summary: 
+5 number of lemmas
+
+------------------------------------
+Cluster 3
+double
+drop
+elem
+half
+le
+one
+qexp
+union2
+
+Cluster summary: 
+8 number of lemmas
+
+------------------------------------
+Cluster 4
+exp
+mult
+rotate
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 5
+qrevflat
+rev
+sorted
+unequal
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 6
+isort
+length
+qfac
+subset2
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 7
+append
+fac
+
+Cluster summary: 
+2 number of lemmas
+
+####################################################################
+
+connString:dbname='hipspec' host='localhost'
+78 features are used...
+------------------------------------
+Cluster 0
+double
+rev
+sorted
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 1
+drop
+elem
+half
+le
+one
+qexp
+unequal
+union2
+
+Cluster summary: 
+8 number of lemmas
+
+------------------------------------
+Cluster 2
+count
+equal
+even
+mult2
+qrevflat
+revflat
+
+Cluster summary: 
+6 number of lemmas
+
+------------------------------------
+Cluster 3
+isort
+length
+qfac
+subset2
+
+Cluster summary: 
+4 number of lemmas
+
+------------------------------------
+Cluster 4
+plus
+qrev
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 5
+append
+fac
+
+Cluster summary: 
+2 number of lemmas
+
+------------------------------------
+Cluster 6
+exp
+mult
+rotate
+
+Cluster summary: 
+3 number of lemmas
+
+------------------------------------
+Cluster 7
+insert2
+intersect2
+
+Cluster summary: 
+2 number of lemmas
+

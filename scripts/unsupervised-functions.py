@@ -15,8 +15,6 @@ def run():
 
   print "%i features are used..." % len(v.get_feature_names())
 
-  print features
-
   x = clf.fit_predict(features)
   xy = zip(x,y)
   
@@ -40,8 +38,6 @@ def run_extract_features(args):
   # Populate SQL db with features for this scheme
   extractFeatures = sh.Command("./scripts/extractFunctionFeatures")
   out = extractFeatures(*args)
-  print out
-  print "invoked extractFeatures with args",args
 
 
 def main():
